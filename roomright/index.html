@@ -10,7 +10,7 @@
 <style>
 /* Layout: search and a live architect's model of campus share the first screen; residence cards each carry
    their own model building; then a playable Allocation Guard, how escrow works, and a closing call to book.
-   Signature: an isometric white scale model where every window is one real bed, lit red when it is free. */
+   Signature: an isometric white scale model of Maria and Camille where every window is one real bed, lit red when free. */
 :root {
   --red: #B5121B;          /* Lancaster red: actions, free beds */
   --red-deep: #8E0D15;
@@ -471,118 +471,279 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
   *, *::before, *::after { animation: none !important; transition: none !important; }
   .hl path { stroke-dashoffset: 0; }
 }
+
+/* ---------- Account chip ---------- */
+.who { display: inline-flex; align-items: center; gap: 8px; font-size: .85rem; font-weight: 700; padding: 5px 5px 5px 13px; background: var(--canvas); border-radius: 999px; margin-left: 6px; white-space: nowrap; }
+.who button { background: var(--card); padding: 6px 11px; font-size: .8rem; box-shadow: inset 0 0 0 1px var(--line); color: var(--fg); }
+.who button:hover { background: var(--fg); color: var(--bg); }
+.nav .btn { color: #FFFFFF; background: var(--red); padding: 9px 16px; margin-left: 6px; }
+.nav .btn:hover { color: #FFFFFF; background: var(--red-deep); }
+
+/* ---------- Finder ---------- */
+.f-price b { display: block; font-family: var(--f-display); font-size: 1.5rem; font-weight: 800; letter-spacing: -.02em; line-height: 1.1; }
+.f-price small { color: var(--muted); font-size: .82rem; }
+.f-note { margin: 0; font-size: .85rem; color: var(--muted); }
+.win.dim { opacity: .28; }
+
+/* ---------- Room types ---------- */
+.section { padding-block: clamp(32px, 5vw, 60px); }
+.types { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+.tcard { background: var(--card); border-radius: var(--r-lg); box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--line); padding: 22px; display: grid; gap: 12px; align-content: start; transition: transform .35s var(--spring), box-shadow .35s; }
+.tcard:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg), inset 0 0 0 1px var(--line); }
+.tcard.full { background: var(--canvas); box-shadow: inset 0 0 0 1px var(--line); }
+.tc-top { display: flex; justify-content: space-between; align-items: center; gap: 8px; min-height: 28px; }
+.beds-ico { display: flex; gap: 5px; }
+.beds-ico i { width: 28px; height: 18px; border-radius: 5px 5px 3px 3px; background: var(--red); position: relative; }
+.beds-ico i::before { content: ""; position: absolute; left: 3px; top: 3px; width: 8px; height: 5px; border-radius: 2px; background: #FFFFFF; opacity: .85; }
+.tcard.full .beds-ico i { background: var(--line-2); }
+.tcard h3 { font-size: 1.3rem; font-weight: 800; }
+.tcard .p { font-family: var(--f-display); font-size: 1.75rem; font-weight: 800; letter-spacing: -.03em; line-height: 1; }
+.tcard .p small { font-family: var(--f-body); font-size: .82rem; font-weight: 500; color: var(--muted); letter-spacing: 0; }
+.tcard .avail { grid-column: auto; }
+
+/* ---------- Hostels ---------- */
+.h-facts { display: flex; flex-wrap: wrap; gap: 6px; }
+.h-mix { display: grid; gap: 6px; font-size: .9rem; margin: 0; }
+.h-mix div { display: flex; justify-content: space-between; gap: 12px; padding: 8px 12px; background: var(--canvas); border-radius: var(--r-sm); }
+.h-mix dt { color: var(--muted); }
+.h-mix dd { margin: 0; font-weight: 700; }
+.info { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 22px; }
+.info .panel h3 { font-size: 1.35rem; font-weight: 800; }
+.ticks { list-style: none; margin: 0; padding: 0; display: grid; gap: 10px; font-size: .95rem; }
+.ticks li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; }
+.ticks li::before { content: ""; width: 8px; height: 8px; margin-top: 8px; border-radius: 50%; background: var(--red); }
+.steps.five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+
+/* ---------- Sign in ---------- */
+.signin { display: grid; grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); gap: 26px; align-items: start; max-width: 980px; }
+.roles { display: grid; gap: 10px; }
+.role { text-align: left; border: 0; border-radius: var(--r-lg); padding: 16px 18px; box-shadow: inset 0 0 0 1.5px var(--line); background: var(--card); cursor: pointer; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 2px 14px; align-items: center; transition: transform .25s var(--spring); }
+.role:hover { transform: translateX(3px); }
+.role[aria-selected="true"] { box-shadow: inset 0 0 0 2px var(--red); background: var(--red-soft); }
+.role .ico { grid-row: span 2; width: 42px; height: 42px; border-radius: 12px; background: var(--canvas); color: var(--red); display: grid; place-items: center; }
+.role[aria-selected="true"] .ico { background: var(--red); color: #FFFFFF; }
+.role b { font-weight: 800; font-size: 1.02rem; }
+.role span { font-size: .86rem; color: var(--muted); }
+.demo-note { background: var(--canvas); border-radius: var(--r-md); padding: 12px 14px; font-size: .86rem; color: var(--muted); margin: 0; }
+.demo-note code { font-family: inherit; font-weight: 800; color: var(--fg); background: var(--card); padding: 2px 7px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); }
+
+/* ---------- My application ---------- */
+.me-grid { display: grid; grid-template-columns: minmax(0, 1.1fr) minmax(0, .9fr); gap: 22px; align-items: start; }
+.stack { display: grid; gap: 22px; min-width: 0; }
+.appid { font-family: var(--f-display); font-weight: 800; font-size: 1.7rem; letter-spacing: .01em; line-height: 1.1; }
+.track { list-style: none; margin: 4px 0 0; padding: 0; display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.track li { position: relative; padding-top: 26px; font-size: .84rem; font-weight: 700; color: var(--faint); }
+.track li small { display: block; font-weight: 500; font-size: .76rem; }
+.track li::before { content: ""; position: absolute; left: 0; top: 0; width: 16px; height: 16px; border-radius: 50%; background: var(--card); box-shadow: inset 0 0 0 2px var(--line-2); z-index: 1; }
+.track li::after { content: ""; position: absolute; left: 16px; right: 0; top: 7px; height: 2px; background: var(--line); }
+.track li:last-child::after { display: none; }
+.track li.done { color: var(--fg); }
+.track li.done::before { background: var(--red); box-shadow: none; }
+.track li.done::after { background: var(--red); }
+.track li.now::before { box-shadow: inset 0 0 0 2px var(--red), 0 0 0 4px var(--red-soft); }
+.next { border-radius: var(--r-lg); background: var(--fg); color: var(--bg); padding: 22px; display: grid; gap: 12px; }
+.next h3 { font-size: 1.35rem; font-weight: 800; color: inherit; }
+.next p { margin: 0; opacity: .8; font-size: .95rem; }
+.next .row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.next .timer { color: inherit; }
+.next .linkbtn { color: inherit; }
+.token-box { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 16px; align-items: center; }
+.qr { width: 136px; height: 136px; background: #FFFFFF; padding: 8px; border-radius: 12px; box-shadow: inset 0 0 0 1px #E6E6EB; display: grid; place-items: center; }
+.qr svg { display: block; width: 100%; height: 100%; }
+.token { font-family: var(--f-display); font-weight: 800; font-size: 1.35rem; letter-spacing: .08em; color: var(--red-ink); word-break: break-all; }
+.inv-row { display: flex; justify-content: space-between; align-items: center; gap: 12px; padding: 10px 0; border-top: 1px solid var(--line); font-size: .9rem; }
+.inv-row:first-of-type { border-top: 0; }
+.up-list { display: grid; gap: 8px; }
+.up-opt { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 4px 12px; align-items: center; padding: 12px 14px; border-radius: var(--r-md); background: var(--canvas); font-size: .9rem; }
+.up-opt small { color: var(--muted); display: block; }
+
+/* ---------- Staff views ---------- */
+.kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin-bottom: 22px; }
+.kpi { background: var(--canvas); border-radius: var(--r-md); padding: 16px 18px; }
+.kpi b { display: block; font-family: var(--f-display); font-size: 1.9rem; font-weight: 800; line-height: 1.1; letter-spacing: -.03em; }
+.kpi b.m { font-size: 1.3rem; line-height: 1.6; white-space: nowrap; }
+.kpi span { font-size: .82rem; color: var(--muted); font-weight: 600; }
+.kpi.red { background: var(--red); }
+.kpi.red b, .kpi.red span { color: #FFFFFF; }
+.staff-grid { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, .75fr); gap: 22px; align-items: start; margin-bottom: 22px; }
+.panel-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; flex-wrap: wrap; }
+.panel-head input { border: 0; box-shadow: inset 0 0 0 1.5px var(--line); border-radius: 999px; padding: 9px 14px; background: var(--card); min-width: 0; width: 220px; max-width: 100%; }
+.tablewrap { overflow-x: auto; }
+table.t { width: 100%; border-collapse: collapse; font-size: .88rem; min-width: 620px; }
+table.t th { text-align: left; font-size: .76rem; color: var(--muted); font-weight: 700; padding: 8px 10px; border-bottom: 1px solid var(--line); white-space: nowrap; }
+table.t td { padding: 10px; border-bottom: 1px solid var(--line); vertical-align: middle; }
+table.t tr:last-child td { border-bottom: 0; }
+table.t td small { display: block; color: var(--muted); }
+.st { display: inline-flex; align-items: center; gap: 6px; font-size: .76rem; font-weight: 700; padding: 4px 9px; border-radius: 999px; white-space: nowrap; background: var(--canvas); color: var(--muted); }
+.st::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+.st.in { background: var(--ok-soft); color: var(--ok); }
+.st.paid { background: var(--fg); color: var(--bg); }
+.st.reserved { background: var(--red-soft); color: var(--red-ink); }
+.bars { display: grid; gap: 12px; }
+.bar-row { display: grid; grid-template-columns: minmax(0, 150px) minmax(0, 1fr) 62px; gap: 12px; align-items: center; font-size: .88rem; }
+.bar-row > span:first-child { font-weight: 600; }
+.bar { height: 10px; background: var(--line); border-radius: 5px; overflow: hidden; }
+.bar i { display: block; height: 100%; background: var(--red); border-radius: 0 5px 5px 0; transition: width .8s var(--ease); }
+.bar-row .v { text-align: right; color: var(--muted); }
+.bar-row .v b { color: var(--fg); }
+.mfloor { display: grid; gap: 10px; }
+.mfloor h4 { margin: 8px 0 0; font-size: .9rem; font-weight: 800; color: var(--muted); }
+.mrooms { display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 10px; }
+.mroom { background: var(--canvas); border-radius: var(--r-md); padding: 12px; display: grid; gap: 7px; align-content: start; }
+.mroom-h { display: flex; justify-content: space-between; align-items: center; gap: 8px; font-weight: 800; }
+.mroom-h small { font-weight: 600; color: var(--muted); font-size: .76rem; }
+.mbed { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 8px; align-items: center; font-size: .84rem; background: var(--card); border-radius: 8px; padding: 6px 8px; border: 0; width: 100%; text-align: left; cursor: pointer; }
+.mbed:hover { box-shadow: inset 0 0 0 1.5px var(--fg); }
+.mbed .l { width: 22px; height: 22px; border-radius: 6px; background: var(--red); color: #FFFFFF; display: grid; place-items: center; font-size: .7rem; font-weight: 800; }
+.mbed .n { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-weight: 600; }
+.mbed.free { cursor: default; color: var(--faint); background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); }
+.mbed.free .l { background: var(--line-2); color: var(--muted); }
+.mbed i { width: 8px; height: 8px; border-radius: 50%; background: var(--ok); }
+.mbed i.paid { background: var(--fg); } .mbed i.reserved { background: var(--red); }
+.gtag { font-size: .72rem; font-weight: 700; padding: 3px 8px; border-radius: 999px; background: var(--card); color: var(--muted); box-shadow: inset 0 0 0 1px var(--line); white-space: nowrap; }
+.pick-h { font-size: .86rem; font-weight: 800; margin: 6px 0 -6px; }
+.pick-h span { color: var(--muted); font-weight: 600; }
+.rm .gtag { justify-self: start; }
+.rm.blocked { opacity: .55; }
+.bed.viewonly { cursor: default; }
+.bed.viewonly:hover { transform: none; background: var(--card); }
+.bigid { text-align: center; background: var(--canvas); border-radius: var(--r-lg); padding: 22px; }
+.bigid small { display: block; font-size: .8rem; font-weight: 700; color: var(--muted); }
+.bigid b { font-family: var(--f-display); font-size: 2.2rem; font-weight: 800; letter-spacing: .02em; color: var(--red-ink); }
+.invoice { border-radius: var(--r-md); box-shadow: inset 0 0 0 1px var(--line); padding: 18px; display: grid; gap: 12px; }
+.invoice-top { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.invoice-top b { font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; }
+
+@media (max-width: 980px) {
+  .types { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .steps.five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .me-grid, .staff-grid, .signin, .info { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 560px) {
+  .types, .steps.five { grid-template-columns: minmax(0, 1fr); }
+  .who > span { display: none; }
+  .who { padding-left: 5px; margin-left: 2px; }
+  .token-box { grid-template-columns: minmax(0, 1fr); justify-items: start; }
+  .bar-row { grid-template-columns: minmax(0, 110px) minmax(0, 1fr) 52px; gap: 8px; }
+  .track li { font-size: .74rem; }
+  .panel { padding: 18px; }
+}
+
+.tag text { font-size: 13px; }
+.model svg { min-width: 440px; }
 </style>
 </head>
 <body>
 
 <header class="top">
   <div class="wrap">
-    <button class="brand" data-view="find" aria-label="RoomRight home">
+    <button class="brand" data-go="home" aria-label="RoomRight home">
       <svg width="30" height="30" viewBox="0 0 30 30" aria-hidden="true"><rect width="30" height="30" rx="9" fill="#B5121B"/><path d="M8 21V12.5L15 8l7 4.5V21" fill="none" stroke="#fff" stroke-width="2.4" stroke-linejoin="round"/><rect x="12.5" y="15" width="5" height="6" rx="1" fill="#fff"/></svg>
       RoomRight
     </button>
-    <nav class="nav" aria-label="Main">
-      <button id="nav-find" data-view="find" aria-current="page"><span class="long">Find a bed</span><span class="short">Find</span></button>
-      <button id="nav-mine" data-view="mine"><span class="long">My bookings</span><span class="short">Bookings</span><span class="count num" id="mine-count">0</span></button>
-      <button id="nav-verify" data-view="verify"><span class="long">For hostels</span><span class="short">Hostels</span></button>
-    </nav>
+    <nav class="nav" id="nav" aria-label="Main"></nav>
   </div>
 </header>
 
 <main>
-<div id="view-find">
+<div id="view-home">
   <section class="hero" aria-labelledby="hero-title">
     <div class="wrap hero-grid">
       <div class="hero-copy">
-        <p class="kicker"><span class="pulse" aria-hidden="true"></span><span><b class="num" id="t-beds">0</b> beds free tonight · Lancaster University Ghana</span></p>
+        <p class="kicker"><span class="pulse" aria-hidden="true"></span><span><b class="num" id="t-beds">0</b> of 87 beds free · Lancaster University Ghana 2026/27</span></p>
         <h1 id="hero-title">Your exact bed, <span class="hl">locked in.<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 14 C 40 4, 70 18, 105 10 S 170 4, 197 12"/></svg></span></h1>
-        <p class="lede">Pick the room and the bed number yourself at Maria, Camille and verified hostels near campus. Your money waits safely until you get the keys.</p>
-
-        <form class="search" id="search" aria-label="Find a bed" novalidate>
-          <div class="s-row"><span class="lbl" id="lbl-zone">Where</span>
-            <div class="pills" role="group" aria-labelledby="lbl-zone">
-              <button type="button" class="pill" data-zone="any" aria-pressed="true">Anywhere<span class="num" id="cz-any"></span></button>
-              <button type="button" class="pill" data-zone="on" aria-pressed="false">On campus<span class="num" id="cz-on"></span></button>
-              <button type="button" class="pill" data-zone="off" aria-pressed="false">Off campus<span class="num" id="cz-off"></span></button>
+        <p class="lede">Apply for Maria or Camille hostel, choose your own room and bed, and reserve it for 24 hours while you pay. No queues, no double booking.</p>
+        <form class="search" id="finder" aria-label="Find a room" novalidate>
+          <div class="s-row" id="f-gender-row"><span class="lbl" id="lbl-g">Show beds open to</span>
+            <div class="pills" role="group" aria-labelledby="lbl-g">
+              <button type="button" class="pill" data-fg="" aria-pressed="true">Everyone</button>
+              <button type="button" class="pill" data-fg="F" aria-pressed="false">Female students</button>
+              <button type="button" class="pill" data-fg="M" aria-pressed="false">Male students</button>
             </div>
           </div>
-          <div class="s-row"><span class="lbl" id="lbl-gender">Who lives there</span>
-            <div class="pills" role="group" aria-labelledby="lbl-gender">
-              <button type="button" class="pill" data-gender="all" aria-pressed="true">Any</button>
-              <button type="button" class="pill" data-gender="Mixed" aria-pressed="false">Mixed</button>
-              <button type="button" class="pill" data-gender="Female only" aria-pressed="false">Female only</button>
-              <button type="button" class="pill" data-gender="Male only" aria-pressed="false">Male only</button>
-            </div>
-          </div>
-          <div class="s-split">
-            <div class="s-row"><span class="lbl" id="lbl-size">Room</span>
-              <div class="pills" role="group" aria-labelledby="lbl-size">
-                <button type="button" class="pill" data-size="0" aria-pressed="true">Any</button>
-                <button type="button" class="pill" data-size="1" aria-pressed="false">1</button>
-                <button type="button" class="pill" data-size="2" aria-pressed="false">2</button>
-                <button type="button" class="pill" data-size="4" aria-pressed="false">4</button>
-              </div>
-            </div>
-            <div class="s-row"><span class="lbl" id="lbl-budget">Max per year</span>
-              <div class="range"><input type="range" id="f-budget" min="5000" max="18000" step="500" value="18000" aria-labelledby="lbl-budget"><output id="budget-out" for="f-budget" class="num"></output></div>
-            </div>
+          <div class="s-row"><span class="lbl" id="lbl-t">Room type</span>
+            <div class="pills" role="group" aria-labelledby="lbl-t" id="f-types"></div>
           </div>
           <div class="s-go">
-            <small id="s-summary">Every residence, every room type</small>
-            <button type="submit" class="btn lg" id="s-btn">Show <span class="num" id="s-count">0</span> beds</button>
+            <div class="f-price"><b class="num" id="f-price"></b><small id="f-sub"></small></div>
+            <button type="submit" class="btn lg" id="f-btn"></button>
           </div>
         </form>
       </div>
-
       <figure class="model" style="margin:0" aria-labelledby="model-cap">
         <div class="model-head">
-          <span class="chip"><span class="pulse" aria-hidden="true"></span>Live campus model</span>
-          <span class="legend" aria-hidden="true"><span><i class="l-free"></i>Free bed</span><span><i class="l-booked"></i>Booked</span><span><i class="l-mine"></i>Yours</span></span>
+          <span class="chip"><span class="pulse" aria-hidden="true"></span>Live hostel model</span>
+          <span class="legend" aria-hidden="true"><span><i class="l-free"></i>Free bed</span><span><i class="l-booked"></i>Taken</span><span><i class="l-mine"></i>Yours</span></span>
         </div>
-        <div class="model-scroll"><svg id="model" role="img" aria-label="Model of campus and nearby hostels. Each red window is a free bed."></svg></div>
-        <figcaption class="model-foot" id="model-cap"><span>Every window is one real bed. Distances along the road are to scale.</span><span>Tap a building to see it</span></figcaption>
+        <div class="model-scroll"><svg id="model" role="img" aria-label="Model of Maria and Camille hostels. Each red window is a free bed."></svg></div>
+        <figcaption class="model-foot" id="model-cap"><span>Every window is one real bed: 48 in Maria, 39 in Camille.</span><span>Tap a hostel to see its rooms</span></figcaption>
       </figure>
     </div>
   </section>
 
   <div class="wrap promise">
-    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M3 18v-6a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2v6M3 18h18M3 21v-3M21 21v-3M7 10V7a1 1 0 0 1 1-1h3a1 1 0 0 1 1 1v3"/></svg></span><b>Your exact bed, by number</b><span>Choose the room and bed yourself, like a seat on a flight.</span></div>
-    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><b>Held for 10 minutes</b><span>Nobody else can pay for a bed while you are holding it.</span></div>
-    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg></span><b>Paid only when you move in</b><span>Your room fee sits in escrow until the hostel checks you in.</span></div>
+    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg></span><b>Your own application number</b><span>Every application gets a number you can quote when you ask about it.</span></div>
+    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><b>Reserved for 24 hours</b><span>Nobody else can take your bed while you arrange payment.</span></div>
+    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h-3zM20 14v6h-6"/></svg></span><b>Invoice and QR token</b><span>Pay, and you get an invoice and a booking token to show at check-in.</span></div>
   </div>
 
-  <section class="wrap results" id="results" aria-labelledby="res-title">
-    <div class="res-head">
-      <div>
-        <h2 id="res-title"><span class="num" id="r-count">0</span> beds free</h2>
-        <p id="r-sub">across 5 residences</p>
+  <section class="wrap section" id="prices" aria-labelledby="types-title">
+    <div class="sec-title">
+      <p class="kicker">Rooms and prices</p>
+      <h2 id="types-title">Six room types. One price each.</h2>
+      <p>Fees are for the 9 month tenancy, per bed, as published by the university for 2026/27. A 5% RoomRight service fee is added at payment.</p>
+    </div>
+    <div class="types" id="types"></div>
+  </section>
+
+  <section class="wrap section" style="padding-top:0" aria-labelledby="hostels-title">
+    <div class="sec-title">
+      <p class="kicker">The hostels</p>
+      <h2 id="hostels-title">Two hostels on campus, for male and female students.</h2>
+      <p>Shared rooms are single gender: once the first student books a bed, the other beds in that room are offered only to students of the same gender.</p>
+    </div>
+    <div class="cards" id="hostels"></div>
+  </section>
+
+  <section class="wrap section" style="padding-top:0" aria-label="What you get and the rules">
+    <div class="info">
+      <div class="panel">
+        <h3>In every room</h3>
+        <ul class="ticks">
+          <li>A single bed and mattress for each student</li>
+          <li>Air conditioning and a ceiling fan</li>
+          <li>A table-top fridge</li>
+          <li>A study desk for each student</li>
+          <li>Its own electricity meter. Roommates top up the credit themselves.</li>
+        </ul>
       </div>
-      <div class="res-tools">
-        <label class="check"><input type="checkbox" id="f-hide"> Hide full rooms</label>
-        <select id="f-sort" aria-label="Sort residences">
-          <option value="near">Closest to campus</option>
-          <option value="price">Lowest price</option>
-          <option value="free">Most beds free</option>
-        </select>
+      <div class="panel">
+        <h3>Who can apply, and the rules</h3>
+        <ul class="ticks">
+          <li>Freshers, and students who stayed in the hostel before. Two years at most.</li>
+          <li>One bed per student. You cannot pay for extra beds to keep a room to yourself.</li>
+          <li>Tenancy is 9 months, starting 1 October or 1 January.</li>
+          <li>Beds cannot be sold, traded or passed to another student.</li>
+          <li>Hostel fees are not refundable, unless you do not meet LUG entry requirements.</li>
+        </ul>
       </div>
     </div>
-    <div class="cards" id="list"></div>
   </section>
 
   <div class="wrap">
     <section class="band-dark" aria-labelledby="guard-title">
       <div>
         <p class="kicker">The Allocation Guard</p>
-        <h2 id="guard-title">Paid for a 2-person room? You stay in a 2-person room.</h2>
-        <p>Every room move passes a check against what the student paid for. Try it: you are the hostel master, and Ama paid for a 2-person room.</p>
-        <button class="btn white" data-view="verify">Open the real hostel desk</button>
+        <h2 id="guard-title">Paid for two in a room? You stay two in a room.</h2>
+        <p>Every room move passes a check against what the student paid for. Try it: you are the hostel manager, and Ama paid for a two in a room.</p>
+        <button class="btn white" data-go="signin" data-role="manager">Sign in as a hostel manager</button>
       </div>
       <div class="demo" id="demo">
-        <div class="demo-who"><span class="avatar">A</span><div><b>Ama Mensah</b><span>Paid for a 2-person room</span></div><span class="chip">Maria</span></div>
-        <div class="demo-bed" id="demo-bed"><div><small>Current bed</small><b id="demo-bed-name">Room M203 · Bed 2</b></div><span class="chip" id="demo-type">2-person</span></div>
+        <div class="demo-who"><span class="avatar">A</span><div><b>Ama Mensah</b><span>Paid for two in a room</span></div><span class="chip">Maria</span></div>
+        <div class="demo-bed" id="demo-bed"><div><small>Current bed</small><b id="demo-bed-name">Room 12 · Bed A</b></div><span class="chip">Two in a room</span></div>
         <div class="demo-actions">
-          <button type="button" data-demo="same">Move to Room M207<small>Another 2-person room</small></button>
-          <button type="button" data-demo="other">Move to Room M305<small>A 4-person room</small></button>
+          <button type="button" data-demo="same">Move to Room 13<small>Another two in a room</small></button>
+          <button type="button" data-demo="other">Move to Room 14<small>A four in a room</small></button>
         </div>
         <div class="verdict idle" id="demo-verdict">Pick a move to see what the guard does.</div>
         <ul class="demo-log" id="demo-log" aria-live="polite"></ul>
@@ -593,32 +754,20 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
   <section class="wrap how" aria-labelledby="how-title">
     <div class="sec-title">
       <p class="kicker">How it works</p>
-      <h2 id="how-title">Four steps, and your money is never at risk.</h2>
+      <h2 id="how-title">From application to keys in five steps.</h2>
     </div>
-    <ol class="steps">
-      <li><b>Choose your bed</b><span>Pick a room and a bed number on the room map.</span></li>
-      <li><b>Hold it for 10 minutes</b><span>The bed leaves the live count, so nobody else can pay for it.</span></li>
-      <li><b>Pay by MoMo or card</b><span>Room fee plus a 5% service fee. No agent fee, ever.</span></li>
-      <li><b>Show your code at check-in</b><span>The hostel confirms your 6 digit code, then gets paid.</span></li>
+    <ol class="steps five">
+      <li><b>Apply</b><span>Give your first and second room choice. You get an application number straight away.</span></li>
+      <li><b>Choose your bed</b><span>See every free bed in your room type and pick the one you want.</span></li>
+      <li><b>Reserve for 24 hours</b><span>The bed is yours while you pay. If you do not pay in time, it goes back on offer.</span></li>
+      <li><b>Pay</b><span>By mobile money or card. You get an invoice and a booking token with a QR code.</span></li>
+      <li><b>Check in</b><span>Show your token at the hostel. The manager confirms it and gives you your keys.</span></li>
     </ol>
     <div class="escrow" aria-label="Where your money goes">
-      <span class="node">You</span><span class="arrow">pay room fee + 5% →</span>
-      <span class="node mid">RoomRight escrow</span><span class="arrow">released at check-in →</span>
-      <span class="node">Hostel</span>
-      <span class="refund">Bed not honoured? Full refund of the room fee.</span>
-    </div>
-  </section>
-
-  <section class="wrap" aria-labelledby="who-title">
-    <div class="sec-title">
-      <p class="kicker">Who it is for</p>
-      <h2 id="who-title">Everyone in the deal sees the same truth.</h2>
-    </div>
-    <div class="who-grid">
-      <div><span>Students</span><b>A fair price and the room you chose.</b><p>One published price, your exact bed, and a receipt you can show anyone.</p></div>
-      <div><span>Parents</span><b>Know the hostel is real and safe.</b><p>Verified listings, distance to campus and who lives there, before money moves.</p></div>
-      <div><span>Hostel owners</span><b>Fill rooms without paying agents.</b><p>Guaranteed payment at check-in, plus a desk to verify codes and manage beds.</p></div>
-      <div><span>Housing office</span><b>See occupancy across every hostel.</b><p>Live counts and a full allocation log, on any phone or laptop.</p></div>
+      <span class="node">You</span><span class="arrow">hostel fee + 5% →</span>
+      <span class="node mid">RoomRight</span><span class="arrow">hostel fee passed on at check-in →</span>
+      <span class="node">University Finance</span>
+      <span class="refund">Room full? Join the waiting list for it.</span>
     </div>
   </section>
 
@@ -626,220 +775,224 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     <section class="finale" aria-labelledby="finale-title">
       <div>
         <h2 id="finale-title">Your bed is waiting.</h2>
-        <p><b class="num" id="t-beds-2">0</b> beds are free tonight across Maria, Camille and three verified off campus residences.</p>
+        <p><b class="num" id="t-beds-2">0</b> beds are free right now across Maria and Camille.</p>
       </div>
-      <div class="ctas"><button class="btn white lg" data-jump="1">Find my bed</button><button class="btn outline-white lg" data-view="verify">I run a hostel</button></div>
+      <div class="ctas"><button class="btn white lg" data-action="apply">Apply for a bed</button><button class="btn outline-white lg" data-go="signin" data-role="manager">Staff sign in</button></div>
     </section>
   </div>
 </div>
 
-<section id="view-mine" class="wrap page" hidden>
+<section id="view-signin" class="wrap page" hidden>
   <div class="page-head">
-    <p class="kicker">Your receipts</p>
-    <h2>My bookings</h2>
-    <p>Show the check-in code when you arrive. The hostel confirms it on RoomRight, hands over your keys, and only then is the room fee released to them.</p>
+    <p class="kicker">Sign in</p>
+    <h2>Who are you signing in as?</h2>
+    <p>Students apply and track their booking. Hostel managers see their rooms and residents. The administrator sees everything.</p>
   </div>
-  <div class="receipts" id="receipts"></div>
+  <div class="signin">
+    <div class="roles" role="tablist" aria-label="Role">
+      <button class="role" role="tab" data-role="student" aria-selected="true"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></span><b>Student</b><span>Looking for a room</span></button>
+      <button class="role" role="tab" data-role="manager" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/></svg></span><b>Hostel manager</b><span>Runs Maria or Camille</span></button>
+      <button class="role" role="tab" data-role="admin" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/></svg></span><b>Administrator</b><span>Housing office, all hostels</span></button>
+    </div>
+    <div class="panel" id="signin-panel"></div>
+  </div>
 </section>
 
-<section id="view-verify" class="wrap page" hidden>
-  <div class="page-head">
-    <p class="kicker">Hostel master desk</p>
-    <h2>Check in and manage beds</h2>
-    <p>Check a student's code at check-in, and move students between beds. Offered a room privately on WhatsApp? Ask for the reference. If it does not show here, it was not paid through RoomRight.</p>
-  </div>
-  <div class="verify">
-    <form class="panel" id="verify-form" novalidate>
-      <div><h3 class="panel-title">Check a booking</h3><p class="panel-sub">Use this at check-in, before you hand over keys.</p></div>
-      <div class="field">
-        <label for="v-ref">Booking reference</label>
-        <input id="v-ref" placeholder="RR-7KQ4M2" autocomplete="off" spellcheck="false">
-      </div>
-      <div class="field">
-        <label for="v-code">Check-in code</label>
-        <input id="v-code" inputmode="numeric" placeholder="6 digits" maxlength="6" autocomplete="off">
-        <span class="hint">The student shows this code on their allocation letter.</span>
-      </div>
-      <button class="btn block" type="submit">Check booking</button>
-      <button class="linkbtn" type="button" id="v-fill" style="justify-self:start">Use my latest booking</button>
-    </form>
-    <div id="verify-result" class="result">
-      <h3>Waiting for a reference</h3>
-      <p>Enter the reference and the 6 digit code. A real booking shows the student name, the exact bed and whether the money is in escrow.</p>
-    </div>
-  </div>
-  <div class="guard-grid">
-    <div class="panel" id="guard-panel"></div>
-    <div class="panel">
-      <div><h3 class="panel-title">Allocation log</h3><p class="panel-sub">Every booking, move and refusal, newest first. Nobody can edit it.</p></div>
-      <ol class="log" id="guard-log"></ol>
-    </div>
-  </div>
-</section>
+<section id="view-me" class="wrap page" hidden></section>
+<section id="view-manager" class="wrap page" hidden></section>
+<section id="view-admin" class="wrap page" hidden></section>
 </main>
 
 <footer>
   <div class="wrap">
-    <span><b style="color:var(--fg)">RoomRight</b> · Demo build. Residences, prices and booking activity are sample data and no real payment is taken. Not an official Lancaster University Ghana service.</span>
-    <button class="linkbtn" id="reset">Reset demo data</button>
+    <span><b style="color:var(--fg)">RoomRight</b> for Lancaster University Ghana · Demo build. Rooms, beds and prices follow the 2026/27 hostel documents. Residents and bookings are sample data and no real payment is taken. Not an official university service.</span>
+    <button class="linkbtn" data-action="reset">Reset demo data</button>
   </div>
 </footer>
 
 <div class="overlay" id="overlay" hidden>
   <div class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title" id="sheet"></div>
 </div>
-<div class="holdpill" id="holdpill" hidden></div>
 <div class="toast" id="toast" role="status" hidden></div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script>
 (function () {
   "use strict";
 
-  /* ---------- Config ---------- */
-  var SERVICE_FEE_RATE = 0.05;      // RoomRight service fee on each booking
-  var HOLD_MINUTES = 10;            // how long a held bed waits for payment
-  var STORE_KEY = "roomright-demo-v2";
-  var SESSION = "2026/27 academic year";
+  /* ---------- Config: rooms and prices from the 2026/27 hostel documents ---------- */
+  var FEE_RATE = 0.05;          // RoomRight service fee, added at payment
+  var RESERVE_HOURS = 24;       // how long a reserved bed waits for payment
+  var STORE_KEY = "roomright-lug-v1";
+  var CODES = { maria: "MARIA-2026", camille: "CAMILLE-2026", admin: "ADMIN-2026" };   // demo access codes
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
+  var TYPES = [
+    { id: "t1",  beds: 1, name: "One in a room", short: "1 in a room", price: 30000 },
+    { id: "t1b", beds: 1, name: "One in a room with balcony", short: "1 + balcony", price: 32000, premium: true },
+    { id: "t2",  beds: 2, name: "Two in a room", short: "2 in a room", price: 20000 },
+    { id: "t3",  beds: 3, name: "Three in a room", short: "3 in a room", price: 17000 },
+    { id: "t3p", beds: 3, name: "Three in a room premium", short: "3 premium", price: 19000, premium: true },
+    { id: "t4",  beds: 4, name: "Four in a room", short: "4 in a room", price: 14000 }
+  ];
+  // [room number, beds, floor] exactly as in the room details sheet
   var HOSTELS = [
-    { id: "ma", zone: "on", block: "M", name: "Maria", km: 0.2, walk: 3, gender: "Mixed", floors: 8, mx: 1.2, my: 1.4,
-      perks: ["24 hour security", "Water and power included", "Study rooms", "Laundry"],
-      rooms: [
-        { id: "ma-1", beds: 1, price: 15800, total: 24, start: 9,  note: "Private bathroom" },
-        { id: "ma-2", beds: 2, price: 10400, total: 48, start: 22, note: "Shared bathroom per room" },
-        { id: "ma-4", beds: 4, price: 6900,  total: 64, start: 0,  note: "Shared bathroom per floor" } ] },
-    { id: "ca", zone: "on", block: "C", name: "Camille", km: 0.35, walk: 5, gender: "Mixed", floors: 6, mx: 13.4, my: 5.2,
-      perks: ["24 hour security", "Water and power included", "Kitchenette per floor", "Wi-Fi"],
-      rooms: [
-        { id: "ca-1", beds: 1, price: 16200, total: 18, start: 6,  note: "Private bathroom, AC" },
-        { id: "ca-2", beds: 2, price: 10900, total: 40, start: 18, note: "Shared bathroom per room, AC" } ] },
-    { id: "ac", zone: "off", block: "A", name: "Aspen Court", km: 0.8, walk: 10, drive: 3, gender: "Mixed", floors: 7, side: "north",
-      perks: ["Backup generator", "Borehole water", "CCTV", "Gym"],
-      rooms: [
-        { id: "ac-1", beds: 1, price: 13900, total: 16, start: 7,  note: "Private bathroom" },
-        { id: "ac-2", beds: 2, price: 8800,  total: 36, start: 17, note: "Shared bathroom per room" },
-        { id: "ac-4", beds: 4, price: 5600,  total: 48, start: 26, note: "Shared bathroom per floor" } ] },
-    { id: "kl", zone: "off", block: "K", name: "Kente Lodge", km: 1.5, walk: 19, drive: 5, shuttle: true, gender: "Male only", floors: 5, side: "south",
-      perks: ["Shuttle at 7:30 and 9:30", "Prepaid power meter per room", "Wi-Fi"],
-      rooms: [
-        { id: "kl-2", beds: 2, price: 7600, total: 30, start: 12, note: "Shared bathroom per room" },
-        { id: "kl-4", beds: 4, price: 4900, total: 40, start: 19, note: "Shared bathroom per floor" } ] },
-    { id: "gs", zone: "off", block: "F", name: "Greenfield Suites", km: 2.1, walk: 26, drive: 7, trotro: true, gender: "Female only", floors: 4, side: "north",
-      perks: ["Gated compound", "Water and power included", "Wi-Fi"],
-      rooms: [
-        { id: "gs-1", beds: 1, price: 12800, total: 12, start: 3, note: "Private bathroom, AC" },
-        { id: "gs-2", beds: 2, price: 8200,  total: 28, start: 0, note: "Shared bathroom per room" } ] }
+    { id: "maria", name: "Maria", floors: ["Ground floor", "First floor"], mx: 1, my: 1,
+      plan: [[1,2,0],[2,2,0],[3,2,0],[4,3,0],[5,4,0],[6,2,0],[7,2,0],[8,4,0],[9,2,0],[10,3,1],[11,4,1],[12,2,1],[13,2,1],[14,4,1],[15,2,1],[16,2,1],[17,1,1],[18,3,1],[19,2,1]] },
+    { id: "camille", name: "Camille", floors: ["Ground floor", "First floor", "Second floor"], mx: 19.5, my: 8,
+      plan: [[20,2,0],[21,1,0],[22,2,0],[23,1,0],[24,2,0],[25,1,0],[26,2,0],[27,1,1],[28,1,1],[29,1,1],[30,2,1],[31,2,1],[32,3,1],[33,3,1],[34,2,1],[35,1,2],[36,1,2],[37,1,2],[38,2,2],[39,2,2],[40,3,2],[41,2,2],[42,1,2]] }
   ];
+  // Which rooms carry the balcony or premium price is an assumption until hostel management confirms it
+  var BALCONY = [27, 29, 35, 37], PREMIUM3 = [10, 33];
 
-  var SIZE_LABEL = { 1: "1-person room", 2: "2-person room", 4: "4-person room" };
-  var METHODS = [
-    { id: "mtn", name: "MTN MoMo", sub: "Approve on your phone", logo: "MTN", bg: "#E0A800" },
-    { id: "telecel", name: "Telecel Cash", sub: "Approve on your phone", logo: "T", bg: "#C8102E" },
-    { id: "at", name: "AT Money", sub: "Approve on your phone", logo: "AT", bg: "#1F4AA8" },
-    { id: "card", name: "Bank card", sub: "Visa or Mastercard", logo: "CARD", bg: "#0E0B0C" }
-  ];
-  var ROOM = {}, HOSTEL = {};
+  var TYPE = {}, HOSTEL = {}, ROOM = {}, ROOMS = [], TOTAL_BEDS = 0;
+  TYPES.forEach(function (t) { TYPE[t.id] = t; t.total = 0; t.rooms = 0; });
   HOSTELS.forEach(function (h) {
-    HOSTEL[h.id] = h; h.beds = 0;
-    h.rooms.forEach(function (r, i) { r.hostel = h; r.series = (i + 1) * 100; ROOM[r.id] = r; h.beds += r.total; });
+    HOSTEL[h.id] = h; h.keys = [];
+    h.rooms = h.plan.map(function (p) {
+      var tid = p[1] === 1 ? (BALCONY.indexOf(p[0]) > -1 ? "t1b" : "t1") : p[1] === 2 ? "t2" : p[1] === 3 ? (PREMIUM3.indexOf(p[0]) > -1 ? "t3p" : "t3") : "t4";
+      var r = { no: p[0], beds: p[1], floor: p[2], hostel: h, type: tid, keys: [] };
+      for (var i = 0; i < r.beds; i++) { r.keys.push(r.no + "-" + i); h.keys.push(r.no + "-" + i); }
+      ROOM[r.no] = r; ROOMS.push(r); TYPE[tid].total += r.beds; TYPE[tid].rooms++; TOTAL_BEDS += r.beds;
+      return r;
+    });
   });
 
+  /* ---------- Helpers ---------- */
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
+  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
+  function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
+  function pad(n, w) { return String(n).padStart(w || 2, "0"); }
+  function money(n) { return "GH₵ " + n.toLocaleString("en-GB", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); }
+  function fee(n) { return Math.round(n * FEE_RATE * 100) / 100; }
+  function hms(ms) { var s = Math.max(0, Math.ceil(ms / 1000)); return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor(s % 3600 / 60)) + ":" + pad(s % 60); }
+  function dateStr(ts) { return new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
+  function timeStr(ts) { return new Date(ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); }
+  function roomOf(key) { return ROOM[+key.split("-")[0]]; }
+  function bedLetter(key) { return "ABCD"[+key.split("-")[1]]; }
+  function bedName(key, withHostel) { var r = roomOf(key); return (withHostel ? r.hostel.name + " · " : "") + "Room " + r.no + (r.beds > 1 ? " · Bed " + bedLetter(key) : ""); }
+  function gWord(g) { return g === "F" ? "Female" : "Male"; }
+  function code(n) { var a = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", s = ""; for (var i = 0; i < n; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
+  var STATUS = { applied: "Applied", reserved: "Reserved, unpaid", paid: "Paid, not checked in", "in": "Checked in", cancelled: "Withdrawn" };
+
   /* ---------- State ---------- */
-  var state;
-  var ui = { view: "find", zone: "any", gender: "all", size: 0, budget: 18000, sort: "near", hideFull: false, sheet: null, animate: true,
-             guard: { hid: "ma", ref: null, rid: null, idx: null, result: "" } };
-  var form = { name: "", sid: "", momo: "", method: "mtn" };
+  var state, OCC = {};
+  var ui = { view: "home", fg: "", ft: "", role: "student", intent: null, sheet: null, mq: "", aq: "", checkin: "", animate: true };
   var paying = false;
 
+  function appId(n) { return "LUG2026" + pad(n, 3); }
+  function invoiceFor(s, app, label, amount, method, ts) {
+    return { no: "INV-2026-" + pad(s.inv++, 4), ref: "TXN" + code(10), label: label, amount: amount, service: fee(amount), total: amount + fee(amount), method: method, ts: ts };
+  }
+  var FN = { F: ["Ama", "Akosua", "Abena", "Efua", "Adwoa", "Esi", "Afia", "Maame", "Serwaa", "Naa", "Dzifa", "Zainab", "Fatima", "Chioma", "Adaeze", "Temi", "Aisha", "Yaa", "Emefa", "Selasi", "Korkor", "Awura", "Mawusi", "Ewurabena"],
+             M: ["Kofi", "Kwame", "Kwesi", "Yaw", "Kojo", "Kwabena", "Nii", "Fiifi", "Ekow", "Selorm", "Edem", "Ibrahim", "Tunde", "Emeka", "Kelechi", "Nana", "Papa", "Elikem", "Senyo", "Kwaku", "Delali", "Jojo", "Paa Kwesi", "Sena"] };
+  var LN = ["Mensah", "Owusu", "Boateng", "Asante", "Osei", "Agyeman", "Addo", "Quaye", "Lamptey", "Tetteh", "Amoah", "Appiah", "Darko", "Ofori", "Ansah", "Bonsu", "Sarpong", "Adjei", "Okafor", "Bello", "Danso", "Frimpong", "Antwi", "Yeboah", "Nartey", "Dogbe"];
+  var MOMO = ["MTN MoMo", "Telecel Cash", "AT Money", "Bank card"];
+  function addSample(s, gender, tid, bed, status, ts, extra) {
+    var a = { id: "", sid: "20" + pick(["25", "26"]) + pad(Math.floor(Math.random() * 10000), 4), name: pick(FN[gender]) + " " + pick(LN), gender: gender,
+      elig: pick(["fresher", "fresher", "returning"]), first: tid, second: "", type: bed ? tid : null, bed: bed, status: status, ts: ts, sample: true, invoices: [], token: null };
+    if (status === "paid" || status === "in") { a.invoices.push(invoiceFor(s, a, "Hostel fee, " + TYPE[tid].name, TYPE[tid].price, pick(MOMO), ts + 36e5)); a.token = "RR-" + code(8); }
+    if (status === "in") a.inAt = ts + 3 * 864e5;
+    if (extra) for (var k in extra) a[k] = extra[k];
+    s.apps.push(a); return a;
+  }
   function freshState() {
-    var taken = {};
-    HOSTELS.forEach(function (h) {
-      h.rooms.forEach(function (r) {
-        var pool = []; for (var i = 0; i < r.total; i++) pool.push(i);
-        taken[r.id] = shuffle(pool).slice(0, r.total - r.start);
+    var s = { apps: [], log: [], inv: 1, seq: 1, session: null, profiles: {} }, now = Date.now(), g = 0;
+    var occupied = { t1: 4, t1b: 3, t2: 27, t3: 8, t3p: 6, t4: 16 };   // the two cheapest-per-head premium and 4-bed types start full
+    TYPES.forEach(function (t) {
+      var left = occupied[t.id];
+      shuffle(ROOMS.filter(function (r) { return r.type === t.id; })).forEach(function (r) {
+        if (left <= 0) return;
+        var gender = (g++ % 2) ? "M" : "F";
+        for (var i = 0; i < r.beds && left > 0; i++, left--) addSample(s, gender, t.id, r.keys[i], "in", now - (20 + Math.random() * 50) * 864e5);
       });
     });
-    return { taken: taken, hold: null, bookings: [], log: [] };
+    shuffle(s.apps.slice()).slice(0, 9).forEach(function (a) { a.status = "paid"; delete a.inAt; a.ts = now - (1 + Math.random() * 9) * 864e5; a.invoices[0].ts = a.ts + 36e5; });
+    var unpaid = shuffle(s.apps.filter(function (a) { return a.status === "in" && (a.type === "t2" || a.type === "t3"); })).slice(0, 3);
+    [3, 11, 21].forEach(function (h, i) { var a = unpaid[i]; if (!a) return; a.status = "reserved"; a.exp = now + h * 36e5; a.ts = now - (24 - h) * 36e5; a.invoices = []; a.token = null; delete a.inAt; });
+    addSample(s, "F", "t4", null, "applied", now - 3 * 864e5, { waitlist: "t4", second: "t3" });
+    addSample(s, "M", "t4", null, "applied", now - 2 * 864e5, { waitlist: "t4", second: "t2" });
+    var up = s.apps.filter(function (a) { return a.status === "in" && a.type === "t3"; })[0];
+    if (up) up.up = { to: "t2", status: "pending", ts: now - 5 * 36e5 };
+    s.apps.sort(function (a, b) { return a.ts - b.ts; });
+    s.apps.forEach(function (a, i) { a.id = appId(i + 1); });
+    s.seq = s.apps.length + 1;
+    return s;
   }
   function load() {
-    try {
-      var s = JSON.parse(localStorage.getItem(STORE_KEY) || "null");
-      if (s && s.taken && Array.isArray(s.bookings)) { s.log = s.log || []; return s; }
-    } catch (e) {}
+    try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (s && Array.isArray(s.apps) && s.profiles) return s; } catch (e) {}
     return freshState();
   }
   function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+  function logEvent(text, kind) { state.log.unshift({ ts: Date.now(), text: text, kind: kind || "ok" }); state.log = state.log.slice(0, 60); }
 
-  /* ---------- Helpers ---------- */
-  function shuffle(a) { for (var i = a.length - 1; i > 0; i--) { var j = Math.floor(Math.random() * (i + 1)); var t = a[i]; a[i] = a[j]; a[j] = t; } return a; }
-  function $(id) { return document.getElementById(id); }
-  function esc(s) { return String(s).replace(/[&<>"']/g, function (c) { return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]; }); }
-  function money(n) { return "GH₵ " + n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
-  function moneyShort(n) { return "GH₵ " + n.toLocaleString("en-GB"); }
-  function fees(price) { var fee = Math.round(price * SERVICE_FEE_RATE * 100) / 100; return { price: price, fee: fee, total: Math.round((price + fee) * 100) / 100 }; }
-  function isTaken(rid, idx) { return state.taken[rid].indexOf(idx) > -1; }
-  function avail(r) { return r.total - state.taken[r.id].length; }
-  function freeBeds(r) { var out = []; for (var i = 0; i < r.total; i++) if (!isTaken(r.id, i)) out.push(i); return out; }
-  function hostelFree(h) { return h.rooms.reduce(function (n, r) { return n + avail(r); }, 0); }
-  function zoneFree(z) { return HOSTELS.reduce(function (n, h) { return n + (h.zone === z ? hostelFree(h) : 0); }, 0); }
-  function roomName(r, idx) { return r.hostel.block + (r.series + Math.floor(idx / r.beds) + 1); }
-  function bedLabel(r, idx) { return r.beds === 1 ? "Room " + roomName(r, idx) : "Room " + roomName(r, idx) + " · Bed " + ((idx % r.beds) + 1); }
-  function isMine(rid, idx) { return state.hold && state.hold.rid === rid && state.hold.idx === idx; }
-  function makeRef() { var a = "ABCDEFGHJKMNPQRSTUVWXYZ23456789", s = "RR-"; for (var i = 0; i < 6; i++) s += a[Math.floor(Math.random() * a.length)]; return s; }
-  function makeCode() { return String(Math.floor(100000 + Math.random() * 900000)); }
-  function mmss(ms) { var s = Math.max(0, Math.ceil(ms / 1000)); return String(Math.floor(s / 60)).padStart(2, "0") + ":" + String(s % 60).padStart(2, "0"); }
-  function activeBookingFor(sid) { return state.bookings.filter(function (b) { return b.sid === sid && b.status === "paid"; })[0] || null; }
-  function byRef(ref) { return state.bookings.filter(function (x) { return x.ref === ref; })[0] || null; }
-  function logEvent(text, kind) { state.log.unshift({ ts: Date.now(), text: text, kind: kind || "ok" }); state.log = state.log.slice(0, 40); }
-
-  var WALK_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="13" cy="4" r="2"/><path d="M9 21l2-7 3 3v5M11 14l-1-5 4-1 3 4 3 1M7 12l3-3"/></svg>';
-  var CAR_ICON = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 17h14v-5l-2-5H7l-2 5v5zM5 12h14"/><circle cx="8" cy="17" r="1.5"/><circle cx="16" cy="17" r="1.5"/></svg>';
-  function distHTML(h) {
-    var parts = h.zone === "on"
-      ? ['<span>' + WALK_ICON + h.walk + ' min walk to lecture halls</span>', '<span>Inside campus</span>']
-      : ['<span>' + WALK_ICON + h.walk + ' min walk</span>', '<span>' + CAR_ICON + h.drive + ' min by car</span>', '<span><b class="num">' + h.km + ' km</b> to the main gate</span>'];
-    if (h.shuttle) parts.push('<span>Free shuttle</span>');
-    if (h.trotro) parts.push('<span>On the trotro route</span>');
-    return '<div class="dist">' + parts.join("") + '</div>';
+  /* ---------- Who is in which bed ---------- */
+  function holding(a) { return a.status === "reserved" || a.status === "paid" || a.status === "in"; }
+  function index() {
+    OCC = {};
+    state.apps.forEach(function (a) {
+      if (holding(a) && a.bed) OCC[a.bed] = a;
+      if (a.up && a.up.status === "approved" && a.up.bed) OCC[a.up.bed] = a;   // bed held for an approved upgrade
+    });
   }
-  function genderBadge(h) { return '<span class="chip' + (h.gender === "Mixed" ? "" : " dark") + '">' + esc(h.gender) + '</span>'; }
+  function roomGender(r, except) {
+    for (var i = 0; i < r.keys.length; i++) { var a = OCC[r.keys[i]]; if (a && a !== except) return a.gender; }
+    return null;
+  }
+  function canTake(key, gender, except) {
+    if (OCC[key] && OCC[key] !== except) return false;
+    var rg = roomGender(roomOf(key), except);
+    return !gender || !rg || rg === gender;
+  }
+  function freeOfType(tid, gender) {
+    var out = [];
+    ROOMS.forEach(function (r) { if (r.type === tid) r.keys.forEach(function (k) { if (!OCC[k] && canTake(k, gender)) out.push(k); }); });
+    return out;
+  }
+  function countFree(tid, gender) { return freeOfType(tid, gender).length; }
+  function totalFree(gender) { return TYPES.reduce(function (n, t) { return n + countFree(t.id, gender); }, 0); }
+  function hostelFree(h) { return h.keys.filter(function (k) { return !OCC[k]; }).length; }
+  function byId(id) { return state.apps.filter(function (a) { return a.id === id; })[0] || null; }
+  function me() { var s = state.session; return s && s.role === "student" ? state.profiles[s.sid] : null; }
+  function myApp() {
+    var p = me(); if (!p) return null;
+    var mine = state.apps.filter(function (a) { return a.sid === p.sid && !a.sample && a.status !== "cancelled"; });
+    return mine[mine.length - 1] || null;
+  }
+  function viewGender() { var p = me(); return p ? p.gender : ui.fg; }
+  function waitPos(a) {
+    var list = state.apps.filter(function (x) { return x.waitlist === a.waitlist && x.status === "applied"; });
+    return list.indexOf(a) + 1;
+  }
 
   var toastTimer;
   function toast(msg) {
     var t = $("toast"); t.hidden = true; void t.offsetWidth; t.textContent = msg; t.hidden = false;
-    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 4500);
+    clearTimeout(toastTimer); toastTimer = setTimeout(function () { t.hidden = true; }, 4800);
   }
 
-
-  /* ---------- The scale model: isometric buildings, one window per bed ---------- */
-  var ISO_C = 0.8660254, ISO_S = 0.5, U = 12, FLOOR = 1.25;
-  var GATE_X = 22.5, KM = 14, ROAD_Y = 14.2, ROAD_W = 3.2;
-  var BB = null;
-  var lenis = null;   // kept for the shared sheet code; no smooth-scroll library on this page
+  /* ---------- The scale model: one window per bed ---------- */
+  var ISO_C = 0.8660254, ISO_S = 0.5, U = 12, FLOOR = 1.3, BB = null;
   function P(x, y, z) {
     var p = [(x - y) * ISO_C * U, (x + y) * ISO_S * U - (z || 0) * U];
     if (BB) { BB[0] = Math.min(BB[0], p[0]); BB[1] = Math.min(BB[1], p[1]); BB[2] = Math.max(BB[2], p[0]); BB[3] = Math.max(BB[3], p[1]); }
     return p;
   }
-  function pts(a) { return a.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" "); }
-  function poly(a, cls, extra) { return '<polygon class="' + cls + '" points="' + pts(a) + '"' + (extra || "") + '/>'; }
+  function poly(a, cls, extra) { return '<polygon class="' + cls + '" points="' + a.map(function (p) { return p[0].toFixed(1) + "," + p[1].toFixed(1); }).join(" ") + '"' + (extra || "") + '/>'; }
   function geom(h) {
-    var cols = Math.ceil(h.beds / h.floors), a = Math.ceil(cols * 0.58), b = cols - a;
-    return { a: a, b: b, w: a + 0.6, d: b + 0.6, ht: (h.floors + 1) * FLOOR + 0.6 };
-  }
-  function bedKeys(h) {
-    var out = [];
-    h.rooms.forEach(function (r) { for (var i = 0; i < r.total; i++) out.push(r.id + ":" + i); });
-    return out;
+    var cols = Math.ceil(h.keys.length / h.floors.length), a = Math.ceil(cols * 0.58), b = cols - a;
+    return { a: a, b: b, w: a + 0.6, d: b + 0.6, ht: (h.floors.length + 1) * FLOOR + 0.5 };
   }
   function winClass(key) {
-    var p = key.split(":"), rid = p[0], idx = +p[1];
-    return isMine(rid, idx) ? "win mine" : isTaken(rid, idx) ? "win" : "win on";
+    var a = OCC[key], mine = myApp(), g = viewGender(), cls = "win";
+    if (a && mine && a === mine) cls += " mine";
+    else if (!a && canTake(key, g)) cls += " on";
+    if (ui.ft && roomOf(key).type !== ui.ft) cls += " dim";
+    return cls;
   }
-  // Draws one building with its footprint corner at (mx, my) on the ground plane
   function buildingSVG(h, mx, my, animate) {
-    var g = geom(h), w = g.w, d = g.d, ht = g.ht, out = "", keys = bedKeys(h), k = 0;
+    var g = geom(h), w = g.w, d = g.d, ht = g.ht, out = "", k = 0, keys = h.keys;
     out += poly([P(mx - 0.5, my - 0.5, 0), P(mx + w + 0.9, my - 0.5, 0), P(mx + w + 0.9, my + d + 0.9, 0), P(mx - 0.5, my + d + 0.9, 0)], "plinth");
     out += poly([P(mx, my + d, 0), P(mx + w, my + d, 0), P(mx + w, my + d, ht), P(mx, my + d, ht)], "f-left");
     out += poly([P(mx + w, my, 0), P(mx + w, my + d, 0), P(mx + w, my + d, ht), P(mx + w, my, ht)], "f-right");
@@ -848,22 +1001,16 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
     out += poly([P(mx + w, my, ht - 0.42), P(mx + w, my + d, ht - 0.42), P(mx + w, my + d, ht), P(mx + w, my, ht)], "band-r");
     var dx = mx + w / 2 - 0.55;
     out += poly([P(dx, my + d, 0), P(dx + 1.1, my + d, 0), P(dx + 1.1, my + d, 1.05), P(dx, my + d, 1.05)], "door");
-    for (var r = h.floors; r >= 1; r--) {
-      var z0 = 0.3 + r * FLOOR + 0.18, z1 = z0 + 0.72;
-      for (var c = 0; c < g.a; c++) {
-        var x0 = mx + 0.3 + c + 0.18, x1 = x0 + 0.64, key = keys[k++];
-        out += win([P(x0, my + d, z0), P(x1, my + d, z0), P(x1, my + d, z1), P(x0, my + d, z1)], key, animate);
-      }
-      for (var c2 = 0; c2 < g.b; c2++) {
-        var y0 = my + 0.3 + c2 + 0.18, y1 = y0 + 0.64, key2 = keys[k++];
-        out += win([P(mx + w, y0, z0), P(mx + w, y1, z0), P(mx + w, y1, z1), P(mx + w, y0, z1)], key2, animate);
-      }
+    for (var r = 1; r <= h.floors.length; r++) {       // ground floor rooms sit on the bottom row
+      var z0 = 0.25 + r * FLOOR + 0.18, z1 = z0 + 0.74;
+      for (var c = 0; c < g.a; c++) { var x0 = mx + 0.3 + c + 0.18; out += win([P(x0, my + d, z0), P(x0 + 0.64, my + d, z0), P(x0 + 0.64, my + d, z1), P(x0, my + d, z1)], keys[k++], animate); }
+      for (var c2 = 0; c2 < g.b; c2++) { var y0 = my + 0.3 + c2 + 0.18; out += win([P(mx + w, y0, z0), P(mx + w, y0 + 0.64, z0), P(mx + w, y0 + 0.64, z1), P(mx + w, y0, z1)], keys[k++], animate); }
     }
     return out;
   }
   function win(a, key, animate) {
     if (!key) return poly(a, "win-x");
-    return poly(a, winClass(key), ' data-w="' + key + '"' + (animate ? ' style="--d:' + Math.floor(Math.random() * 1400) + '"' : ""));
+    return poly(a, winClass(key), ' data-w="' + key + '"' + (animate ? ' style="--d:' + Math.floor(Math.random() * 1200) + '"' : ""));
   }
   function treeSVG(x, y) {
     var base = P(x, y, 0), top = P(x, y, 1.0), c = P(x, y, 1.75);
@@ -871,680 +1018,601 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
       '<line class="tree-t" x1="' + base[0].toFixed(1) + '" y1="' + base[1].toFixed(1) + '" x2="' + top[0].toFixed(1) + '" y2="' + top[1].toFixed(1) + '"/>' +
       '<circle class="tree-c" cx="' + c[0].toFixed(1) + '" cy="' + c[1].toFixed(1) + '" r="' + (U * 0.78).toFixed(1) + '"/>';
   }
-  function placeOf(h) {
-    var g = geom(h);
-    if (h.zone === "on") return { mx: h.mx, my: h.my };
-    var cx = GATE_X + h.km * KM;
-    return { mx: cx - g.w / 2, my: h.side === "north" ? ROAD_Y - g.d - 1.1 : ROAD_Y + ROAD_W + 1.1 };
-  }
   function vb(pad, padTop) { return (BB[0] - pad).toFixed(0) + " " + (BB[1] - padTop).toFixed(0) + " " + (BB[2] - BB[0] + pad * 2).toFixed(0) + " " + (BB[3] - BB[1] + pad + padTop).toFixed(0); }
-
   function buildModel() {
     BB = [Infinity, Infinity, -Infinity, -Infinity];
-    var END = GATE_X + 2.6 * KM, ground = "";
-    ground += poly([P(-2, -2, 0), P(END + 4, -2, 0), P(END + 4, ROAD_Y + ROAD_W + 9, 0), P(-2, ROAD_Y + ROAD_W + 9, 0)], "ground");
-    ground += poly([P(-0.8, -0.8, 0), P(GATE_X, -0.8, 0), P(GATE_X, ROAD_Y - 0.6, 0), P(-0.8, ROAD_Y - 0.6, 0)], "campus");
-    ground += poly([P(-2, ROAD_Y, 0), P(END + 4, ROAD_Y, 0), P(END + 4, ROAD_Y + ROAD_W, 0), P(-2, ROAD_Y + ROAD_W, 0)], "road");
-    var l0 = P(-2, ROAD_Y + ROAD_W / 2, 0), l1 = P(END + 4, ROAD_Y + ROAD_W / 2, 0);
-    ground += '<line class="road-line" x1="' + l0[0].toFixed(1) + '" y1="' + l0[1].toFixed(1) + '" x2="' + l1[0].toFixed(1) + '" y2="' + l1[1].toFixed(1) + '"/>';
-    for (var k = 0.5; k <= 2.5; k += 0.5) {
-      var t0 = P(GATE_X + k * KM, ROAD_Y + ROAD_W, 0), t1 = P(GATE_X + k * KM, ROAD_Y + ROAD_W + 0.7, 0);
-      ground += '<line class="km-tick" x1="' + t0[0].toFixed(1) + '" y1="' + t0[1].toFixed(1) + '" x2="' + t1[0].toFixed(1) + '" y2="' + t1[1].toFixed(1) + '"/>' +
-        '<text class="km" x="' + (t1[0] - 10).toFixed(1) + '" y="' + (t1[1] + 18).toFixed(1) + '">' + k + ' km</text>';
-    }
-    var gp = P(GATE_X, ROAD_Y - 0.4, 0), gt = P(GATE_X, ROAD_Y - 0.4, 2.2), over = "";
-    over += '<line x1="' + gp[0].toFixed(1) + '" y1="' + gp[1].toFixed(1) + '" x2="' + gt[0].toFixed(1) + '" y2="' + gt[1].toFixed(1) + '" stroke="var(--red)" stroke-width="2"/>' +
-      '<path class="gate" d="M' + gt[0].toFixed(1) + ' ' + gt[1].toFixed(1) + ' l14 4 l-14 4z"/>' +
-      '<text class="ground-label" text-anchor="end" x="' + (gt[0] - 6).toFixed(1) + '" y="' + (gt[1] + 9).toFixed(1) + '">Main gate</text>';
-    var cl = P(-0.4, ROAD_Y - 0.9, 0);
-    over += '<text class="ground-label" x="' + (cl[0] - 6).toFixed(1) + '" y="' + (cl[1] + 4).toFixed(1) + '">Main campus</text>';
-
-    // depth-sort buildings and trees so nearer things paint over farther ones
+    var ground = poly([P(-2.5, -2.5, 0), P(31.5, -2.5, 0), P(31.5, 17.5, 0), P(-2.5, 17.5, 0)], "campus");
+    ground += poly([P(-2.5, 13.6, 0), P(31.5, 13.6, 0), P(31.5, 15.4, 0), P(-2.5, 15.4, 0)], "road") + poly([P(16.6, -2.5, 0), P(18.2, -2.5, 0), P(18.2, 13.6, 0), P(16.6, 13.6, 0)], "road");
     var items = [];
-    HOSTELS.forEach(function (h, i) { var p = placeOf(h), g = geom(h); items.push({ depth: p.mx + p.my + (g.w + g.d) / 2, h: h, p: p, i: i }); });
-    [[17.5, 1.2], [19.5, 3.4], [0.6, 10.6], [14.6, 11.4], [9.5, 11.6], [28.5, 11.6], [37, 19.6], [45.5, 11.8], [52.5, 19.8], [31.5, 20.4], [57, 12.2], [24, 20]].forEach(function (t) { items.push({ depth: t[0] + t[1], tree: t }); });
+    HOSTELS.forEach(function (h, i) { var g = geom(h); items.push({ depth: h.mx + h.my + (g.w + g.d) / 2, h: h, i: i }); });
+    [[0, 13], [4.5, 12.6], [9, 13], [13.5, 12.6], [20, 1.5], [23.5, 3], [27, 1.2], [29.5, 5], [-1, 16.6], [8, 16.8], [22, 16.6], [30, 16.4], [17.4, 16.8]].forEach(function (t) { items.push({ depth: t[0] + t[1], tree: t }); });
     items.sort(function (a, b) { return a.depth - b.depth; });
     var body = items.map(function (it) {
       if (it.tree) return treeSVG(it.tree[0], it.tree[1]);
-      var h = it.h, g = geom(h), tagP = P(it.p.mx + g.w / 2, it.p.my + g.d / 2, g.ht + 2.0);
-      var label = h.name, tw = Math.round(label.length * 10.2 + 62);
-      return '<g class="bldg" style="--i:' + it.i + '" data-goto="' + h.id + '" id="mb-' + h.id + '" tabindex="0" role="button" aria-label="' + esc(h.name) + ', ' + hostelFree(h) + ' beds free. Show this residence.">' +
-        buildingSVG(h, it.p.mx, it.p.my, true) +
-        '<g class="tag"><rect x="' + (tagP[0] - tw / 2).toFixed(1) + '" y="' + (tagP[1] - 21).toFixed(1) + '" width="' + tw + '" height="32" rx="16"/>' +
-        '<text x="' + (tagP[0] - tw / 2 + 15).toFixed(1) + '" y="' + (tagP[1] + 1.5).toFixed(1) + '">' + esc(label) + ' <tspan class="tag-n" id="mt-' + h.id + '">' + hostelFree(h) + '</tspan></text></g></g>';
+      var h = it.h, g = geom(h), tp = P(h.mx + g.w / 2, h.my + g.d / 2, g.ht + 2.2), tw = Math.round(h.name.length * 8.2 + 92);
+      return '<g class="bldg" style="--i:' + it.i + '" data-action="rooms" data-hid="' + h.id + '" id="mb-' + h.id + '" tabindex="0" role="button" aria-label="' + h.name + ' hostel. Show its rooms.">' +
+        buildingSVG(h, h.mx, h.my, true) +
+        '<g class="tag"><rect x="' + (tp[0] - tw / 2).toFixed(1) + '" y="' + (tp[1] - 17).toFixed(1) + '" width="' + tw + '" height="27" rx="13.5"/>' +
+        '<text x="' + tp[0].toFixed(1) + '" y="' + (tp[1] + 1.5).toFixed(1) + '" text-anchor="middle">' + h.name + ' <tspan class="tag-n" id="mt-' + h.id + '"></tspan></text></g></g>';
     }).join("");
-    var svg = $("model");
-    svg.setAttribute("viewBox", vb(16, 44));
-    svg.innerHTML = ground + body + over;
-    BB = null;
+    var svg = $("model"); svg.setAttribute("viewBox", vb(12, 34)); svg.innerHTML = ground + body; BB = null;
   }
-  function artSVG(h, size) {
+  function artSVG(h) {
     BB = [Infinity, Infinity, -Infinity, -Infinity];
-    var g = geom(h), out = poly([P(-2.2, -2.2, 0), P(g.w + 2.4, -2.2, 0), P(g.w + 2.4, g.d + 2.4, 0), P(-2.2, g.d + 2.4, 0)], "campus", ' style="stroke:none"') + buildingSVG(h, 0, 0, false);
+    var g = geom(h), out = poly([P(-2, -2, 0), P(g.w + 2.2, -2, 0), P(g.w + 2.2, g.d + 2.2, 0), P(-2, g.d + 2.2, 0)], "campus", ' style="stroke:none"') + buildingSVG(h, 0, 0, false);
     var box = vb(8, 8); BB = null;
-    return '<svg viewBox="' + box + '" role="img" aria-label="Model of ' + esc(h.name) + ': ' + hostelFree(h) + ' of ' + h.beds + ' beds free"' + (size ? ' style="max-height:' + size + 'px"' : '') + '>' + out + '</svg>';
+    return '<svg viewBox="' + box + '" role="img" aria-label="Model of ' + h.name + ' hostel: ' + hostelFree(h) + ' of ' + h.keys.length + ' beds free">' + out + '</svg>';
   }
-
   function paintWindows() {
     var wins = document.querySelectorAll("[data-w]");
-    for (var k = 0; k < wins.length; k++) {
-      var p = wins[k].getAttribute("data-w").split(":"), rid = p[0], idx = +p[1];
-      wins[k].classList.toggle("on", !isTaken(rid, idx));
-      wins[k].classList.toggle("mine", isMine(rid, idx));
-    }
-    HOSTELS.forEach(function (h) {
-      var t = $("mt-" + h.id); if (t) t.textContent = hostelFree(h);
-      var b = $("mb-" + h.id); if (b) { b.classList.toggle("dim", !matches(h)); b.setAttribute("aria-label", h.name + ", " + hostelFree(h) + " beds free. Show this residence."); }
-    });
+    for (var k = 0; k < wins.length; k++) { var keep = wins[k].classList.contains("flash"); wins[k].setAttribute("class", winClass(wins[k].getAttribute("data-w")) + (keep ? " flash" : "")); }
+    HOSTELS.forEach(function (h) { var t = $("mt-" + h.id); if (t) t.textContent = hostelFree(h) + " free"; });
   }
-  function flashWindow(rid, idx) {
-    var w = $("model").querySelector('[data-w="' + rid + ":" + idx + '"]');
-    if (w) { w.classList.remove("flash"); void w.getBBox(); w.classList.add("flash"); setTimeout(function () { w.classList.remove("flash"); }, 1700); }
+  function flashWindow(key) {
+    var w = $("model").querySelector('[data-w="' + key + '"]');
+    if (w) { w.classList.add("flash"); setTimeout(function () { w.classList.remove("flash"); }, 1700); }
+  }
+  function qrSVG(text) {
+    if (!window.qrcode) return "";
+    try {
+      var q = window.qrcode(0, "M"); q.addData(text); q.make();
+      var n = q.getModuleCount(), d = "";
+      for (var r = 0; r < n; r++) for (var c = 0; c < n; c++) if (q.isDark(r, c)) d += "M" + c + " " + r + "h1v1h-1z";
+      return '<svg viewBox="0 0 ' + n + ' ' + n + '" shape-rendering="crispEdges" role="img" aria-label="QR code for booking token"><rect width="' + n + '" height="' + n + '" fill="#FFFFFF"/><path d="' + d + '" fill="#121214"/></svg>';
+    } catch (e) { return ""; }
   }
 
-  /* ---------- Search and results ---------- */
-  function visibleRooms(h) {
-    return h.rooms.filter(function (r) {
-      if (ui.size && r.beds !== ui.size) return false;
-      if (r.price > ui.budget) return false;
-      if (ui.hideFull && avail(r) === 0) return false;
-      return true;
-    });
+  /* ---------- Navigation and home ---------- */
+  function navBtn(view, long, short) { return '<button data-go="' + view + '"' + (ui.view === view ? ' aria-current="page"' : "") + '><span class="long">' + long + '</span><span class="short">' + short + '</span></button>'; }
+  function renderNav() {
+    var s = state.session, h;
+    if (!s) h = navBtn("home", "Hostels", "Hostels") + '<button class="btn" data-go="signin">Sign in</button>';
+    else if (s.role === "student") h = navBtn("home", "Find a room", "Find") + navBtn("me", "My application", "Mine") + who(me().name.split(" ")[0]);
+    else if (s.role === "manager") h = navBtn("manager", "Dashboard", "Dashboard") + who(HOSTEL[s.hostel].name + " manager");
+    else h = navBtn("admin", "Overview", "Overview") + who("Administrator");
+    $("nav").innerHTML = h;
+    ["home", "signin", "me", "manager", "admin"].forEach(function (v) { $("view-" + v).hidden = ui.view !== v; });
   }
-  function matches(h) {
-    return (ui.zone === "any" || h.zone === ui.zone) && (ui.gender === "all" || h.gender === ui.gender) && visibleRooms(h).length > 0;
-  }
-  function matchingBeds() {
-    return HOSTELS.reduce(function (n, h) { return n + (matches(h) ? visibleRooms(h).reduce(function (m, r) { return m + avail(r); }, 0) : 0); }, 0);
-  }
-  var shown = { s: null };
-  function setCount(id, n) {
-    var el = $(id); if (!el) return;
-    if (el.textContent !== String(n)) { el.textContent = n; var host = el.closest(".btn, h2") || el; host.classList.remove("bump"); void host.offsetWidth; host.classList.add("bump"); }
-  }
-  function renderTotals() {
-    var all = zoneFree("on") + zoneFree("off");
-    $("t-beds").textContent = all; $("t-beds-2").textContent = all;
-    $("cz-any").textContent = all; $("cz-on").textContent = zoneFree("on"); $("cz-off").textContent = zoneFree("off");
-    setCount("s-count", matchingBeds());
+  function who(label) { return '<span class="who"><span>' + esc(label) + '</span><button data-action="signout">Sign out</button></span>'; }
+  function stateTag(free) { return free === 0 ? '<span class="state none">Fully booked</span>' : free <= 3 ? '<span class="state low">Only ' + free + ' left</span>' : ""; }
+
+  function renderHome() {
+    var g = viewGender(), free = totalFree(), p = me(), app = myApp();
+    $("t-beds").textContent = free; $("t-beds-2").textContent = free;
+    $("f-gender-row").hidden = !!p;
+    document.querySelectorAll("[data-fg]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.fg === ui.fg)); });
+    $("f-types").innerHTML = '<button type="button" class="pill" data-ft="" aria-pressed="' + (ui.ft === "") + '">All<span class="num">' + totalFree(g) + '</span></button>' +
+      TYPES.map(function (t) { return '<button type="button" class="pill" data-ft="' + t.id + '" aria-pressed="' + (ui.ft === t.id) + '">' + t.short + '<span class="num">' + countFree(t.id, g) + '</span></button>'; }).join("");
+    var t = TYPE[ui.ft], n = t ? countFree(t.id, g) : totalFree(g);
+    $("f-price").textContent = t ? money(t.price) : "From " + money(14000);
+    $("f-sub").textContent = (t ? t.name + " · " : "") + "per bed for 9 months, plus 5% service fee";
+    $("f-btn").textContent = app && app.status !== "applied" ? "View my application" : n ? "Apply · " + n + (n === 1 ? " bed free" : " beds free") : "Join the waiting list";
+
+    $("types").innerHTML = TYPES.map(function (t) {
+      var f = countFree(t.id, g), by = HOSTELS.map(function (h) { var c = h.rooms.filter(function (r) { return r.type === t.id; }).length; return c ? h.name + " " + c + (c === 1 ? " room" : " rooms") : ""; }).filter(Boolean).join(" · ");
+      return '<article class="tcard' + (f ? "" : " full") + '"><div class="tc-top"><span class="beds-ico" aria-hidden="true">' + new Array(t.beds + 1).join("<i></i>") + '</span>' + (t.premium ? '<span class="chip">Includes ' + money(2000) + ' premium</span>' : "") + '</div>' +
+        '<h3>' + t.name + '</h3><div class="p num">' + money(t.price) + '<small> per bed, 9 months</small></div>' +
+        '<div class="avail"><span class="num"><b>' + f + '</b>/' + t.total + ' free' + (g ? " for you" : "") + '</span><span class="meter" role="img" aria-label="' + f + ' of ' + t.total + ' beds free"><i style="width:' + (f / t.total * 100).toFixed(1) + '%"></i></span>' + stateTag(f) + '</div>' +
+        '<p class="room-note" style="margin:0">' + by + '</p>' +
+        '<button class="btn block' + (f ? "" : " ghost") + '" data-action="apply" data-tid="' + t.id + '">' + (f ? "Apply for this room" : "Join the waiting list") + '</button></article>';
+    }).join("");
+
+    $("hostels").innerHTML = HOSTELS.map(function (h, i) {
+      var mix = TYPES.map(function (t) { var rs = h.rooms.filter(function (r) { return r.type === t.id; }); if (!rs.length) return ""; var fr = 0; rs.forEach(function (r) { r.keys.forEach(function (k) { if (!OCC[k]) fr++; }); });
+        return '<div><dt>' + t.name + '</dt><dd class="num">' + rs.length + (rs.length === 1 ? " room" : " rooms") + ' · ' + fr + ' free</dd></div>'; }).join("");
+      return '<article class="card" style="--i:' + i + '"><button class="card-art" data-action="rooms" data-hid="' + h.id + '" aria-label="See the rooms in ' + h.name + '">' + artSVG(h) +
+        '<span class="art-chips"><span><span class="chip">On campus</span></span><span class="chip red"><span class="num">' + hostelFree(h) + '</span> beds free</span></span><span class="art-foot"><span class="chip">University hostel</span></span></button>' +
+        '<div class="card-body"><div class="card-title"><div><h3>' + h.name + '</h3></div></div>' +
+        '<div class="h-facts"><span class="chip dark">Male and female</span><span class="chip">' + h.rooms.length + ' rooms</span><span class="chip">' + h.keys.length + ' beds</span><span class="chip">' + h.floors.length + ' floors</span></div>' +
+        '<dl class="h-mix">' + mix + '</dl><div class="card-foot"><button class="btn quiet" data-action="rooms" data-hid="' + h.id + '">See every room</button><span class="room-note">Lounge and reception on the ground floor</span></div></div></article>';
+    }).join("");
+    $("hostels").classList.toggle("settled", !ui.animate); ui.animate = false;
     paintWindows();
   }
-  function renderSearch() {
-    document.querySelectorAll("[data-zone]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.zone === ui.zone)); });
-    document.querySelectorAll("[data-gender]").forEach(function (b) { b.setAttribute("aria-pressed", String(b.dataset.gender === ui.gender)); });
-    document.querySelectorAll("[data-size]").forEach(function (b) { b.setAttribute("aria-pressed", String(+b.dataset.size === ui.size)); });
-    $("f-budget").value = ui.budget; $("budget-out").textContent = moneyShort(ui.budget); $("f-hide").checked = ui.hideFull; $("f-sort").value = ui.sort;
-    var bits = [ui.zone === "any" ? "Anywhere" : ui.zone === "on" ? "On campus" : "Off campus", ui.gender === "all" ? "any residence" : ui.gender.toLowerCase(), ui.size ? ui.size + "-person rooms" : "any room", "up to " + moneyShort(ui.budget)];
-    $("s-summary").textContent = bits.join(" · ");
-  }
-  function roomRow(r) {
-    var left = avail(r), pct = r.total ? (left / r.total) * 100 : 0, holdHere = state.hold && state.hold.rid === r.id;
-    var st = holdHere ? ["mine", "Held by you"] : left === 0 ? ["none", "Fully booked"] : left <= 5 ? ["low", "Only " + left + " left"] : null;
-    var btn = holdHere ? '<button class="btn sm ghost" data-action="resume">Pay now</button>'
-      : left === 0 ? '<button class="btn sm" disabled>Full</button>'
-      : '<button class="btn sm" data-action="pick" data-rid="' + r.id + '">Choose bed</button>';
-    return '<div class="room' + (holdHere ? " mine" : "") + '" id="row-' + r.id + '">' +
-      '<div><div class="room-top"><b>' + SIZE_LABEL[r.beds] + '</b><span class="price num">' + moneyShort(r.price) + '<small>/yr</small></span></div><div class="room-note">' + esc(r.note) + '</div></div>' +
-      btn +
-      '<div class="avail"><span class="num"><b>' + left + '</b>/' + r.total + ' free</span><span class="meter" role="img" aria-label="' + left + ' of ' + r.total + ' beds free"><i style="width:' + pct.toFixed(1) + '%"></i></span>' + (st ? '<span class="state ' + st[0] + '">' + st[1] + '</span>' : '') + '</div></div>';
-  }
-  var PIN = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.4"/></svg>';
-  var SHIELD = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg>';
-  function renderList() {
-    var hostels = HOSTELS.filter(matches).map(function (h) { return { h: h, rooms: visibleRooms(h) }; });
-    hostels.sort(function (a, b) {
-      if (ui.sort === "free") return hostelFree(b.h) - hostelFree(a.h);
-      if (ui.sort === "near") return a.h.km - b.h.km;
-      return Math.min.apply(null, a.rooms.map(function (r) { return r.price; })) - Math.min.apply(null, b.rooms.map(function (r) { return r.price; }));
-    });
-    var beds = 0;
-    $("list").innerHTML = hostels.length ? hostels.map(function (x, i) {
-      var h = x.h, free = hostelFree(h), from = Math.min.apply(null, h.rooms.map(function (r) { return r.price; }));
-      x.rooms.forEach(function (r) { beds += avail(r); });
-      return '<article class="card" id="card-' + h.id + '" style="--i:' + i + '">' +
-        '<button class="card-art" data-action="tour" data-hid="' + h.id + '" aria-label="View ' + esc(h.name) + '">' + artSVG(h) +
-          '<span class="art-chips"><span><span class="chip">' + PIN + (h.zone === "on" ? "On campus" : h.km + " km away") + '</span></span><span class="chip red"><span class="num">' + free + '</span> beds free</span></span>' +
-          '<span class="art-foot"><span class="chip">' + (h.zone === "on" ? "University run" : SHIELD + "Verified landlord") + '</span></span></button>' +
-        '<div class="card-body">' +
-          '<div class="card-title"><div><h3>' + esc(h.name) + '</h3>' + distHTML(h) + '</div><div class="from">from<b class="num">' + moneyShort(from) + '</b></div></div>' +
-          '<ul class="perks"><li style="background:var(--fg);color:var(--bg)">' + esc(h.gender) + '</li>' + h.perks.map(function (p) { return "<li>" + esc(p) + "</li>"; }).join("") + '</ul>' +
-          '<div class="rooms">' + x.rooms.map(roomRow).join("") + '</div>' +
-          '<div class="card-foot"><button class="linkbtn" data-action="tour" data-hid="' + h.id + '">See room layouts</button><span class="room-note">' + h.beds + ' beds in total</span></div>' +
-        '</div></article>';
-    }).join("") : '<div class="empty"><b>No beds match that search</b>' +
-      (ui.zone === "on" && ui.gender !== "all" && ui.gender !== "Mixed" ? "Both on campus residences, Maria and Camille, are mixed. " : "") +
-      'Try another room type, raise your budget, or search anywhere.<div style="margin-top:16px"><button class="btn quiet" data-action="clear">Clear search</button></div></div>';
-    $("list").classList.toggle("settled", !ui.animate); ui.animate = false;
-    $("r-count").textContent = beds;
-    $("r-sub").textContent = "across " + hostels.length + (hostels.length === 1 ? " residence" : " residences") + (ui.zone === "on" ? " on campus" : ui.zone === "off" ? " off campus" : "");
-    renderSearch(); renderTotals();
-  }
-  function renderNav() {
-    ["find", "mine", "verify"].forEach(function (v) {
-      $("view-" + v).hidden = ui.view !== v;
-      var b = $("nav-" + v); if (ui.view === v) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
-    });
-    $("mine-count").textContent = state.bookings.filter(function (b) { return b.status === "paid"; }).length;
-  }
-  /* ---------- Receipts ---------- */
-  function ticketHTML(b, withCancel) {
-    var paid = b.status === "paid";
-    return '<article class="ticket">' +
-      '<div class="ticket-top"><div><div class="lbl">Receipt and allocation letter</div><div class="ref">' + esc(b.ref) + '</div><div class="small">' + esc(b.hostel) + ' · ' + SIZE_LABEL[b.beds] + '</div></div>' +
-      '<span class="small">' + new Date(b.ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) + '</span></div>' +
-      '<div class="ticket-body">' +
-        '<div><div class="ticket-bed">' + esc(b.bed) + '</div><div style="font-size:var(--t-xs);color:var(--muted);margin-top:6px">Assigned to ' + esc(b.name) + ' · ID ' + esc(b.sid) + '</div></div>' +
-        '<div>' + (paid ? '<span class="status">Paid · in escrow until check-in</span>' : '<span class="status off">Cancelled · refunded</span>') + '</div>' +
-        (paid ? '<p class="lock-line"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" aria-hidden="true"><rect x="5" y="11" width="14" height="10" rx="1"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg><span>Room type locked to ' + SIZE_LABEL[b.beds] + '. Nobody can move you to another room type without your approval.</span></p>' : '') +
-        (paid && withCancel && b.request ? requestHTML(b) : '') +
-      '</div><div class="ticket-cut"></div><div class="ticket-body">' +
-        (paid ? '<div><div class="code-lbl">Check-in code</div><div class="code">' + esc(b.code) + '</div></div>' : '') +
-        '<dl class="rows">' +
-          '<div><dt>Room fee, ' + SESSION + '</dt><dd>' + money(b.price) + '</dd></div>' +
-          '<div><dt>Service fee (' + Math.round(SERVICE_FEE_RATE * 100) + '%)</dt><dd>' + money(b.fee) + '</dd></div>' +
-          '<div><dt>Agent fee</dt><dd>' + money(0) + '</dd></div>' +
-          '<div class="total"><dt>Total paid</dt><dd>' + money(b.total) + '</dd></div>' +
-          (b.refunded ? '<div><dt>Refunded, cheaper room</dt><dd>' + money(b.refunded) + '</dd></div>' : '') +
-          '<div><dt>Paid with</dt><dd>' + esc(b.method) + '</dd></div>' +
-        '</dl>' +
-        (paid && withCancel ? '<button class="btn quiet" data-action="cancel" data-ref="' + esc(b.ref) + '">Cancel booking</button>' : '') +
-      '</div></article>';
-  }
-  function renderBookings() {
-    var list = state.bookings.slice().reverse();
-    $("receipts").innerHTML = list.length ? list.map(function (b) { return ticketHTML(b, true); }).join("")
-      : '<div class="empty" style="grid-column:1/-1"><b>No bookings yet</b>Choose a bed in Residences. Your allocation letter, exact bed and check-in code will appear here.</div>';
-  }
-  function renderAll() { renderTotals(); renderList(); renderNav(); renderBookings(); renderPill(); renderGuard(); }
 
-  function renderPill() {
-    var p = $("holdpill");
-    if (!state.hold || !$("overlay").hidden) { p.hidden = true; return; }
-    var r = ROOM[state.hold.rid];
-    p.innerHTML = '<span><span style="opacity:.65">Held · </span>' + esc(bedLabel(r, state.hold.idx)) + ' <span class="t num" id="pill-timer">' + mmss(state.hold.exp - Date.now()) + '</span></span><button class="btn" data-action="resume">Pay now</button>';
-    p.hidden = false;
-  }
-
-  /* ---------- Sheet ---------- */
+  /* ---------- Sheets ---------- */
   var lastFocus = null;
   function showSheet(html, focusSel) {
     if ($("overlay").hidden) lastFocus = document.activeElement;
-    $("sheet").innerHTML = html; $("overlay").hidden = false; $("holdpill").hidden = true;
-    if (lenis) lenis.stop();
+    $("sheet").innerHTML = html; $("overlay").hidden = false;
     var f = $("sheet").querySelector(focusSel || ".close"); if (f) f.focus({ preventScroll: true });
+    $("sheet").scrollTop = 0;
   }
   function closeSheet() {
-    $("overlay").hidden = true; $("sheet").innerHTML = ""; ui.sheet = null; renderPill();
-    if (lenis) lenis.start();
+    $("overlay").hidden = true; $("sheet").innerHTML = ""; ui.sheet = null;
     if (lastFocus && lastFocus.focus && document.body.contains(lastFocus)) lastFocus.focus({ preventScroll: true });
   }
-  function head(title, sub, closeLabel) {
-    return '<div class="sheet-head"><div><h3 id="sheet-title">' + title + '</h3><p>' + sub + '</p></div><button class="close" data-action="close" aria-label="' + (closeLabel || "Close") + '">×</button></div>';
+  function head(title, sub) { return '<div class="sheet-head"><div><h3 id="sheet-title">' + title + '</h3><p>' + sub + '</p></div><button class="close" data-action="close" aria-label="Close">×</button></div>'; }
+  function stepper(n) { return '<ol class="stepper">' + ["Apply", "Choose bed", "Reserve and pay", "Done"].map(function (s, i) { return '<li class="' + (i + 1 === n ? "now" : i + 1 < n ? "done" : "") + '"' + (i + 1 === n ? ' aria-current="step"' : "") + '>' + s + '</li>'; }).join("") + '</ol>'; }
+  function field(id, label, type, val, hint, extra) { return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" type="' + type + '" value="' + esc(val) + '" ' + (extra || "") + '><span class="hint">' + (hint || "") + '</span><span class="err" id="' + id + '-err"></span></div>'; }
+  function selectField(id, label, opts, val, hint) { return '<div class="field"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(val) ? " selected" : "") + (o[2] ? " disabled" : "") + '>' + esc(o[1]) + '</option>'; }).join("") + '</select><span class="hint">' + (hint || "") + '</span><span class="err" id="' + id + '-err"></span></div>'; }
+  function setErr(id, msg) { var el = $(id), e = $(id + "-err"); if (!el) return !msg; if (msg) el.setAttribute("aria-invalid", "true"); else el.removeAttribute("aria-invalid"); if (e) e.textContent = msg || ""; return !msg; }
+
+  /* ---------- Room maps ---------- */
+  // mode "view": anyone browsing. mode "pick": a student choosing a bed of one room type.
+  function roomTiles(rooms, mode, gender, sel, app) {
+    return '<div class="floor">' + rooms.map(function (r) {
+      var rg = roomGender(r, app), blocked = mode === "pick" && rg && rg !== gender, anyFree = false;
+      var beds = r.keys.map(function (k) {
+        var taken = !!OCC[k] && OCC[k] !== app, ok = !taken && !blocked; if (!taken) anyFree = true;
+        if (mode === "view") return '<span class="bed viewonly' + (taken ? " taken" : "") + '" aria-label="' + bedName(k) + (taken ? ", taken" : ", free") + '">' + (r.beds === 1 ? "" : bedLetter(k)) + '</span>';
+        return '<button type="button" class="bed' + (ok ? "" : " taken") + (k === sel ? " sel" : "") + '" data-action="sel" data-key="' + k + '"' + (ok ? "" : " disabled") + ' aria-pressed="' + (k === sel) + '" aria-label="' + bedName(k) + (ok ? ", free" : ", not available") + '">' + (r.beds === 1 ? "" : bedLetter(k)) + '</button>';
+      }).join("");
+      return '<div class="rm' + (blocked ? " blocked" : anyFree ? "" : " full") + '"><span class="rm-no">Room ' + r.no + (mode === "view" ? " · " + TYPE[r.type].short : "") + '</span><div class="beds' + (r.beds === 1 ? " one" : "") + '">' + beds + '</div>' +
+        (rg && r.beds > 1 ? '<span class="gtag">' + gWord(rg) + ' room</span>' : "") + '</div>';
+    }).join("") + '</div>';
   }
-  function stepper(n) {
-    return '<ol class="stepper">' + ["Choose bed", "Hold and pay", "Done"].map(function (s, i) {
-      return '<li class="' + (i + 1 === n ? "now" : i + 1 < n ? "done" : "") + '"' + (i + 1 === n ? ' aria-current="step"' : "") + '>' + s + '</li>';
-    }).join("") + '</ol>';
+  function openRooms(hid, floor) {
+    var h = HOSTEL[hid]; floor = floor || 0; ui.sheet = { kind: "rooms", hid: hid, floor: floor };
+    showSheet(head(h.name + " hostel", h.rooms.length + " rooms · " + h.keys.length + " beds · " + hostelFree(h) + " free now") +
+      '<div class="tabs" role="tablist">' + h.floors.map(function (f, i) { return '<button role="tab" aria-selected="' + (i === floor) + '" data-action="rooms" data-hid="' + hid + '" data-floor="' + i + '">' + f + '</button>'; }).join("") + '</div>' +
+      '<div class="sheet-body"><div class="map-key"><span><i class="mk-free"></i>Free bed</span><span><i class="mk-taken"></i>Taken</span></div>' +
+      roomTiles(h.rooms.filter(function (r) { return r.floor === floor; }), "view") +
+      '<p class="tour-note">Room numbers and bed counts follow the hostel floor plans. Shared rooms with someone in them show whether they are a female or a male room.</p>' +
+      '<div class="actions"><button class="btn block" data-action="apply">Apply for a bed</button></div></div>', '[aria-selected="true"]');
   }
 
-  function openPicker(rid, keepSel) {
-    if (state.hold && state.hold.rid !== rid) { openConflict(rid); return; }
-    if (state.hold && state.hold.rid === rid) { openPay(); return; }
-    var r = ROOM[rid], free = freeBeds(r);
-    if (!free.length) { toast("That room type just sold out."); renderAll(); return; }
-    ui.sheet = { step: 1, rid: rid, sel: keepSel != null && !isTaken(rid, keepSel) ? keepSel : free[0] };
-    renderPicker(".bed.sel");
-  }
-  function renderPicker(focusSel) {
-    var s = ui.sheet, r = ROOM[s.rid], rooms = Math.ceil(r.total / r.beds), html = "";
-    for (var k = 0; k < rooms; k++) {
-      var beds = "", full = true;
-      for (var b = 0; b < r.beds; b++) {
-        var idx = k * r.beds + b; if (idx >= r.total) break;
-        var t = isTaken(r.id, idx), sel = idx === s.sel; if (!t) full = false;
-        beds += '<button type="button" class="bed' + (t ? " taken" : "") + (sel ? " sel" : "") + '" data-action="sel" data-idx="' + idx + '"' + (t ? " disabled" : "") +
-          ' aria-pressed="' + sel + '" aria-label="' + esc(bedLabel(r, idx)) + (t ? ", booked" : ", free") + '">' + (r.beds === 1 ? "" : b + 1) + '</button>';
-      }
-      html += '<div class="rm' + (full ? " full" : "") + '"><span class="rm-no">' + roomName(r, k * r.beds) + '</span><div class="beds' + (r.beds === 1 ? " one" : "") + '">' + beds + '</div></div>';
+  /* ---------- Sign in ---------- */
+  var ICON_NOTE = "Demo sign in. Use any 4 digit PIN, and never a real password.";
+  function renderSignin() {
+    document.querySelectorAll(".role").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.role === ui.role)); });
+    var h;
+    if (ui.role === "student") {
+      h = '<div><h3 class="panel-title">Student sign in</h3><p class="panel-sub">New here? Fill this in once and we create your profile.</p></div><form id="f-student" novalidate style="display:grid;gap:14px">' +
+        '<div class="grid2">' + field("s-name", "Full name", "text", "Ama Mensah", "As on your student ID", 'autocomplete="name"') + field("s-sid", "Student ID", "text", "20261234", "8 digits", 'inputmode="numeric" maxlength="8"') + '</div>' +
+        '<div class="grid2">' + selectField("s-gender", "I am", [["F", "Female"], ["M", "Male"]], "F", "Shared rooms are single gender") +
+        selectField("s-elig", "My situation", [["fresher", "Fresher, first year at LUG"], ["returning", "Stayed in the hostel last year"], ["never", "Continuing, never stayed in the hostel"], ["two", "Already stayed two years"]], "fresher", "Decides if you can apply") + '</div>' +
+        field("s-pin", "PIN", "password", "1234", ICON_NOTE, 'inputmode="numeric" maxlength="4" autocomplete="off"') +
+        '<button class="btn block" type="submit">Sign in as a student</button></form>';
+    } else if (ui.role === "manager") {
+      h = '<div><h3 class="panel-title">Hostel manager sign in</h3><p class="panel-sub">See your rooms, your residents and who is arriving.</p></div><form id="f-manager" novalidate style="display:grid;gap:14px">' +
+        selectField("m-hostel", "Your hostel", [["maria", "Maria"], ["camille", "Camille"]], "maria") + field("m-code", "Access code", "text", CODES.maria, "", 'autocomplete="off" spellcheck="false"') +
+        '<p class="demo-note">Demo access codes: <code>' + CODES.maria + '</code> for Maria, <code>' + CODES.camille + '</code> for Camille.</p>' +
+        '<button class="btn block" type="submit">Sign in as hostel manager</button></form>';
+    } else {
+      h = '<div><h3 class="panel-title">Administrator sign in</h3><p class="panel-sub">Every application, payment, upgrade request and waiting list.</p></div><form id="f-admin" novalidate style="display:grid;gap:14px">' +
+        field("a-code", "Access code", "text", CODES.admin, "", 'autocomplete="off" spellcheck="false"') +
+        '<p class="demo-note">Demo access code: <code>' + CODES.admin + '</code></p><button class="btn block" type="submit">Sign in as administrator</button></form>';
     }
-    var f = fees(r.price);
-    showSheet(head(esc(r.hostel.name) + ' · ' + SIZE_LABEL[r.beds], esc(r.note) + ' · ' + avail(r) + ' of ' + r.total + ' beds free') + stepper(1) +
-      '<div class="sheet-body">' +
-        '<div class="map-key"><span><i class="mk-free"></i>Free</span><span><i class="mk-sel"></i>Your choice</span><span><i class="mk-taken"></i>Booked</span></div>' +
-        '<div class="floor" role="group" aria-label="Room map">' + html + '</div>' +
-        '<div class="pick-sum"><div><small>Your bed</small><div class="bedname">' + esc(bedLabel(r, s.sel)) + '</div></div>' +
-        '<div style="text-align:right"><small>Total with 5% service fee</small><b class="num">' + money(f.total) + '</b></div></div>' +
-        '<div class="actions"><button class="btn block" data-action="hold">Hold this bed for ' + HOLD_MINUTES + ' minutes</button></div>' +
-      '</div>', focusSel);
+    $("signin-panel").innerHTML = h;
   }
-  function openConflict(wantRid) {
-    var held = ROOM[state.hold.rid], want = ROOM[wantRid];
-    showSheet(head("You are already holding a bed", "One hold per student keeps beds free for everyone.") +
-      '<div class="sheet-body"><p style="margin:0">You are holding <b>' + esc(bedLabel(held, state.hold.idx)) + '</b> at <b>' + esc(held.hostel.name) + '</b>. Release it to choose a ' + SIZE_LABEL[want.beds] + ' at ' + esc(want.hostel.name) + ' instead.</p>' +
-      '<div class="actions"><button class="btn block" data-action="switch" data-rid="' + want.id + '">Release it and choose a new bed</button>' +
-      '<button class="btn quiet block" data-action="resume">Keep my current bed</button></div></div>', ".btn");
+  function signinStudent() {
+    var name = $("s-name").value.trim(), sid = $("s-sid").value.trim(), elig = $("s-elig").value;
+    var ok = setErr("s-name", name.length < 3 ? "Enter your full name." : "");
+    ok = setErr("s-sid", /^\d{8}$/.test(sid) ? "" : "Student ID must be 8 digits.") && ok;
+    ok = setErr("s-pin", /^\d{4}$/.test($("s-pin").value) ? "" : "PIN must be 4 digits.") && ok;
+    ok = setErr("s-elig", elig === "never" || elig === "two" ? "Hostel places are for freshers and students who stayed last year, for two years at most. Contact Hostel Management if you have a medical exception." : "") && ok;
+    if (!ok) return;
+    if (!state.profiles[sid]) state.profiles[sid] = { sid: sid, name: name, gender: $("s-gender").value, elig: elig };
+    state.session = { role: "student", sid: sid };
+    var intent = ui.intent; ui.intent = null;
+    go(myApp() && !intent ? "me" : "home"); toast("Signed in as " + state.profiles[sid].name + ".");
+    if (intent) apply(intent.tid);
   }
-  function holdBed() {
-    var s = ui.sheet; if (!s) return;
-    if (isTaken(s.rid, s.sel)) { toast("That bed was just booked. Pick another one."); openPicker(s.rid); return; }
-    state.taken[s.rid].push(s.sel);
-    state.hold = { rid: s.rid, idx: s.sel, exp: Date.now() + HOLD_MINUTES * 60000 };
-    save(); renderAll(); openPay();
-  }
-  function releaseHold(msg) {
-    if (!state.hold) return;
-    var h = state.hold, t = state.taken[h.rid], i = t.indexOf(h.idx);
-    if (i > -1) t.splice(i, 1);
-    state.hold = null; save(); renderAll();
-    if (msg) toast(msg);
+  function signinStaff(role) {
+    if (role === "manager") {
+      var hid = $("m-hostel").value;
+      if (!setErr("m-code", $("m-code").value.trim().toUpperCase() === CODES[hid] ? "" : "That code does not match " + HOSTEL[hid].name + ".")) return;
+      state.session = { role: "manager", hostel: hid }; go("manager");
+    } else {
+      if (!setErr("a-code", $("a-code").value.trim().toUpperCase() === CODES.admin ? "" : "That access code is not right.")) return;
+      state.session = { role: "admin" }; go("admin");
+    }
   }
 
-  function field(id, label, type, val, hint, extra) {
-    return '<div class="field"><label for="' + id + '">' + label + '</label><input id="' + id + '" type="' + type + '" value="' + esc(val) + '" ' + (extra || "") + '><span class="hint">' + hint + '</span><span class="err" id="' + id + '-err"></span></div>';
+  /* ---------- Student: apply, choose, reserve, pay ---------- */
+  function apply(tid) {
+    var s = state.session;
+    if (!s) { ui.intent = { tid: tid || ui.ft || "" }; ui.role = "student"; go("signin"); toast("Sign in as a student to apply."); return; }
+    if (s.role !== "student") { toast("Sign out and sign in as a student to apply."); return; }
+    var app = myApp();
+    if (app && app.status !== "applied") { go("me"); return; }
+    if (app) { openChooser(app); return; }
+    tid = tid || ui.ft || "t2";
+    var second = TYPES.filter(function (t) { return t.id !== tid; }).sort(function (a, b) { return countFree(b.id, me().gender) - countFree(a.id, me().gender); })[0].id;
+    openApply(tid, second);
   }
-  function openPay() {
-    var hold = state.hold; if (!hold) return;
-    var r = ROOM[hold.rid], f = fees(r.price);
-    ui.sheet = { step: 2, rid: hold.rid };
-    showSheet(head(esc(r.hostel.name) + ' · ' + SIZE_LABEL[r.beds], SESSION + ' · ' + esc(r.note), "Close and keep my hold") + stepper(2) +
-      '<form class="sheet-body" id="pay-form" novalidate>' +
-        '<div class="holdbox"><div><small>Held for you</small><div class="bedname">' + esc(bedLabel(r, hold.idx)) + '</div><small style="text-transform:none;letter-spacing:0;font-family:var(--f-body)">Nobody else can pay for this bed.</small></div>' +
-        '<div style="text-align:right"><small>Time left</small><div class="timer num" id="timer">' + mmss(hold.exp - Date.now()) + '</div></div></div>' +
-        '<div class="grid2">' +
-          field("p-name", "Full name", "text", form.name, "As on your student ID", 'autocomplete="name"') +
-          field("p-sid", "Student ID", "text", form.sid, "8 digits", 'inputmode="numeric" maxlength="8"') +
-        '</div>' +
-        (r.hostel.gender !== "Mixed" ? '<div class="field"><label class="check" for="p-gender"><input type="checkbox" id="p-gender"> I confirm I am ' + (r.hostel.gender === "Female only" ? "female" : "male") + '. ' + esc(r.hostel.name) + ' is ' + r.hostel.gender.toLowerCase() + ' and checks your student ID at check-in.</label><span class="err" id="p-gender-err"></span></div>' : '') +
-        '<div><div class="legend" style="margin-bottom:8px">Pay with</div><fieldset class="methods">' +
-          METHODS.map(function (m) {
-            return '<div class="method"><input type="radio" name="method" id="m-' + m.id + '" value="' + m.id + '"' + (form.method === m.id ? " checked" : "") + '><label for="m-' + m.id + '"><span class="logo" style="background:' + m.bg + '">' + m.logo + '</span><span>' + m.name + '<small>' + m.sub + '</small></span></label></div>';
-          }).join("") +
-        '</fieldset></div>' +
-        '<div id="momo-wrap"' + (form.method === "card" ? " hidden" : "") + '>' + field("p-momo", "Mobile money number", "tel", form.momo, "The number that will get the approval prompt", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') + '</div>' +
-        '<dl class="rows">' +
-          '<div><dt>Room fee, full year</dt><dd>' + money(f.price) + '</dd></div>' +
-          '<div><dt>Service fee (' + Math.round(SERVICE_FEE_RATE * 100) + '%)</dt><dd>' + money(f.fee) + '</dd></div>' +
-          '<div><dt>Agent fee</dt><dd>' + money(0) + '</dd></div>' +
-          '<div class="total"><dt>Total today</dt><dd>' + money(f.total) + '</dd></div>' +
-        '</dl>' +
-        '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>The room fee stays in escrow until the hostel confirms your check-in code. If they cannot give you this bed, you get a full refund.</span></p>' +
-        '<div class="actions"><button class="btn block" type="submit" id="pay-btn">Pay ' + money(f.total) + '</button>' +
-        '<div style="display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;font-size:var(--t-sm)"><button class="linkbtn" type="button" data-action="change">Choose a different bed</button><button class="linkbtn" type="button" data-action="release">Release this bed</button></div></div>' +
-      '</form>', "#p-name");
+  function typeOpts(g) { return TYPES.map(function (t) { var n = countFree(t.id, g); return [t.id, t.name + " · " + money(t.price) + " · " + (n ? n + " free" : "full")]; }); }
+  function openApply(first, second) {
+    var p = me(); ui.sheet = { kind: "apply" };
+    showSheet(head("Hostel application", "2026/27 academic year · " + esc(p.name) + " · " + gWord(p.gender)) + stepper(1) +
+      '<form class="sheet-body" id="f-apply" novalidate>' +
+      selectField("ap-first", "First choice room", typeOpts(p.gender), first, "The room type you want most") +
+      selectField("ap-second", "Second choice room", typeOpts(p.gender), second, "Used if your first choice is full, so you do not have to apply again") +
+      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6"/></svg><span>You get an application number as soon as you submit. Quote it whenever you ask about your application.</span></p>' +
+      '<div class="actions"><button class="btn block" type="submit">Submit application</button></div></form>', "#ap-first");
   }
-  function setErr(id, msg) {
-    var el = $(id), e = $(id + "-err");
-    if (msg) el.setAttribute("aria-invalid", "true"); else el.removeAttribute("aria-invalid");
-    if (e) e.textContent = msg || "";
-    return !msg;
+  function submitApply() {
+    var first = $("ap-first").value, second = $("ap-second").value, p = me();
+    if (!setErr("ap-second", first === second ? "Pick a different room type for your second choice." : "")) return;
+    var app = { id: appId(state.seq++), sid: p.sid, name: p.name, gender: p.gender, elig: p.elig, first: first, second: second, type: null, bed: null, status: "applied", ts: Date.now(), invoices: [], token: null };
+    state.apps.push(app); logEvent("Application " + app.id + " received from " + app.name + ": " + TYPE[first].short + ", then " + TYPE[second].short); commit();
+    var f1 = countFree(first, p.gender), f2 = countFree(second, p.gender), next;
+    if (f1) next = '<p style="margin:0">Your first choice, <b>' + TYPE[first].name + '</b>, has ' + f1 + ' free ' + (f1 === 1 ? "bed" : "beds") + '. Choose yours now.</p><div class="actions"><button class="btn block" data-action="choose" data-tid="' + first + '">Choose my bed</button></div>';
+    else next = '<p style="margin:0">Your first choice, <b>' + TYPE[first].name + '</b>, is fully booked.' + (f2 ? ' Your second choice, <b>' + TYPE[second].name + '</b>, has ' + f2 + ' free.' : ' Your second choice is full too.') + '</p><div class="actions">' +
+      (f2 ? '<button class="btn block" data-action="choose" data-tid="' + second + '">Choose a bed in my second choice</button>' : "") +
+      '<button class="btn block ' + (f2 ? "quiet" : "") + '" data-action="wait" data-tid="' + first + '">Join the waiting list for ' + TYPE[first].short + '</button></div>';
+    showSheet(head("Application received", "Keep this number. You will need it for any enquiry.") + stepper(1) +
+      '<div class="sheet-body"><div class="bigid"><small>Your application number</small><b>' + app.id + '</b></div>' + next + '</div>', ".btn");
   }
-  function submitPay(ev) {
-    ev.preventDefault();
-    if (paying || !state.hold) return;
-    form.name = $("p-name").value.trim(); form.sid = $("p-sid").value.trim();
-    form.momo = $("p-momo") ? $("p-momo").value.replace(/\s+/g, "") : "";
-    var ok = setErr("p-name", form.name.length < 3 ? "Enter your full name." : "");
-    ok = setErr("p-sid", /^\d{8}$/.test(form.sid) ? "" : "Student ID must be 8 digits.") && ok;
-    if ($("p-gender")) ok = setErr("p-gender", $("p-gender").checked ? "" : "Tick to confirm. This residence is " + ROOM[state.hold.rid].hostel.gender.toLowerCase() + ".") && ok;
-    if (form.method !== "card") ok = setErr("p-momo", /^0\d{9}$/.test(form.momo) ? "" : "Enter a 10 digit number starting with 0.") && ok;
-    if (!ok) { var bad = $("sheet").querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
-    var existing = activeBookingFor(form.sid);
-    if (existing) { setErr("p-sid", "This ID already has a paid bed (" + existing.ref + "). One bed per student."); $("p-sid").focus(); return; }
-
+  function openChooser(app, tid, sel) {
+    var g = app.gender; tid = tid || (countFree(app.first, g) ? app.first : app.second);
+    var free = freeOfType(tid, g);
+    if (!free.length && !sel) { go("me"); closeSheet(); toast(TYPE[tid].name + " is full. Join the waiting list or try your other choice."); return; }
+    if (sel == null || !canTake(sel, g, app)) sel = free[0];
+    ui.sheet = { kind: "choose", id: app.id, tid: tid, sel: sel };
+    var t = TYPE[tid], body = "";
+    HOSTELS.forEach(function (h) { h.floors.forEach(function (f, i) {
+      var rs = h.rooms.filter(function (r) { return r.type === tid && r.floor === i; });
+      if (rs.length) body += '<p class="pick-h">' + h.name + ' <span>· ' + f + '</span></p>' + roomTiles(rs, "pick", g, sel, app);
+    }); });
+    var other = tid === app.first ? app.second : app.first;
+    showSheet(head(t.name, app.id + " · " + money(t.price) + " for 9 months · " + free.length + " free for you") + stepper(2) +
+      '<div class="sheet-body"><div class="map-key"><span><i class="mk-free"></i>Free</span><span><i class="mk-sel"></i>Your choice</span><span><i class="mk-taken"></i>Not available</span></div>' + body +
+      '<div class="pick-sum"><div><small>Your bed</small><div class="bedname">' + bedName(sel, true) + '</div></div><div style="text-align:right"><small>Total with 5% service fee</small><b class="num">' + money(t.price + fee(t.price)) + '</b></div></div>' +
+      '<div class="actions"><button class="btn block" data-action="reserve">Reserve this bed for ' + RESERVE_HOURS + ' hours</button>' +
+      (countFree(other, g) ? '<button class="linkbtn" data-action="choose" data-tid="' + other + '" style="justify-self:center">See my other choice: ' + TYPE[other].name + '</button>' : "") + '</div></div>', ".bed.sel");
+  }
+  function reserve() {
+    var s = ui.sheet, app = byId(s.id);
+    if (!canTake(s.sel, app.gender, app)) { toast("That bed was just taken. Pick another one."); openChooser(app, s.tid); return; }
+    app.status = "reserved"; app.bed = s.sel; app.type = s.tid; app.exp = Date.now() + RESERVE_HOURS * 36e5; delete app.waitlist; delete app.expired;
+    logEvent(app.id + " reserved " + bedName(app.bed, true) + " for " + RESERVE_HOURS + " hours"); commit(); openPay(app, "booking");
+  }
+  var METHODS = [["mtn", "MTN MoMo", "Approve on your phone", "MTN", "#E0A800"], ["telecel", "Telecel Cash", "Approve on your phone", "T", "#C8102E"], ["at", "AT Money", "Approve on your phone", "AT", "#1F4AA8"], ["card", "Bank card", "Visa or Mastercard", "CARD", "#121214"]];
+  var payForm = { method: "mtn", momo: "" };
+  function openPay(app, kind) {
+    var up = kind === "upgrade", t = TYPE[up ? app.up.to : app.type], amount = up ? t.price - TYPE[app.type].price : t.price, bed = up ? app.up.bed : app.bed, exp = up ? app.up.exp : app.exp;
+    ui.sheet = { kind: "pay", id: app.id, pay: kind };
+    showSheet(head(up ? "Pay for your upgrade" : "Pay for your bed", app.id + " · " + t.name) + (up ? "" : stepper(3)) +
+      '<form class="sheet-body" id="f-pay" novalidate>' +
+      '<div class="holdbox"><div><small>' + (up ? "New bed, held for you" : "Reserved for you") + '</small><div class="bedname">' + bedName(bed, true) + '</div></div><div style="text-align:right"><small>Time left to pay</small><div class="timer num" data-exp="' + exp + '">' + hms(exp - Date.now()) + '</div></div></div>' +
+      '<div><div class="legend-t" style="margin-bottom:8px">Pay with</div><fieldset class="methods">' + METHODS.map(function (m) {
+        return '<div class="method"><input type="radio" name="method" id="m-' + m[0] + '" value="' + m[0] + '"' + (payForm.method === m[0] ? " checked" : "") + '><label for="m-' + m[0] + '"><span class="logo" style="background:' + m[4] + '">' + m[3] + '</span><span>' + m[1] + '<small>' + m[2] + '</small></span></label></div>'; }).join("") + '</fieldset></div>' +
+      '<div id="momo-wrap"' + (payForm.method === "card" ? " hidden" : "") + '>' + field("p-momo", "Mobile money number", "tel", payForm.momo || "0241234567", "The number that gets the approval prompt", 'inputmode="tel" autocomplete="tel"') + '</div>' +
+      '<dl class="rows"><div><dt>' + (up ? "Difference, " + TYPE[app.type].short + " to " + t.short : "Hostel fee, " + t.name + ", 9 months") + '</dt><dd>' + money(amount) + '</dd></div>' +
+      '<div><dt>RoomRight service fee (5%)</dt><dd>' + money(fee(amount)) + '</dd></div><div class="total"><dt>Total to pay</dt><dd>' + money(amount + fee(amount)) + '</dd></div></dl>' +
+      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Demo: no real money moves. In the live system the hostel fee is passed to University Finance when you check in.</span></p>' +
+      '<div class="actions"><button class="btn block" type="submit">Pay ' + money(amount + fee(amount)) + '</button></div></form>', "#m-" + payForm.method);
+  }
+  function submitPay() {
+    if (paying) return;
+    var s = ui.sheet, app = byId(s.id), up = s.pay === "upgrade", method = payForm.method;
+    if (method !== "card") { payForm.momo = $("p-momo").value.replace(/\s+/g, ""); if (!setErr("p-momo", /^0\d{9}$/.test(payForm.momo) ? "" : "Enter a 10 digit number starting with 0.")) return; }
     paying = true;
-    var r = ROOM[state.hold.rid], f = fees(r.price);
-    var m = METHODS.filter(function (x) { return x.id === form.method; })[0];
-    $("sheet").innerHTML = stepper(2) + '<div class="processing"><div class="spinner" aria-hidden="true"></div><h3 id="sheet-title">' +
-      (form.method === "card" ? "Confirming your card payment" : "Approve " + money(f.total) + " on " + esc(form.momo.replace(/^(\d{3})(\d{3})(\d{4})$/, "$1 $2 $3"))) +
-      '</h3><p>Demo: this completes on its own in a moment. Your bed stays held while we wait.</p></div>';
+    $("sheet").innerHTML = '<div class="processing"><div class="spinner" aria-hidden="true"></div><h3 id="sheet-title">' + (method === "card" ? "Confirming your card payment" : "Approve the payment on your phone") + '</h3><p>Demo: this completes on its own in a moment.</p></div>';
     setTimeout(function () {
       paying = false;
-      if (!state.hold) { closeSheet(); toast("Your hold ended before payment finished. No money was taken."); return; }
-      var hold = state.hold;
-      var b = { ref: makeRef(), code: makeCode(), rid: hold.rid, idx: hold.idx, hostel: r.hostel.name, beds: r.beds,
-        bed: bedLabel(r, hold.idx), name: form.name, sid: form.sid,
-        method: m.name + (form.method === "card" ? "" : " · " + form.momo.slice(0, 3) + " ••• " + form.momo.slice(-4)),
-        price: f.price, fee: f.fee, total: f.total, ts: Date.now(), status: "paid" };
-      state.bookings.push(b);
-      logEvent("Booked " + b.ref + " · " + b.hostel + " " + b.bed + " (" + SIZE_LABEL[b.beds] + ")", "ok");
-      state.hold = null;   // the bed stays taken: it now belongs to this booking
-      save(); renderAll(); showReceipt(b);
-    }, 2200);
+      var mName = METHODS.filter(function (m) { return m[0] === method; })[0][1] + (method === "card" ? "" : " · " + payForm.momo.slice(0, 3) + " ••• " + payForm.momo.slice(-4)), inv;
+      if (up) {
+        if (!app.up || app.up.status !== "approved") { closeSheet(); toast("The held bed was released before payment finished. No money was taken."); return; }
+        var from = bedName(app.bed, true), t = TYPE[app.up.to];
+        inv = invoiceFor(state, app, "Upgrade to " + t.name, t.price - TYPE[app.type].price, mName, Date.now());
+        app.bed = app.up.bed; app.type = app.up.to; app.up.status = "done"; app.invoices.push(inv);
+        logEvent(app.id + " upgraded from " + from + " to " + bedName(app.bed, true) + " · " + money(inv.total) + " paid");
+      } else {
+        if (app.status !== "reserved") { closeSheet(); toast("Your reservation ended before payment finished. No money was taken."); return; }
+        inv = invoiceFor(state, app, "Hostel fee, " + TYPE[app.type].name + ", 9 months", TYPE[app.type].price, mName, Date.now());
+        app.status = "paid"; app.invoices.push(inv); app.token = "RR-" + code(8); delete app.exp;
+        logEvent(app.id + " paid " + money(inv.total) + " for " + bedName(app.bed, true) + " · invoice " + inv.no);
+      }
+      commit(); go("me");
+      showSheet(head(up ? "Upgrade complete" : "Your bed is booked", "Your invoice and booking token are saved under My application.") + (up ? "" : stepper(4)) +
+        '<div class="sheet-body">' + tokenHTML(app) + invoiceHTML(app, inv) + '<div class="actions"><button class="btn block dark" data-action="close">Go to my application</button></div></div>', ".btn.dark");
+    }, 2000);
   }
-  function showReceipt(b) {
-    ui.sheet = { step: 3 };
-    showSheet(head("Your bed is secured", "Saved under My bookings. Show the code at check-in.") + stepper(3) +
-      '<div class="sheet-body">' + ticketHTML(b, false) +
-      '<div class="actions"><button class="btn block black" data-action="goto-mine">View my bookings</button></div></div>');
+  function tokenHTML(app) {
+    var qr = qrSVG("ROOMRIGHT|" + app.id + "|" + app.token);
+    return '<div class="token-box">' + (qr ? '<div class="qr">' + qr + '</div>' : "") + '<div><div class="code-lbl">Booking token</div><div class="token">' + app.token + '</div>' +
+      '<div class="ticket-bed" style="margin-top:8px">' + bedName(app.bed, true) + '</div><div class="room-note">' + TYPE[app.type].name + ' · ' + esc(app.name) + ' · ' + app.id + '</div></div></div>';
   }
-  function cancelBooking(ref) {
-    var b = byRef(ref); if (!b || b.status !== "paid") return;
-    showSheet(head("Cancel " + esc(b.ref) + "?", esc(b.hostel) + " · " + esc(b.bed)) +
-      '<div class="sheet-body"><p style="margin:0">The bed goes straight back on sale and ' + money(b.price - (b.refunded || 0)) + ' is refunded from escrow. The ' + money(b.fee) + ' service fee is not refunded.</p>' +
-      '<div class="actions"><button class="btn block" data-action="confirm-cancel" data-ref="' + esc(b.ref) + '">Cancel booking and refund</button><button class="btn quiet block" data-action="close">Keep my booking</button></div></div>', ".btn.quiet");
+  function invoiceText(app, inv) {
+    return ["RoomRight payment invoice " + inv.no, "Student: " + app.name + " (ID " + app.sid + ")", "Application number: " + app.id, "Room type: " + TYPE[app.type].name, "Item: " + inv.label,
+      "Amount: " + money(inv.amount), "Service fee (5%): " + money(inv.service), "Amount paid: " + money(inv.total), "Payment date: " + dateStr(inv.ts) + " " + timeStr(inv.ts), "Paid with: " + inv.method, "Transaction reference: " + inv.ref].join("\n");
   }
-  function confirmCancel(ref) {
-    var b = byRef(ref); if (!b || b.status !== "paid") return;
-    b.status = "cancelled"; delete b.request;
-    var t = state.taken[b.rid], i = t.indexOf(b.idx); if (i > -1) t.splice(i, 1);
-    logEvent("Cancelled " + b.ref + " · " + b.bed + " back on sale", "info");
-    save(); closeSheet(); renderAll(); toast(b.bed + " at " + b.hostel + " is back on sale.");
-  }
-
-  /* ---------- Residence tour ---------- */
-  function planSVG(r) {
-    var n = r.beds, bath = /bathroom per room|Private bathroom|Studio/.test(r.note), out = "", bw = 44, bh = 82, gap = n === 4 ? 6 : 10;
-    out += '<rect x="10" y="10" width="220" height="150" fill="none" stroke="currentColor" stroke-width="2.5"/>';
-    out += '<line x1="90" y1="10" x2="150" y2="10" stroke="var(--bg)" stroke-width="4"/><line x1="90" y1="7" x2="150" y2="7" stroke="currentColor" stroke-width="1"/><line x1="90" y1="13" x2="150" y2="13" stroke="currentColor" stroke-width="1"/>';
-    out += '<line x1="182" y1="160" x2="216" y2="160" stroke="var(--bg)" stroke-width="5"/><path d="M182 160 A34 34 0 0 1 216 126" fill="none" stroke="currentColor" stroke-width="1" stroke-dasharray="3 3"/><line x1="182" y1="160" x2="182" y2="126" stroke="currentColor" stroke-width="1.5"/>';
-    if (bath) out += '<rect x="166" y="12" width="62" height="56" fill="var(--mist)" stroke="currentColor" stroke-width="1.2"/><text x="197" y="44" text-anchor="middle" font-size="10" fill="currentColor">Bath</text>';
-    for (var i = 0; i < n; i++) {
-      var x = 22 + i * (bw + gap);
-      out += '<rect x="' + x + '" y="22" width="' + bw + '" height="' + bh + '" rx="3" fill="var(--red-wash)" stroke="var(--red)" stroke-width="1.2"/>' +
-        '<rect x="' + (x + 7) + '" y="27" width="' + (bw - 14) + '" height="12" rx="3" fill="var(--bg)" stroke="var(--red)" stroke-width="1"/>' +
-        '<text x="' + (x + bw / 2) + '" y="78" text-anchor="middle" font-size="12" font-weight="700" fill="var(--red-text)">' + (i + 1) + '</text>';
-    }
-    var dw = (148 - (n - 1) * 6) / n;
-    for (var d = 0; d < n; d++) out += '<rect x="' + (22 + d * (dw + 6)) + '" y="132" width="' + dw + '" height="20" fill="none" stroke="currentColor" stroke-width="1" opacity=".7"/>';
-    out += '<text x="96" y="125" text-anchor="middle" font-size="9" fill="currentColor" opacity=".7">' + (n === 1 ? "desk" : "desks") + '</text>';
-    return '<svg viewBox="0 0 240 170" role="img" aria-label="Floor plan for ' + SIZE_LABEL[n] + ': ' + n + (n === 1 ? ' bed' : ' beds') + (bath ? ' and its own bathroom' : '') + '">' + out + '</svg>';
-  }
-  function openTour(hid, tab) {
-    var h = HOSTEL[hid]; if (!h) return;
-    tab = tab || "building";
-    ui.sheet = { step: 0, tour: hid };
-    var body = "";
-    if (tab === "building") {
-      body = '<div class="tour-art">' + artSVG(h) + '</div>' +
-        '<dl class="tour-facts">' +
-          '<div><dt>Beds free</dt><dd class="num">' + hostelFree(h) + ' of ' + h.beds + '</dd></div>' +
-          '<div><dt>Who lives here</dt><dd>' + genderBadge(h) + '</dd></div>' +
-          '<div><dt>Walk to campus</dt><dd class="num">' + h.walk + ' min' + (h.zone === "off" ? ' · ' + h.km + ' km' : '') + '</dd></div>' +
-          '<div><dt>Run by</dt><dd>' + (h.zone === "on" ? "Lancaster University Ghana" : "Verified private landlord") + '</dd></div>' +
-        '</dl><p class="tour-note">Each window is one bed. Red windows are free right now.</p>';
-    } else if (tab === "rooms") {
-      body = '<div class="plans">' + h.rooms.map(function (r) {
-        var left = avail(r);
-        return '<div class="plan"><div class="plan-svg">' + planSVG(r) + '</div><div class="plan-info"><b>' + SIZE_LABEL[r.beds] + '</b><span>' + esc(r.note) + '</span>' +
-          '<span class="num">' + moneyShort(r.price) + ' per bed · ' + left + ' free</span>' +
-          (left ? '<button class="btn" data-action="pick" data-rid="' + r.id + '">Choose bed</button>' : '<button class="btn" disabled>Fully booked</button>') + '</div></div>';
-      }).join("") + '</div><p class="tour-note">Layouts show where beds, desks and bathrooms sit. Exact room sizes are confirmed by the residence.</p>';
-    } else {
-      body = '<div class="photos">' + ["Outside the building", "Bedroom", "Bathroom", "Common area"].map(function (t) {
-        return '<div class="photo-slot"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.4" aria-hidden="true"><path d="M4 8h3l2-3h6l2 3h3v11H4z"/><circle cx="12" cy="13" r="3.5"/></svg><b>' + t + '</b><span>Real photo from ' + esc(h.name) + ' goes here</span></div>';
-      }).join("") + '</div><p class="tour-note">Every residence must upload its own photos, taken in the last 12 months, before its beds go on sale. No stock photos.</p>';
-    }
-    showSheet(head(esc(h.name), (h.zone === "on" ? "On campus" : h.km + " km from campus") + " · " + esc(h.gender) + " · " + h.walk + " min walk") +
-      '<div class="tabs" role="tablist">' + [["building", "Building"], ["rooms", "Room layouts"], ["photos", "Photos"]].map(function (t) {
-        return '<button role="tab" aria-selected="' + (t[0] === tab) + '" data-action="tour-tab" data-hid="' + hid + '" data-tab="' + t[0] + '">' + t[1] + '</button>';
-      }).join("") + '</div><div class="sheet-body">' + body + '</div>', '[aria-selected="true"]');
+  function invoiceHTML(app, inv) {
+    return '<div class="invoice"><div class="invoice-top"><div><div class="code-lbl">Payment invoice</div><b>' + inv.no + '</b></div><span class="status">Paid</span></div><dl class="rows">' +
+      '<div><dt>Student</dt><dd>' + esc(app.name) + ' · ' + esc(app.sid) + '</dd></div><div><dt>Application number</dt><dd>' + app.id + '</dd></div><div><dt>Room type</dt><dd>' + TYPE[app.type].name + '</dd></div>' +
+      '<div><dt>' + esc(inv.label) + '</dt><dd>' + money(inv.amount) + '</dd></div><div><dt>Service fee (5%)</dt><dd>' + money(inv.service) + '</dd></div><div class="total"><dt>Amount paid</dt><dd>' + money(inv.total) + '</dd></div>' +
+      '<div><dt>Payment date</dt><dd>' + dateStr(inv.ts) + ', ' + timeStr(inv.ts) + '</dd></div><div><dt>Paid with</dt><dd>' + esc(inv.method) + '</dd></div><div><dt>Transaction reference</dt><dd>' + inv.ref + '</dd></div></dl>' +
+      '<button class="btn quiet sm" data-action="copy-inv" data-id="' + app.id + '" data-inv="' + inv.no + '" style="justify-self:start">Copy invoice</button></div>';
   }
 
-  /* ---------- Allocation Guard ---------- */
-  function moveBed(b, rid, idx) {
-    var t = state.taken[b.rid], i = t.indexOf(b.idx); if (i > -1) t.splice(i, 1);
-    state.taken[rid].push(idx);
-    var to = ROOM[rid], from = b.bed;
-    b.rid = rid; b.idx = idx; b.beds = to.beds; b.bed = bedLabel(to, idx);
-    return from;
-  }
-  function requestHTML(b) {
-    var to = ROOM[b.request.rid], idx = b.request.idx;
-    var where = idx != null && !isTaken(to.id, idx) ? bedLabel(to, idx) : "the next free bed";
-    var net = b.price - (b.refunded || 0);
-    return '<div class="req"><b>' + esc(b.hostel) + ' asks to move you</b>' +
-      '<span>To a ' + SIZE_LABEL[to.beds] + ', ' + esc(where) + '. You booked a ' + SIZE_LABEL[b.beds] + ', so nothing changes unless you accept.' +
-      (to.price < net ? ' You would get ' + money(net - to.price) + ' back.' : ' You would pay nothing extra.') + '</span>' +
-      '<div class="req-actions"><button class="btn" data-action="req-accept" data-ref="' + esc(b.ref) + '">Accept move</button><button class="btn quiet" data-action="req-decline" data-ref="' + esc(b.ref) + '">Decline</button></div></div>';
-  }
-  function acceptRequest(ref) {
-    var b = byRef(ref); if (!b || !b.request) return;
-    var to = ROOM[b.request.rid], idx = b.request.idx;
-    if (idx == null || isTaken(to.id, idx)) { var f = freeBeds(to); idx = f.length ? f[0] : null; }
-    if (idx == null) { delete b.request; logEvent("Refused " + ref + ": no free bed in " + SIZE_LABEL[to.beds] + "", "bad"); save(); renderAll(); toast("That room type filled up. Your booking is unchanged."); return; }
-    var refund = Math.max(0, b.price - (b.refunded || 0) - to.price);
-    var from = moveBed(b, to.id, idx);
-    b.refunded = (b.refunded || 0) + refund; delete b.request;
-    logEvent("Student approved: moved " + ref + " from " + from + " to " + b.bed + (refund ? " · " + money(refund) + " refunded" : ""), "ok");
-    save(); renderAll(); toast("Moved to " + b.bed + ".");
-  }
-  function declineRequest(ref) {
-    var b = byRef(ref); if (!b || !b.request) return;
-    delete b.request; logEvent("Student declined the move for " + ref + ". Booking unchanged.", "info");
-    save(); renderAll(); toast("Declined. Your bed stays the same.");
-  }
-  function renderGuard() {
-    var g = ui.guard, h = HOSTEL[g.hid];
-    var books = state.bookings.filter(function (b) { return b.status === "paid" && ROOM[b.rid].hostel.id === g.hid; });
-    if (!books.some(function (b) { return b.ref === g.ref; })) { g.ref = books.length ? books[books.length - 1].ref : null; g.rid = null; }
-    var b = g.ref ? byRef(g.ref) : null;
-    if (!g.rid || ROOM[g.rid].hostel.id !== g.hid) g.rid = b ? b.rid : h.rooms[0].id;
-    var tr = ROOM[g.rid], free = freeBeds(tr);
-    if (free.indexOf(g.idx) < 0) g.idx = free.length ? free[0] : null;
-    var sel = function (id, label, opts, val) {
-      return '<div class="field"><label for="' + id + '">' + label + '</label><select id="' + id + '">' + opts.map(function (o) { return '<option value="' + esc(o[0]) + '"' + (String(o[0]) === String(val) ? " selected" : "") + '>' + esc(o[1]) + '</option>'; }).join("") + '</select></div>';
-    };
-    var html = '<div><h3 class="panel-title">Move a student</h3><p class="panel-sub">The Allocation Guard checks every move against the room type the student paid for.</p></div>' +
-      sel("g-hostel", "Your residence", HOSTELS.map(function (x) { return [x.id, x.name]; }), g.hid);
-    if (!b) {
-      html += '<div class="empty" style="padding:22px"><b>No paid bookings at ' + esc(h.name) + ' yet</b>Book a bed there as a student first, then come back to try moving it.</div>';
-    } else {
-      html += sel("g-booking", "Student booking", books.map(function (x) { return [x.ref, x.ref + " · " + x.name + " · " + x.bed]; }), g.ref) +
-        '<p class="cur-bed">Paid for: <b>' + SIZE_LABEL[b.beds] + '</b> · ' + esc(b.bed) + '</p>' +
-        '<div class="grid2">' + sel("g-room", "Move to room type", h.rooms.map(function (r) { return [r.id, SIZE_LABEL[r.beds] + " · " + avail(r) + " free"]; }), g.rid) +
-        (free.length ? sel("g-bed", "Bed", free.map(function (i) { return [i, bedLabel(tr, i)]; }), g.idx) : '<div class="field"><label>Bed</label><p class="hint" style="margin:8px 0 0">No free beds in this room type</p></div>') + '</div>' +
-        '<button class="btn black block" data-action="g-move">Move student</button>';
-    }
-    html += '<div id="g-result">' + (g.result || "") + '</div>';
-    $("guard-panel").innerHTML = html;
-    $("guard-log").innerHTML = state.log.length ? state.log.map(function (e) {
-      return '<li class="' + e.kind + '"><span class="t num">' + new Date(e.ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }) + '</span><span>' + esc(e.text) + '</span></li>';
-    }).join("") : '<li class="info"><span></span><span>Nothing yet. Bookings, moves and refusals appear here.</span></li>';
-  }
-  function guardMove() {
-    var g = ui.guard, b = byRef(g.ref); if (!b) return;
-    var from = ROOM[b.rid], to = ROOM[g.rid];
-    if (to.beds !== from.beds) {
-      logEvent("Blocked: move " + b.ref + " from " + SIZE_LABEL[from.beds] + " to " + SIZE_LABEL[to.beds] + " (wrong room type)", "bad");
-      g.result = '<div class="result bad"><h3>Move refused</h3><p>Room type ' + to.beds + ' ≠ ' + from.beds + '. ' + esc(b.name) + ' paid for a ' + SIZE_LABEL[from.beds] + ', so the Allocation Guard will not put them in a ' + SIZE_LABEL[to.beds] + '.</p>' +
-        '<button class="btn ghost" style="margin-top:14px" data-action="g-request">Ask the student to accept this move</button></div>';
-    } else if (g.idx == null || isTaken(to.id, g.idx)) {
-      logEvent("Blocked: " + b.ref + " target bed is not free", "bad");
-      g.result = '<div class="result bad"><h3>That bed is taken</h3><p>A bed can never be assigned twice. Pick a free bed.</p></div>';
-    } else {
-      var old = moveBed(b, to.id, g.idx);
-      logEvent("Moved " + b.ref + " from " + old + " to " + b.bed + " (same room type)", "ok");
-      g.result = '<div class="result good"><h3>Move allowed</h3><p>Same room type, so the guard lets it through. ' + esc(b.name) + ' is now in ' + esc(b.bed) + '. The change is logged and their allocation letter is updated.</p></div>';
-    }
-    save(); renderAll();
-  }
-  function guardRequest() {
-    var g = ui.guard, b = byRef(g.ref); if (!b) return;
-    b.request = { rid: g.rid, idx: g.idx };
-    logEvent("Asked the student to approve moving " + b.ref + " to a " + SIZE_LABEL[ROOM[g.rid].beds], "info");
-    g.result = '<div class="result"><h3>Request sent to the student</h3><p>' + esc(b.name) + '&#39;s booking stays exactly as it is until they accept under My bookings.</p></div>';
-    save(); renderAll();
-  }
-
-  /* ---------- Verify ---------- */
-  function verify(ev) {
-    ev.preventDefault();
-    var ref = $("v-ref").value.trim().toUpperCase(), code = $("v-code").value.trim(), out = $("verify-result"), b = byRef(ref);
-    if (!b || b.code !== code) {
-      out.className = "result bad";
-      out.innerHTML = '<h3>No booking matches</h3><p>Nothing on RoomRight matches <span>' + esc(ref || "this reference") + '</span> with that code. Do not hand over keys, and do not pay anyone outside RoomRight for this bed.</p>';
+  /* ---------- Student: my application ---------- */
+  function renderMe() {
+    var p = me(), app = myApp(), el = $("view-me");
+    if (!p) { el.innerHTML = ""; return; }
+    if (!app) {
+      el.innerHTML = '<div class="page-head"><p class="kicker">My application</p><h2>No application yet</h2><p>Apply once, with a first and second room choice. You get your application number straight away.</p></div><button class="btn lg" data-action="apply">Apply for a bed</button>';
       return;
     }
-    if (b.status !== "paid") {
-      out.className = "result bad";
-      out.innerHTML = '<h3>Booking was cancelled</h3><p>' + esc(b.ref) + ' was cancelled and refunded. This bed is no longer assigned to ' + esc(b.name) + '.</p>';
-      return;
+    var st = app.status, order = ["applied", "reserved", "paid", "in"], at = order.indexOf(st);
+    var track = '<ol class="track">' + [["Applied", dateStr(app.ts)], ["Bed reserved", app.bed ? bedName(app.bed) : ""], ["Paid", app.invoices[0] ? dateStr(app.invoices[0].ts) : ""], ["Checked in", app.inAt ? dateStr(app.inAt) : ""]].map(function (x, i) {
+      return '<li class="' + (i <= at ? "done" : i === at + 1 ? "now" : "") + '">' + x[0] + '<small>' + x[1] + '</small></li>'; }).join("") + '</ol>';
+    var g = app.gender, next = "";
+    if (st === "applied") {
+      var f1 = countFree(app.first, g), f2 = countFree(app.second, g);
+      if (app.waitlist) {
+        var wf = countFree(app.waitlist, g);
+        next = '<h3>' + (wf ? "A bed just opened up" : "You are number " + waitPos(app) + " on the waiting list") + '</h3><p>' + (wf ? TYPE[app.waitlist].name + " has " + wf + " free now. Reserve it before someone else does." : "We will show a bed here as soon as one opens in " + TYPE[app.waitlist].name + ".") + '</p><div class="row">' +
+          (wf ? '<button class="btn" data-action="choose" data-tid="' + app.waitlist + '">Choose my bed</button>' : "") + (app.waitlist !== app.second && f2 ? '<button class="btn white" data-action="choose" data-tid="' + app.second + '">Take my second choice instead</button>' : "") + '<button class="linkbtn" data-action="unwait">Leave the waiting list</button></div>';
+      } else {
+        next = '<h3>' + (app.expired ? "Your reservation ran out" : "Next: choose your bed") + '</h3><p>' + (app.expired ? "You did not pay within " + RESERVE_HOURS + " hours, so the bed went back on offer. Your application is still open." : "Your application is in. Pick the exact bed you want.") + '</p><div class="row">' +
+          (f1 ? '<button class="btn" data-action="choose" data-tid="' + app.first + '">Choose a bed: ' + TYPE[app.first].short + '</button>' : '<button class="btn" data-action="wait" data-tid="' + app.first + '">Join waiting list: ' + TYPE[app.first].short + '</button>') +
+          (f2 ? '<button class="btn white" data-action="choose" data-tid="' + app.second + '">Second choice: ' + TYPE[app.second].short + '</button>' : "") + '</div>';
+      }
+    } else if (st === "reserved") {
+      next = '<h3>' + bedName(app.bed, true) + ' is reserved for you</h3><p>Pay within the time left or the bed goes back on offer.</p><div class="row"><span class="timer num" data-exp="' + app.exp + '">' + hms(app.exp - Date.now()) + '</span><button class="btn" data-action="pay">Pay ' + money(TYPE[app.type].price + fee(TYPE[app.type].price)) + '</button><button class="linkbtn" data-action="release">Release this bed</button></div>';
+    } else if (st === "paid") next = '<h3>You are booked. See you at ' + roomOf(app.bed).hostel.name + '.</h3><p>Show your booking token or QR code at the hostel. The manager confirms it and gives you your keys.</p>';
+    else next = '<h3>You are checked in</h3><p>' + bedName(app.bed, true) + ' is your bed for the 9 month tenancy.</p>';
+
+    var right = "";
+    if (app.token) right += '<div class="panel"><div><h3 class="panel-title">Booking token</h3><p class="panel-sub">Your proof that the bed is yours.</p></div>' + tokenHTML(app) + '</div>';
+    if (app.invoices.length) right += '<div class="panel"><h3 class="panel-title">Invoices</h3><div>' + app.invoices.map(function (i) {
+      return '<div class="inv-row"><span><b>' + i.no + '</b><br><span class="room-note">' + esc(i.label) + ' · ' + dateStr(i.ts) + '</span></span><span style="text-align:right"><b class="num">' + money(i.total) + '</b><br><button class="linkbtn" data-action="invoice" data-inv="' + i.no + '">View</button></span></div>'; }).join("") + '</div></div>';
+    if (st === "paid" || st === "in") right += upgradePanel(app);
+    if (!right) right = '<div class="panel"><h3 class="panel-title">What happens next</h3><ul class="ticks"><li>Choose your bed and reserve it for ' + RESERVE_HOURS + ' hours.</li><li>Pay by mobile money or card.</li><li>Get your invoice and QR booking token here.</li></ul></div>';
+
+    el.innerHTML = '<div class="page-head"><p class="kicker">My application</p><h2>' + esc(p.name.split(" ")[0]) + ', here is where you are.</h2></div>' +
+      '<div class="me-grid"><div class="stack"><div class="panel"><div class="panel-head"><div><div class="code-lbl">Application number</div><div class="appid">' + app.id + '</div></div><span class="st ' + st + '">' + STATUS[st] + '</span></div>' + track +
+      '<dl class="rows"><div><dt>First choice</dt><dd>' + TYPE[app.first].name + '</dd></div><div><dt>Second choice</dt><dd>' + TYPE[app.second].name + '</dd></div>' + (app.bed ? '<div><dt>Your bed</dt><dd><b>' + bedName(app.bed, true) + '</b></dd></div>' : "") + '</dl></div>' +
+      '<div class="next">' + next + '</div></div><div class="stack">' + right + '</div></div>';
+  }
+  function upgradePanel(app) {
+    var up = app.up, cur = TYPE[app.type], body;
+    if (up && up.status === "pending") body = '<p class="panel-sub">You asked to move to <b>' + TYPE[up.to].name + '</b>. The housing office is reviewing it. Your current bed is safe meanwhile.</p><button class="linkbtn" data-action="up-cancel" style="justify-self:start">Withdraw request</button>';
+    else if (up && up.status === "approved") { var diff = TYPE[up.to].price - cur.price;
+      body = '<p class="panel-sub">Approved. <b>' + bedName(up.bed, true) + '</b> is held for you for <span class="num" data-exp="' + up.exp + '">' + hms(up.exp - Date.now()) + '</span>.</p><button class="btn" data-action="up-pay" style="justify-self:start">Pay the ' + money(diff + fee(diff)) + ' difference</button>'; }
+    else {
+      var opts = TYPES.filter(function (t) { return t.price > cur.price; });
+      body = (up && up.status === "declined" ? '<p class="panel-sub">Your last request was declined. You can ask again.</p>' : up && up.status === "expired" ? '<p class="panel-sub">Your approved upgrade was not paid in time and was released.</p>' : "") +
+        (opts.length ? '<div class="up-list">' + opts.map(function (t) { var n = countFree(t.id, app.gender), d = t.price - cur.price;
+          return '<div class="up-opt"><span><b>' + t.name + '</b><small>' + (n ? n + " free for you" : "Full right now") + ' · pay ' + money(d) + ' more</small></span><button class="btn sm" data-action="up-request" data-tid="' + t.id + '"' + (n ? "" : " disabled") + '>Request</button></div>'; }).join("") + '</div>' : '<p class="panel-sub">You already have the highest priced room type.</p>') +
+        '<p class="room-note" style="margin:0">Upgrades need a free bed and approval. Hostel fees are not refundable, so moves to a cheaper room are not offered.</p>';
     }
-    out.className = "result good";
-    out.innerHTML = '<h3>Valid booking</h3><dl class="rows" style="margin-top:10px">' +
-      '<div><dt>Student</dt><dd>' + esc(b.name) + ' · ' + esc(b.sid) + '</dd></div>' +
-      '<div><dt>Residence</dt><dd>' + esc(b.hostel) + '</dd></div>' +
-      '<div><dt>Assigned bed</dt><dd><b>' + esc(b.bed) + '</b></dd></div>' +
-      '<div><dt>Room fee</dt><dd>' + money(b.price - (b.refunded || 0)) + ' in escrow</dd></div></dl>' +
-      '<p style="margin-top:14px">In the live product the hostel taps Confirm check-in here and the room fee is released to them.</p>';
+    return '<div class="panel"><div><h3 class="panel-title">Change my room type</h3><p class="panel-sub">You have ' + cur.name + ' at ' + money(cur.price) + '.</p></div>' + body + '</div>';
   }
 
-  /* ---------- Simulated activity from other students ---------- */
+  /* ---------- Things that free or hold beds ---------- */
+  function releaseBed(app, why) {
+    var was = bedName(app.bed, true);
+    app.status = "applied"; app.bed = null; app.type = null; delete app.exp;
+    logEvent(app.id + " " + why + ": " + was + " is back on offer", "info");
+  }
+  function checkExpiry() {
+    var now = Date.now(), changed = false;
+    state.apps.forEach(function (a) {
+      if (a.status === "reserved" && a.exp <= now) { releaseBed(a, "was not paid within " + RESERVE_HOURS + " hours"); a.expired = true; changed = true; }
+      if (a.up && a.up.status === "approved" && a.up.exp <= now) { a.up.status = "expired"; delete a.up.bed; logEvent(a.id + " upgrade was not paid in time. The held bed is back on offer", "info"); changed = true; }
+    });
+    return changed;
+  }
+  function approveUpgrade(app) {
+    var bed = freeOfType(app.up.to, app.gender)[0];
+    if (!bed) { toast("No free bed in " + TYPE[app.up.to].name + " for this student right now."); return; }
+    app.up.status = "approved"; app.up.bed = bed; app.up.exp = Date.now() + RESERVE_HOURS * 36e5;
+    logEvent("Upgrade approved for " + app.id + ": " + bedName(bed, true) + " held for " + RESERVE_HOURS + " hours"); commit();
+  }
+  // The Allocation Guard: a manager may only move a student within the room type they paid for
+  function guardMove(app, key) {
+    var from = roomOf(app.bed), to = roomOf(key);
+    if (to.type !== app.type) { logEvent("Blocked: " + app.id + " paid for " + TYPE[app.type].short + ", not " + TYPE[to.type].short + " (Room " + to.no + ")", "bad"); commit();
+      return { ok: false, title: "Move refused", text: esc(app.name) + " paid for " + TYPE[app.type].name + ". Room " + to.no + " is " + TYPE[to.type].name + ", so the Allocation Guard will not allow it. A different room type needs an upgrade request from the student." }; }
+    if (!canTake(key, app.gender, app)) { logEvent("Blocked: Room " + to.no + " is not open to " + app.id, "bad"); commit();
+      return { ok: false, title: "Move refused", text: "Room " + to.no + " is taken or is a " + (app.gender === "F" ? "male" : "female") + " room." }; }
+    var was = bedName(app.bed, true); app.bed = key;
+    logEvent("Moved " + app.id + " from " + was + " to " + bedName(key, true) + " (same room type)"); commit();
+    return { ok: true, title: "Move allowed", text: esc(app.name) + " is now in " + bedName(key) + ". Same room type, so the guard lets it through. The change is logged." };
+  }
+
+  /* ---------- Hostel manager ---------- */
+  function renderManager() {
+    var s = state.session, el = $("view-manager");
+    if (!s || s.role !== "manager") { el.innerHTML = ""; return; }
+    var h = HOSTEL[s.hostel], res = state.apps.filter(function (a) { return holding(a) && a.bed && roomOf(a.bed).hostel === h; });
+    var n = function (st) { return res.filter(function (a) { return a.status === st; }).length; };
+    var kpis = '<div class="kpis"><div class="kpi red"><b class="num">' + (h.keys.length - hostelFree(h)) + '/' + h.keys.length + '</b><span>Beds taken</span></div><div class="kpi"><b class="num">' + n("in") + '</b><span>Checked in</span></div>' +
+      '<div class="kpi"><b class="num">' + n("paid") + '</b><span>Paid, arriving</span></div><div class="kpi"><b class="num">' + n("reserved") + '</b><span>Reserved, unpaid</span></div><div class="kpi"><b class="num">' + hostelFree(h) + '</b><span>Beds free</span></div></div>';
+    var map = h.floors.map(function (f, i) {
+      return '<div class="mfloor"><h4>' + f + '</h4><div class="mrooms">' + h.rooms.filter(function (r) { return r.floor === i; }).map(function (r) {
+        var rg = roomGender(r);
+        return '<div class="mroom"><div class="mroom-h"><span>Room ' + r.no + ' <small>' + TYPE[r.type].short + '</small></span>' + (rg ? '<span class="gtag">' + gWord(rg) + '</span>' : "") + '</div>' + r.keys.map(function (k) {
+          var a = OCC[k], held = a && a.bed !== k;
+          return a ? '<button class="mbed" data-action="resident" data-id="' + a.id + '"><span class="l">' + bedLetter(k) + '</span><span class="n">' + esc(a.name) + (held ? " (upgrade hold)" : "") + '</span><i class="' + (held ? "reserved" : a.status) + '" title="' + STATUS[a.status] + '"></i></button>'
+                   : '<div class="mbed free"><span class="l">' + bedLetter(k) + '</span><span class="n">Free</span></div>';
+        }).join("") + '</div>'; }).join("") + '</div></div>'; }).join("");
+    var q = ui.mq.toLowerCase(), rows = res.filter(function (a) { return !q || (a.name + " " + a.id + " " + a.sid).toLowerCase().indexOf(q) > -1; }).sort(function (a, b) { return roomOf(a.bed).no - roomOf(b.bed).no || a.bed.localeCompare(b.bed); });
+    el.innerHTML = '<div class="page-head"><p class="kicker">Hostel manager · ' + h.name + '</p><h2>' + h.name + ' hostel today</h2><p>Who is in every room, who is still to arrive, and check-in by booking token.</p></div>' + kpis +
+      '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Rooms and residents</h3><p class="panel-sub">Tap a resident to see their booking or move them. Green is checked in, black is paid and arriving, red is reserved and unpaid.</p></div>' + map + '</div>' +
+      '<div class="stack"><form class="panel" id="f-checkin" novalidate><div><h3 class="panel-title">Check a student in</h3><p class="panel-sub">Type the booking token from their phone, or the code under their QR.</p></div>' +
+      field("ci-token", "Booking token", "text", ui.checkin, "", 'placeholder="RR-7KQ4M2XP" autocomplete="off" spellcheck="false"') + '<button class="btn block" type="submit">Check token</button>' +
+      '<button class="linkbtn" type="button" data-action="ci-fill" style="justify-self:start">Use the next arriving student</button><div id="ci-result"></div></form>' +
+      '<div class="panel"><div><h3 class="panel-title">Recent activity</h3></div><ol class="log">' + logHTML(function (e) { return e.text.indexOf(h.name) > -1; }, 8) + '</ol></div></div></div>' +
+      '<div class="panel"><div class="panel-head"><div><h3 class="panel-title">Residents (' + res.length + ')</h3></div><input id="mq" type="search" placeholder="Search name or application" value="' + esc(ui.mq) + '" aria-label="Search residents"></div>' +
+      '<div class="tablewrap"><table class="t"><thead><tr><th>Student</th><th>Application</th><th>Room and bed</th><th>Room type</th><th>Status</th><th></th></tr></thead><tbody>' +
+      (rows.map(function (a) { return '<tr><td><b>' + esc(a.name) + '</b><small>' + gWord(a.gender) + ' · ID ' + esc(a.sid) + '</small></td><td>' + a.id + '</td><td>' + bedName(a.bed) + '</td><td>' + TYPE[a.type].short + '</td><td><span class="st ' + a.status + '">' + STATUS[a.status] + '</span></td><td><button class="btn sm quiet" data-action="resident" data-id="' + a.id + '">Open</button></td></tr>'; }).join("") || '<tr><td colspan="6">No residents match that search.</td></tr>') +
+      '</tbody></table></div></div>';
+  }
+  function logHTML(filter, max) {
+    var list = state.log.filter(filter || function () { return true; }).slice(0, max || 30);
+    return list.length ? list.map(function (e) { return '<li class="' + e.kind + '"><span class="t num">' + timeStr(e.ts) + '</span><span>' + esc(e.text) + '</span></li>'; }).join("") : '<li class="info"><span></span><span>Nothing yet. Bookings, check-ins and moves appear here.</span></li>';
+  }
+  function checkToken() {
+    var tok = $("ci-token").value.trim().toUpperCase(), out = $("ci-result"), h = HOSTEL[state.session.hostel]; ui.checkin = tok;
+    var a = state.apps.filter(function (x) { return x.token === tok; })[0];
+    if (!a) out.innerHTML = '<div class="result bad"><h3>No booking matches</h3><p>Nothing matches that token. Do not hand over keys.</p></div>';
+    else if (roomOf(a.bed).hostel !== h) out.innerHTML = '<div class="result bad"><h3>Wrong hostel</h3><p>This booking is for ' + roomOf(a.bed).hostel.name + ', not ' + h.name + '.</p></div>';
+    else out.innerHTML = '<div class="result good"><h3>' + (a.status === "in" ? "Already checked in" : "Valid booking") + '</h3><dl class="rows" style="margin-top:8px"><div><dt>Student</dt><dd>' + esc(a.name) + ' · ' + esc(a.sid) + '</dd></div><div><dt>Application</dt><dd>' + a.id + '</dd></div><div><dt>Bed</dt><dd><b>' + bedName(a.bed) + '</b></dd></div><div><dt>Room type</dt><dd>' + TYPE[a.type].name + '</dd></div></dl>' +
+      (a.status === "paid" ? '<button class="btn block" style="margin-top:14px" type="button" data-action="checkin" data-id="' + a.id + '">Confirm check-in and hand over keys</button>' : "") + '</div>';
+  }
+  function openResident(id, result) {
+    var a = byId(id), h = roomOf(a.bed).hostel; ui.sheet = { kind: "resident", id: id };
+    var beds = h.keys.filter(function (k) { return !OCC[k]; }).map(function (k) { return [k, bedName(k) + " · " + TYPE[roomOf(k).type].short]; });
+    showSheet(head(esc(a.name), a.id + " · " + gWord(a.gender) + " · ID " + esc(a.sid)) +
+      '<div class="sheet-body"><dl class="rows"><div><dt>Bed</dt><dd><b>' + bedName(a.bed, true) + '</b></dd></div><div><dt>Paid for</dt><dd>' + TYPE[a.type].name + '</dd></div><div><dt>Status</dt><dd><span class="st ' + a.status + '">' + STATUS[a.status] + '</span></dd></div>' +
+      (a.invoices[0] ? '<div><dt>Paid</dt><dd>' + money(a.invoices.reduce(function (n, i) { return n + i.amount; }, 0)) + ' hostel fee · ' + dateStr(a.invoices[0].ts) + '</dd></div>' : "") + '</dl>' +
+      (a.status === "reserved" ? '<p class="tour-note">This bed is reserved but not paid. It is released automatically if the student does not pay in time.</p>' :
+      '<div class="panel" style="padding:16px"><div><h3 class="panel-title" style="font-size:1.1rem">Move to another bed</h3><p class="panel-sub">The Allocation Guard checks the move against the room type the student paid for.</p></div>' +
+      (beds.length ? selectField("mv-bed", "Free beds in " + h.name, beds, beds[0][0]) + '<button class="btn dark block" data-action="move" data-id="' + a.id + '">Move student</button>' : '<p class="tour-note">No free beds in ' + h.name + ' right now.</p>') +
+      (result ? '<div class="result ' + (result.ok ? "good" : "bad") + '"><h3>' + result.title + '</h3><p>' + result.text + '</p></div>' : "") + '</div>') + '</div>', result ? ".result" : ".close");
+    if (result && !result.ok) { var s = $("sheet"); s.classList.remove("shake"); void s.offsetWidth; s.classList.add("shake"); }
+  }
+
+  /* ---------- Administrator ---------- */
+  function renderAdmin() {
+    var s = state.session, el = $("view-admin");
+    if (!s || s.role !== "admin") { el.innerHTML = ""; return; }
+    var apps = state.apps, taken = TOTAL_BEDS - totalFree(), fees = 0, service = 0;
+    apps.forEach(function (a) { a.invoices.forEach(function (i) { fees += i.amount; service += i.service; }); });
+    var n = function (st) { return apps.filter(function (a) { return a.status === st; }).length; };
+    var ups = apps.filter(function (a) { return a.up && (a.up.status === "pending" || a.up.status === "approved"); });
+    var waits = apps.filter(function (a) { return a.waitlist && a.status === "applied"; });
+    var kpis = '<div class="kpis"><div class="kpi red"><b class="num">' + taken + '/' + TOTAL_BEDS + '</b><span>Beds taken</span></div><div class="kpi"><b class="num">' + apps.length + '</b><span>Applications</span></div>' +
+      '<div class="kpi"><b class="num">' + n("reserved") + '</b><span>Awaiting payment</span></div><div class="kpi"><b class="num m">' + money(fees) + '</b><span>Hostel fees collected</span></div><div class="kpi"><b class="num m">' + money(service) + '</b><span>Service fees (5%)</span></div></div>';
+    var bars = '<div class="bars">' + TYPES.map(function (t) { var used = t.total - countFree(t.id);
+      return '<div class="bar-row"><span>' + t.name + '</span><span class="bar" role="img" aria-label="' + used + ' of ' + t.total + ' beds taken"><i style="width:' + (used / t.total * 100).toFixed(1) + '%"></i></span><span class="v num"><b>' + used + '</b>/' + t.total + '</span></div>'; }).join("") +
+      HOSTELS.map(function (h) { var used = h.keys.length - hostelFree(h); return '<div class="bar-row"><span><b>' + h.name + '</b></span><span class="bar" role="img" aria-label="' + used + ' of ' + h.keys.length + ' beds taken"><i style="width:' + (used / h.keys.length * 100).toFixed(1) + '%;background:var(--fg)"></i></span><span class="v num"><b>' + used + '</b>/' + h.keys.length + '</span></div>'; }).join("") + '</div>';
+    var upHTML = ups.length ? ups.map(function (a) { var d = TYPE[a.up.to].price - TYPE[a.type].price, free = countFree(a.up.to, a.gender);
+      return '<div class="up-opt"><span><b>' + a.id + ' · ' + esc(a.name) + '</b><small>' + TYPE[a.type].short + ' to ' + TYPE[a.up.to].short + ' · pays ' + money(d) + ' more · ' + (a.up.status === "approved" ? "approved, " + bedName(a.up.bed, true) + " held" : free + " free for this student") + '</small></span>' +
+        (a.up.status === "pending" ? '<span style="display:flex;gap:6px"><button class="btn sm" data-action="up-approve" data-id="' + a.id + '"' + (free ? "" : " disabled") + '>Approve</button><button class="btn sm quiet" data-action="up-decline" data-id="' + a.id + '">Decline</button></span>' : '<span class="st reserved">Awaiting payment</span>') + '</div>'; }).join("") : '<p class="panel-sub">No upgrade requests waiting.</p>';
+    var waitHTML = waits.length ? TYPES.map(function (t) { var l = waits.filter(function (a) { return a.waitlist === t.id; }); if (!l.length) return "";
+      return '<div class="up-opt"><span><b>' + t.name + '</b><small>' + l.map(function (a, i) { return (i + 1) + ". " + esc(a.name) + " (" + a.id + ")"; }).join(" · ") + '</small></span><span class="st">' + l.length + ' waiting</span></div>'; }).join("") : '<p class="panel-sub">Nobody is on a waiting list.</p>';
+    var q = ui.aq.toLowerCase(), rows = apps.filter(function (a) { return !q || (a.name + " " + a.id + " " + a.sid).toLowerCase().indexOf(q) > -1; }).slice().reverse().slice(0, 40);
+    var pays = []; apps.forEach(function (a) { a.invoices.forEach(function (i) { pays.push({ a: a, i: i }); }); }); pays.sort(function (x, y) { return y.i.ts - x.i.ts; });
+    el.innerHTML = '<div class="page-head"><p class="kicker">Administrator · Housing office</p><h2>Every bed, application and payment.</h2><p>Search by application number, approve room upgrades, watch the waiting lists and see what has been paid.</p></div>' + kpis +
+      '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Beds taken by room type</h3><p class="panel-sub">Red bars are room types. Black bars are the two hostels.</p></div>' + bars + '</div>' +
+      '<div class="stack"><div class="panel"><div><h3 class="panel-title">Upgrade requests</h3></div><div class="up-list">' + upHTML + '</div></div><div class="panel"><div><h3 class="panel-title">Waiting lists</h3></div><div class="up-list">' + waitHTML + '</div></div></div></div>' +
+      '<div class="panel" style="margin-bottom:22px"><div class="panel-head"><div><h3 class="panel-title">Applications</h3><p class="panel-sub">Newest first. Showing ' + rows.length + ' of ' + apps.length + '.</p></div><input id="aq" type="search" placeholder="Search LUG2026... or a name" value="' + esc(ui.aq) + '" aria-label="Search applications"></div>' +
+      '<div class="tablewrap"><table class="t"><thead><tr><th>Application</th><th>Student</th><th>Choices</th><th>Bed</th><th>Status</th><th></th></tr></thead><tbody>' +
+      (rows.map(function (a) { return '<tr><td><b>' + a.id + '</b><small>' + dateStr(a.ts) + '</small></td><td>' + esc(a.name) + '<small>' + gWord(a.gender) + ' · ' + esc(a.sid) + (a.sample ? "" : " · you") + '</small></td><td>' + TYPE[a.first].short + '<small>then ' + (TYPE[a.second] ? TYPE[a.second].short : "none") + '</small></td>' +
+        '<td>' + (a.bed ? bedName(a.bed, true) : a.waitlist ? "Waiting list" : "Not chosen") + '</td><td><span class="st ' + a.status + '">' + STATUS[a.status] + '</span>' + (a.status === "reserved" ? '<small class="num" data-exp="' + a.exp + '">' + hms(a.exp - Date.now()) + '</small>' : "") + '</td>' +
+        '<td>' + (a.status === "reserved" ? '<button class="btn sm quiet" data-action="expire" data-id="' + a.id + '">Expire now</button>' : "") + '</td></tr>'; }).join("") || '<tr><td colspan="6">No application matches that search.</td></tr>') + '</tbody></table></div>' +
+      '<p class="room-note" style="margin:0">"Expire now" is a demo shortcut: it skips the rest of the 24 hours so you can show a reservation running out.</p></div>' +
+      '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Payments</h3><p class="panel-sub">Latest ' + Math.min(12, pays.length) + ' of ' + pays.length + ' invoices.</p></div><div class="tablewrap"><table class="t"><thead><tr><th>Invoice</th><th>Student</th><th>For</th><th>Paid</th><th>Reference</th></tr></thead><tbody>' +
+      pays.slice(0, 12).map(function (p) { return '<tr><td><b>' + p.i.no + '</b><small>' + dateStr(p.i.ts) + '</small></td><td>' + esc(p.a.name) + '<small>' + p.a.id + '</small></td><td>' + esc(p.i.label) + '</td><td class="num"><b>' + money(p.i.total) + '</b><small>' + esc(p.i.method) + '</small></td><td>' + p.i.ref + '</td></tr>'; }).join("") + '</tbody></table></div></div>' +
+      '<div class="panel"><div><h3 class="panel-title">Allocation log</h3><p class="panel-sub">Every booking, move, refusal and expiry.</p></div><ol class="log">' + logHTML(null, 30) + '</ol></div></div>';
+  }
+
+  /* ---------- Sample activity from other students ---------- */
   function simulate() {
-    var candidates = [];
-    HOSTELS.forEach(function (h) { h.rooms.forEach(function (r) { if (avail(r) >= 2) candidates.push(r); }); });
-    if (candidates.length) {
-      var r = candidates[Math.floor(Math.random() * candidates.length)], free = freeBeds(r), s = ui.sheet;
-      var idx = s && s.step === 1 && s.rid === r.id && Math.random() < .5 ? s.sel : free[Math.floor(Math.random() * free.length)];
-      state.taken[r.id].push(idx); save();
-      renderTotals(); flashWindow(r.id, idx);
-      if (ui.view === "find") {
-        renderList();
-        var row = $("row-" + r.id);
-        if (row) { row.classList.add("flash"); setTimeout(function () { row.classList.remove("flash"); }, 1500); }
-      }
-      if (s && s.step === 1 && s.rid === r.id) {
-        if (idx === s.sel) {
-          var left = freeBeds(r);
-          if (left.length) { s.sel = left[0]; toast("Another student just booked the bed you were looking at. We moved you to " + bedLabel(r, s.sel) + "."); renderPicker(); }
-          else { closeSheet(); toast("That room type just sold out."); }
-        } else renderPicker(null);
+    if (totalFree() > 14 && $("overlay").hidden) {
+      var g = Math.random() < 0.5 ? "F" : "M", opts = TYPES.filter(function (t) { return countFree(t.id, g) > 2; });
+      if (opts.length) {
+        var t = pick(opts), bed = pick(freeOfType(t.id, g)), a = addSample(state, g, t.id, bed, "paid", Date.now()); a.id = appId(state.seq++);
+        logEvent(a.id + " paid for " + bedName(bed, true) + " (sample student)"); commit(); flashWindow(bed);
       }
     }
-    setTimeout(simulate, 13000 + Math.random() * 9000);
+    setTimeout(simulate, 40000 + Math.random() * 30000);
   }
-
   function tick() {
-    if (!state.hold) return;
-    var left = state.hold.exp - Date.now(), t = $("timer"), pt = $("pill-timer");
-    if (t) { t.textContent = mmss(left); t.classList.toggle("urgent", left < 60000); }
-    if (pt) pt.textContent = mmss(left);
-    if (left <= 0 && !paying) {
-      if (!$("overlay").hidden) closeSheet();
-      releaseHold("Your " + HOLD_MINUTES + " minute hold ended. The bed is back on sale.");
-    }
+    if (!paying && checkExpiry()) { commit(); if (ui.sheet && (ui.sheet.kind === "pay")) { closeSheet(); toast("Time ran out. The bed is back on offer."); } }
+    var now = Date.now(), els = document.querySelectorAll("[data-exp]");
+    for (var i = 0; i < els.length; i++) els[i].textContent = hms(+els[i].getAttribute("data-exp") - now);
   }
-
 
   /* ---------- Allocation Guard demo on the home page ---------- */
-  var demo = { bed: "Room M203 · Bed 2" };
+  var demoBed = "Room 12 · Bed A";
   function runDemo(kind) {
     var v = $("demo-verdict"), box = $("demo"), log = $("demo-log"), li = document.createElement("li");
     if (kind === "same") {
-      var next = demo.bed === "Room M207 · Bed 1" ? "Room M203 · Bed 2" : "Room M207 · Bed 1";
-      demo.bed = next; $("demo-bed-name").textContent = next;
-      v.className = "verdict ok";
-      v.innerHTML = '<span>✓</span><span>Allowed. Same room type, so the move goes through and Ama\'s allocation letter updates.</span>';
-      li.textContent = "Moved Ama to " + next + " (2-person room)";
-      $("demo-bed").style.backgroundColor = "#E5F4EA"; setTimeout(function () { $("demo-bed").style.backgroundColor = ""; }, 900);
+      demoBed = demoBed === "Room 13 · Bed B" ? "Room 12 · Bed A" : "Room 13 · Bed B"; $("demo-bed-name").textContent = demoBed;
+      v.className = "verdict ok"; v.innerHTML = "<span>✓</span><span>Allowed. Same room type, so the move goes through and is logged.</span>";
+      li.textContent = "Moved Ama to " + demoBed + " (two in a room)";
     } else {
-      v.className = "verdict no";
-      v.innerHTML = '<span>✕</span><span>Refused. Ama paid for a 2-person room, so she can\'t be put in a 4-person room unless she agrees.</span>';
-      li.className = "no"; li.textContent = "Refused moving Ama to Room M305 (4-person room)";
+      v.className = "verdict no"; v.innerHTML = "<span>✕</span><span>Refused. Ama paid for two in a room, so she cannot be put in a four in a room.</span>";
+      li.className = "no"; li.textContent = "Refused moving Ama to Room 14 (four in a room)";
       box.classList.remove("shake"); void box.offsetWidth; box.classList.add("shake");
     }
-    log.insertBefore(li, log.firstChild);
-    while (log.children.length > 4) log.removeChild(log.lastChild);
+    log.insertBefore(li, log.firstChild); while (log.children.length > 4) log.removeChild(log.lastChild);
   }
 
-  /* ---------- Events ---------- */
-  function goView(v) { ui.view = v; renderAll(); window.scrollTo(0, 0); }
-  function toResults() { var el = $("results"); if (el) el.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "start" }); }
-  function afterFilter() { ui.animate = true; renderList(); }
+  /* ---------- Rendering and routing ---------- */
+  function renderAll() { renderNav(); renderHome(); if (ui.view === "signin") renderSignin(); renderMe(); renderManager(); renderAdmin(); }
+  function commit() { index(); save(); renderAll(); }
+  function go(view) {
+    var s = state.session, need = { me: "student", manager: "manager", admin: "admin" }[view];
+    if (need && (!s || s.role !== need)) { ui.role = need; view = "signin"; }
+    if (view === "home" && s && s.role !== "student") view = s.role;
+    ui.view = view; commit(); window.scrollTo(0, 0);
+  }
+  function copyText(text) {
+    var done = function () { toast("Invoice copied."); };
+    if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(text).then(done, function () { toast("Copy is blocked here. Select the invoice text instead."); });
+    else toast("Copy is not available here. Select the invoice text instead.");
+  }
+
   document.addEventListener("click", function (e) {
-    var el = e.target.closest("[data-action], [data-view], [data-zone], [data-jump], [data-gender], [data-size], [data-goto], [data-demo]");
+    var el = e.target.closest("[data-action], [data-go], [data-fg], [data-ft], [data-demo], .role");
     if (!el) return;
-    if (el.dataset.demo) { runDemo(el.dataset.demo); return; }
-    if (el.dataset.view) { if (!$("overlay").hidden && !paying) closeSheet(); goView(el.dataset.view); return; }
-    if (el.dataset.zone) { ui.zone = el.dataset.zone; afterFilter(); return; }
-    if (el.dataset.gender) { ui.gender = el.dataset.gender; afterFilter(); return; }
-    if (el.dataset.size !== undefined) { ui.size = +el.dataset.size; afterFilter(); return; }
-    if (el.dataset.goto) {
-      var gh = HOSTEL[el.dataset.goto];
-      ui.zone = "any"; ui.gender = "all"; ui.size = 0; ui.budget = 18000; ui.hideFull = false;
-      renderList();
-      var card = $("card-" + gh.id);
-      if (card) { card.scrollIntoView({ behavior: REDUCED ? "auto" : "smooth", block: "center" }); card.classList.add("ping"); setTimeout(function () { card.classList.remove("ping"); }, 1800); }
-      return;
-    }
-    if (el.dataset.jump) { if (ui.view !== "find") goView("find"); toResults(); return; }
-    switch (el.dataset.action) {
-      case "pick": openPicker(el.dataset.rid); break;
-      case "sel": ui.sheet.sel = +el.dataset.idx; renderPicker('[data-idx="' + el.dataset.idx + '"]'); break;
-      case "hold": holdBed(); break;
-      case "resume": if (state.hold) openPay(); break;
-      case "change": var prev = state.hold; releaseHold(); if (prev) openPicker(prev.rid, prev.idx); break;
-      case "switch": releaseHold(); openPicker(el.dataset.rid); break;
-      case "release": closeSheet(); releaseHold("Bed released. It is back on sale."); break;
+    var d = el.dataset, app = myApp();
+    if (el.classList.contains("role")) { ui.role = d.role; renderSignin(); return; }
+    if (d.demo) { runDemo(d.demo); return; }
+    if (d.go) { if (!$("overlay").hidden) closeSheet(); if (d.role) ui.role = d.role; go(d.go); return; }
+    if (d.fg !== undefined) { ui.fg = d.fg; renderHome(); return; }
+    if (d.ft !== undefined) { ui.ft = d.ft; renderHome(); return; }
+    switch (d.action) {
       case "close": closeSheet(); break;
-      case "goto-mine": closeSheet(); goView("mine"); break;
-      case "cancel": cancelBooking(el.dataset.ref); break;
-      case "confirm-cancel": confirmCancel(el.dataset.ref); break;
-      case "tour": openTour(el.dataset.hid); break;
-      case "tour-tab": openTour(el.dataset.hid, el.dataset.tab); break;
-      case "g-move": guardMove(); break;
-      case "g-request": guardRequest(); break;
-      case "req-accept": acceptRequest(el.dataset.ref); break;
-      case "req-decline": declineRequest(el.dataset.ref); break;
-      case "clear": ui.zone = "any"; ui.gender = "all"; ui.size = 0; ui.budget = 18000; ui.hideFull = false; afterFilter(); break;
+      case "signout": state.session = null; if (!$("overlay").hidden) closeSheet(); go("home"); toast("Signed out."); break;
+      case "reset": state = freshState(); if (!$("overlay").hidden) closeSheet(); ui.view = "home"; index(); buildModel(); commit(); toast("Demo data reset."); break;
+      case "apply": if (!$("overlay").hidden) closeSheet(); apply(d.tid); break;
+      case "rooms": openRooms(d.hid, +d.floor || 0); break;
+      case "choose": openChooser(app, d.tid); break;
+      case "sel": openChooser(byId(ui.sheet.id), ui.sheet.tid, d.key); break;
+      case "reserve": reserve(); break;
+      case "pay": openPay(app, "booking"); break;
+      case "release": releaseBed(app, "released by the student"); commit(); toast("Bed released. Your application stays open."); break;
+      case "wait": app.waitlist = d.tid; logEvent(app.id + " joined the waiting list for " + TYPE[d.tid].short, "info"); closeSheet(); go("me"); toast("You are on the waiting list for " + TYPE[d.tid].name + "."); break;
+      case "unwait": delete app.waitlist; commit(); break;
+      case "invoice": var inv = app.invoices.filter(function (i) { return i.no === d.inv; })[0]; showSheet(head("Invoice " + inv.no, "Paid " + dateStr(inv.ts)) + '<div class="sheet-body">' + invoiceHTML(app, inv) + '</div>'); break;
+      case "copy-inv": var a2 = byId(d.id); copyText(invoiceText(a2, a2.invoices.filter(function (i) { return i.no === d.inv; })[0])); break;
+      case "up-request": app.up = { to: d.tid, status: "pending", ts: Date.now() }; logEvent(app.id + " asked to upgrade from " + TYPE[app.type].short + " to " + TYPE[d.tid].short, "info"); commit(); toast("Upgrade request sent to the housing office."); break;
+      case "up-cancel": delete app.up; commit(); break;
+      case "up-pay": openPay(app, "upgrade"); break;
+      case "up-approve": approveUpgrade(byId(d.id)); break;
+      case "up-decline": var a3 = byId(d.id); a3.up.status = "declined"; logEvent("Upgrade declined for " + a3.id, "info"); commit(); break;
+      case "expire": var a4 = byId(d.id); a4.exp = Date.now() - 1; if (checkExpiry()) commit(); toast(a4.id + " expired. The bed is back on offer."); break;
+      case "resident": openResident(d.id); break;
+      case "move": openResident(d.id, guardMove(byId(d.id), $("mv-bed").value)); break;
+      case "ci-fill": var nx = state.apps.filter(function (a) { return a.status === "paid" && roomOf(a.bed).hostel.id === state.session.hostel; })[0]; if (nx) { $("ci-token").value = nx.token; checkToken(); } else toast("Nobody is waiting to check in."); break;
+      case "checkin": var a5 = byId(d.id); a5.status = "in"; a5.inAt = Date.now(); logEvent(a5.id + " checked in to " + bedName(a5.bed, true) + " · hostel fee released to University Finance"); ui.checkin = ""; commit(); toast(a5.name + " is checked in."); break;
     }
+  });
+  document.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var id = e.target.id;
+    if (id === "finder") apply(ui.ft);
+    else if (id === "f-student") signinStudent();
+    else if (id === "f-manager") signinStaff("manager");
+    else if (id === "f-admin") signinStaff("admin");
+    else if (id === "f-apply") submitApply();
+    else if (id === "f-pay") submitPay();
+    else if (id === "f-checkin") checkToken();
+  });
+  document.addEventListener("change", function (e) {
+    var t = e.target;
+    if (t.name === "method") { payForm.method = t.value; var w = $("momo-wrap"); if (w) w.hidden = t.value === "card"; }
+    if (t.id === "m-hostel") $("m-code").value = CODES[t.value];
+  });
+  document.addEventListener("input", function (e) {
+    var t = e.target, pos;
+    if (t.id === "mq") { ui.mq = t.value; pos = t.selectionStart; renderManager(); $("mq").focus(); $("mq").setSelectionRange(pos, pos); }
+    else if (t.id === "aq") { ui.aq = t.value; pos = t.selectionStart; renderAdmin(); $("aq").focus(); $("aq").setSelectionRange(pos, pos); }
+    else if (t.getAttribute("aria-invalid")) setErr(t.id, "");
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !$("overlay").hidden && !paying) { closeSheet(); return; }
     var b = e.target.closest && e.target.closest(".bldg");
-    if (b && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); b.dispatchEvent(new MouseEvent("click", { bubbles: true })); }
-  });
-  document.addEventListener("change", function (e) {
-    var id = e.target.id;
-    if (e.target.name === "method") { form.method = e.target.value; var w = $("momo-wrap"); if (w) w.hidden = form.method === "card"; }
-    if (id === "f-sort") { ui.sort = e.target.value; renderList(); }
-    if (id === "f-hide") { ui.hideFull = e.target.checked; renderList(); }
-    if (id === "p-gender" && e.target.checked) setErr("p-gender", "");
-    if (/^g-/.test(id)) {
-      var g = ui.guard, v = e.target.value; g.result = "";
-      if (id === "g-hostel") { g.hid = v; g.ref = null; g.rid = null; }
-      if (id === "g-booking") { g.ref = v; g.rid = null; }
-      if (id === "g-room") { g.rid = v; g.idx = null; }
-      if (id === "g-bed") g.idx = +v;
-      renderGuard(); var again = $(id); if (again) again.focus();
-    }
-  });
-  document.addEventListener("input", function (e) {
-    var id = e.target.id;
-    if (id === "f-budget") { ui.budget = +e.target.value; renderList(); }
-    if (id === "p-name") form.name = e.target.value;
-    if (id === "p-sid") form.sid = e.target.value;
-    if (id === "p-momo") form.momo = e.target.value;
-    if (/^p-/.test(id) && e.target.getAttribute("aria-invalid")) setErr(id, "");
-  });
-  document.addEventListener("submit", function (e) {
-    if (e.target.id === "search") { e.preventDefault(); toResults(); }
-    if (e.target.id === "pay-form") submitPay(e);
-    if (e.target.id === "verify-form") verify(e);
+    if (b && (e.key === "Enter" || e.key === " ")) { e.preventDefault(); openRooms(b.dataset.hid); }
   });
   $("overlay").addEventListener("click", function (e) { if (e.target === this && !paying) closeSheet(); });
-  $("v-fill").addEventListener("click", function () {
-    var b = state.bookings.filter(function (x) { return x.status === "paid"; }).pop();
-    if (!b) { toast("You have no paid bookings yet. Choose a bed first."); return; }
-    $("v-ref").value = b.ref; $("v-code").value = b.code;
-  });
-  $("reset").addEventListener("click", function () { state = freshState(); save(); if (!$("overlay").hidden) closeSheet(); buildModel(); renderAll(); toast("Demo data reset."); });
-
-  function countUp(id, to) {
-    var el = $(id); if (!el || REDUCED) return;
-    var t0 = null;
-    function step(t) { if (!t0) t0 = t; var p = Math.min(1, (t - t0) / 1400), e = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(to * e); if (p < 1) requestAnimationFrame(step); }
-    requestAnimationFrame(step);
-  }
 
   /* ---------- Boot ---------- */
-  state = load();
-  if (state.hold && state.hold.exp <= Date.now()) { var h0 = state.hold, t0 = state.taken[h0.rid], i0 = t0.indexOf(h0.idx); if (i0 > -1) t0.splice(i0, 1); state.hold = null; save(); }
-  buildModel();
-  renderAll();
-  countUp("t-beds", zoneFree("on") + zoneFree("off"));
+  state = load(); index();
+  if (checkExpiry()) index();
+  var s0 = state.session; ui.view = !s0 ? "home" : s0.role === "student" ? "home" : s0.role;
+  buildModel(); commit();
   setInterval(tick, 1000);
-  setTimeout(simulate, 7000);
+  setTimeout(simulate, 30000);
 })();
 </script>
 </body>
