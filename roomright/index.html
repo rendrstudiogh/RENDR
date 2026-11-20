@@ -674,6 +674,46 @@ table.t td small { display: block; color: var(--muted); }
 
 .tag text { font-size: 13px; }
 .model svg { min-width: 440px; }
+/* ---------- v5: verification, staff access, compact options ---------- */
+.mail { border-radius: var(--r-md); box-shadow: inset 0 0 0 1.5px var(--line); overflow: hidden; background: var(--card); }
+.mail-h { background: var(--canvas); padding: 12px 16px; display: grid; gap: 2px; }
+.mail-h small { color: var(--muted); font-size: .78rem; }
+.mail-tag { justify-self: start; font-size: .68rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--red-ink); }
+.mail-b { padding: 14px 16px; display: grid; gap: 8px; font-size: .92rem; }
+.mail-b p { margin: 0; }
+.mail-code { font-family: var(--f-display); font-size: 1.9rem; font-weight: 800; letter-spacing: .3em; color: var(--red-ink); }
+.types { grid-template-columns: minmax(0, 1fr); gap: 8px; }
+.tcard { grid-template-columns: auto minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, .9fr) auto; align-items: center; gap: 18px; padding: 14px 18px; border-radius: var(--r-md); }
+.tcard:hover { transform: translateY(-2px); }
+.tcard h3 { font-size: 1.05rem; }
+.tcard .room-note { margin: 2px 0 0; }
+.tcard .beds-ico { width: 72px; flex-wrap: wrap; gap: 4px; }
+.tcard .beds-ico i { width: 16px; height: 11px; border-radius: 3px 3px 2px 2px; }
+.tcard .beds-ico i::before { left: 2px; top: 2px; width: 5px; height: 3px; }
+.tc-price b { display: block; font-family: var(--f-display); font-size: 1.2rem; font-weight: 800; letter-spacing: -.02em; }
+.tc-price small, .tc-avail small { display: block; color: var(--muted); font-size: .76rem; }
+.state.ok { color: var(--ok); }
+.opts { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 6px; }
+.opt { position: relative; cursor: pointer; display: block; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt span { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 0 10px; padding: 9px 12px; border-radius: var(--r-sm); box-shadow: inset 0 0 0 1.5px var(--line); font-size: .88rem; }
+.opt b { font-weight: 700; }
+.opt small { grid-column: 1; color: var(--muted); }
+.opt em { grid-column: 2; grid-row: 1 / span 2; align-self: center; font-style: normal; font-weight: 700; font-size: .78rem; color: var(--ok); }
+.opt em.none { color: var(--faint); }
+.opt input:checked + span { box-shadow: inset 0 0 0 2px var(--red); background: var(--red-soft); }
+.opt input:focus-visible + span { outline: 2.5px solid var(--red); outline-offset: 2px; }
+.opts[aria-invalid="true"] .opt span { box-shadow: inset 0 0 0 1.5px var(--red); }
+.choice-note { margin: 0; font-size: .86rem; font-weight: 600; color: var(--muted); }
+.code-row { display: grid; grid-template-columns: minmax(0, 1fr) auto auto; gap: 8px; align-items: end; }
+@media (max-width: 760px) {
+  .tcard { grid-template-columns: auto minmax(0, 1fr) auto; gap: 6px 12px; }
+  .tcard .btn { grid-column: 3; grid-row: 1; }
+  .tc-price { grid-column: 2; grid-row: 2; }
+  .tc-avail { grid-column: 3; grid-row: 2; text-align: right; }
+  .tcard .beds-ico { width: 40px; grid-row: 1 / span 2; }
+  .opts, .code-row { grid-template-columns: minmax(0, 1fr); }
+}
 </style>
 </head>
 <body>
@@ -734,7 +774,7 @@ table.t td small { display: block; color: var(--muted); }
     <div class="sec-title">
       <p class="kicker">Rooms and prices</p>
       <h2 id="types-title">Six room types. One price each.</h2>
-      <p>Fees are for the 9 month tenancy, per bed, as published by the university for 2026/27. A 5% RoomRight service fee is added at payment.</p>
+      <p>Fees are for the 9 month tenancy, per bed, as published by the university for 2026/27. You pay the hostel fee only. There is no service fee.</p>
     </div>
     <div class="types" id="types"></div>
   </section>
@@ -779,8 +819,8 @@ table.t td small { display: block; color: var(--muted); }
       <div>
         <p class="kicker">The Allocation Guard</p>
         <h2 id="guard-title">Paid for two in a room? You stay two in a room.</h2>
-        <p>Every room move passes a check against what the student paid for. Try it: you are the hostel manager, and Ama paid for a two in a room.</p>
-        <button class="btn white" data-go="signin" data-role="manager">Sign in as a hostel manager</button>
+        <p>Every room move passes a check against what the student paid for, so nobody can be pushed into a room they did not book. Try it: Ama paid for a two in a room.</p>
+        <button class="btn white" data-action="apply">Apply for a bed</button>
       </div>
       <div class="demo" id="demo">
         <div class="demo-who"><span class="avatar">A</span><div><b>Ama Mensah</b><span>Paid for two in a room</span></div><span class="chip">Maria</span></div>
@@ -808,7 +848,7 @@ table.t td small { display: block; color: var(--muted); }
       <li><b>Check in</b><span>Show your token at the hostel. The manager confirms it and gives you your keys.</span></li>
     </ol>
     <div class="escrow" aria-label="Where your money goes">
-      <span class="node">You</span><span class="arrow">hostel fee + 5% →</span>
+      <span class="node">You</span><span class="arrow">hostel fee →</span>
       <span class="node mid">RoomRight</span><span class="arrow">hostel fee passed on at check-in →</span>
       <span class="node">University Finance</span>
       <span class="refund">Room full? Join the waiting list for it.</span>
@@ -821,24 +861,32 @@ table.t td small { display: block; color: var(--muted); }
         <h2 id="finale-title">Your bed is waiting.</h2>
         <p><b class="num" id="t-beds-2">0</b> beds are free right now across Maria and Camille.</p>
       </div>
-      <div class="ctas"><button class="btn white lg" data-action="apply">Apply for a bed</button><button class="btn outline-white lg" data-go="signin" data-role="manager">Staff sign in</button></div>
+      <div class="ctas"><button class="btn white lg" data-action="apply">Apply for a bed</button><button class="btn outline-white lg" data-go="signin">Sign in</button></div>
     </section>
   </div>
 </div>
 
 <section id="view-signin" class="wrap page" hidden>
   <div class="page-head">
-    <p class="kicker">Sign in</p>
-    <h2>Who are you signing in as?</h2>
-    <p>Students apply and track their booking. Hostel managers see their rooms and residents. The administrator sees everything.</p>
+    <p class="kicker">Students</p>
+    <h2>Sign in to apply for a bed</h2>
+    <p>Apply for Maria or Camille, choose your bed, pay, and follow your booking.</p>
+  </div>
+  <div class="panel" id="signin-panel" style="max-width:620px"></div>
+</section>
+
+<section id="view-staff" class="wrap page" hidden>
+  <div class="page-head">
+    <p class="kicker">Staff only</p>
+    <h2>Staff sign in</h2>
+    <p>For hostel managers and the housing office administrator. Students do not use this page.</p>
   </div>
   <div class="signin">
-    <div class="roles" role="tablist" aria-label="Role">
-      <button class="role" role="tab" data-role="student" aria-selected="true"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg></span><b>Student</b><span>Looking for a room</span></button>
-      <button class="role" role="tab" data-role="manager" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/></svg></span><b>Hostel manager</b><span>Runs Maria or Camille</span></button>
+    <div class="roles" role="tablist" aria-label="Staff role">
+      <button class="role" role="tab" data-role="manager" aria-selected="true"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M4 21V8l8-5 8 5v13M9 21v-6h6v6"/></svg></span><b>Hostel manager</b><span>Runs Maria or Camille</span></button>
       <button class="role" role="tab" data-role="admin" aria-selected="false"><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/></svg></span><b>Administrator</b><span>Housing office, all hostels</span></button>
     </div>
-    <div class="panel" id="signin-panel"></div>
+    <div class="panel" id="staff-panel"></div>
   </div>
 </section>
 
@@ -850,7 +898,7 @@ table.t td small { display: block; color: var(--muted); }
 <footer>
   <div class="wrap">
     <span><b style="color:var(--fg)">RoomRight</b> for Lancaster University Ghana · Demo build. Rooms, beds and prices follow the 2026/27 hostel documents. Residents and bookings are sample data and no real payment is taken. Not an official university service.</span>
-    <button class="linkbtn" data-action="reset">Reset demo data</button>
+    <span style="display:flex;gap:16px;flex-wrap:wrap"><button class="linkbtn" id="staff-link" data-go="staff">Staff login</button><button class="linkbtn" data-action="reset">Reset demo data</button></span>
   </div>
 </footer>
 
@@ -860,14 +908,14 @@ table.t td small { display: block; color: var(--muted); }
 <div class="toast" id="toast" role="status" hidden></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script>
 (function () {
   "use strict";
 
   /* ---------- Config: rooms and prices from the 2026/27 hostel documents ---------- */
-  var FEE_RATE = 0.05;          // RoomRight service fee, added at payment
   var RESERVE_HOURS = 24;       // how long a reserved bed waits for payment
-  var STORE_KEY = "roomright-lug-v2";
+  var STORE_KEY = "roomright-lug-v3";
   var CODES = { maria: "MARIA-2026", camille: "CAMILLE-2026", admin: "ADMIN-2026" };   // demo access codes
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -909,7 +957,6 @@ table.t td small { display: block; color: var(--muted); }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
   function pad(n, w) { return String(n).padStart(w || 2, "0"); }
   function money(n) { return "GH₵ " + n.toLocaleString("en-GB", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); }
-  function fee(n) { return Math.round(n * FEE_RATE * 100) / 100; }
   function hms(ms) { var s = Math.max(0, Math.ceil(ms / 1000)); return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor(s % 3600 / 60)) + ":" + pad(s % 60); }
   function dateStr(ts) { return new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
   function timeStr(ts) { return new Date(ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); }
@@ -922,12 +969,12 @@ table.t td small { display: block; color: var(--muted); }
 
   /* ---------- State ---------- */
   var state, OCC = {};
-  var ui = { sauth: null, skind: "new", rf: "active", view: "home", fg: "", ft: "", role: "student", intent: null, sheet: null, mq: "", aq: "", checkin: "", animate: true };
+  var ui = { verify: null, smode: null, showCodes: false, codeEdit: null, issued: null, sauth: null, skind: "new", rf: "active", view: "home", fg: "", ft: "", role: "student", intent: null, sheet: null, mq: "", aq: "", checkin: "", animate: true };
   var paying = false;
 
   function appId(n) { return "LUG2026" + pad(n, 3); }
   function invoiceFor(s, app, label, amount, method, ts) {
-    return { no: "INV-2026-" + pad(s.inv++, 4), ref: "TXN" + code(10), label: label, amount: amount, service: fee(amount), total: amount + fee(amount), method: method, ts: ts };
+    return { no: "INV-2026-" + pad(s.inv++, 4), ref: "TXN" + code(10), label: label, amount: amount, total: amount, method: method, ts: ts };
   }
   var FN = { F: ["Ama", "Akosua", "Abena", "Efua", "Adwoa", "Esi", "Afia", "Maame", "Serwaa", "Naa", "Dzifa", "Zainab", "Fatima", "Chioma", "Adaeze", "Temi", "Aisha", "Yaa", "Emefa", "Selasi", "Korkor", "Awura", "Mawusi", "Ewurabena"],
              M: ["Kofi", "Kwame", "Kwesi", "Yaw", "Kojo", "Kwabena", "Nii", "Fiifi", "Ekow", "Selorm", "Edem", "Ibrahim", "Tunde", "Emeka", "Kelechi", "Nana", "Papa", "Elikem", "Senyo", "Kwaku", "Delali", "Jojo", "Paa Kwesi", "Sena"] };
@@ -942,7 +989,7 @@ table.t td small { display: block; color: var(--muted); }
     s.apps.push(a); return a;
   }
   function freshState() {
-    var s = { apps: [], log: [], inv: 1, seq: 1, session: null, profiles: {}, useq: 1, reports: [], rseq: 1 }, now = Date.now(), g = 0;
+    var s = { apps: [], log: [], inv: 1, seq: 1, session: null, profiles: {}, useq: 1, reports: [], rseq: 1, codes: { maria: CODES.maria, camille: CODES.camille, admin: CODES.admin }, adminEmail: "housing.admin@roomright.demo", codeReqs: [], cseq: 2, mail: [] }, now = Date.now(), g = 0;
     var occupied = { t1: 4, t1b: 3, t2: 27, t3: 8, t3p: 6, t4: 16 };   // the two cheapest-per-head premium and 4-bed types start full
     TYPES.forEach(function (t) {
       var left = occupied[t.id];
@@ -963,6 +1010,7 @@ table.t td small { display: block; color: var(--muted); }
     s.apps.forEach(function (a, i) { a.id = appId(i + 1); });
     s.seq = s.apps.length + 1;
     sampleReports(s, now);
+    s.codeReqs.push({ no: "ACR-001", hostel: "camille", name: "Yaw Darko", contact: "0207654321", note: "I changed phones and lost the code.", ts: now - 26 * 36e5, status: "pending" });
     return s;
   }
   // A few problem reports so the manager and administrator views have something in them
@@ -986,11 +1034,25 @@ table.t td small { display: block; color: var(--muted); }
     add(wl, "booking", false, "I am on the waiting list for four in a room. Can I also be considered for three in a room?", "open", 12);
     s.reports.sort(function (a, b) { return b.upd - a.upd; });
   }
+  function valid(s) { return s && Array.isArray(s.apps) && s.profiles && Array.isArray(s.reports) && s.codes && Array.isArray(s.codeReqs); }
+  // Shared data lives in localStorage; who is signed in is kept per browser tab, so two tabs can be two different people
+  function readSession() { try { return JSON.parse(sessionStorage.getItem(STORE_KEY + "-session") || "null"); } catch (e) { return null; } }
   function load() {
-    try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (s && Array.isArray(s.apps) && s.profiles && Array.isArray(s.reports)) return s; } catch (e) {}
-    return freshState();
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); } catch (e) {}
+    if (!valid(s)) s = freshState();
+    s.session = readSession();
+    return s;
   }
-  function save() { try { localStorage.setItem(STORE_KEY, JSON.stringify(state)); } catch (e) {} }
+  function save() {
+    var o = {}; for (var k in state) if (k !== "session") o[k] = state[k];
+    try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {}
+    try { sessionStorage.setItem(STORE_KEY + "-session", JSON.stringify(state.session)); } catch (e) {}
+  }
+  // Re-read what other tabs have saved, right before anything that takes a bed
+  function refresh() {
+    try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (valid(s)) { s.session = state.session; state = s; index(); } } catch (e) {}
+  }
   function logEvent(text, kind) { state.log.unshift({ ts: Date.now(), text: text, kind: kind || "ok" }); state.log = state.log.slice(0, 60); }
 
   /* ---------- Who is in which bed ---------- */
@@ -1142,7 +1204,8 @@ table.t td small { display: block; color: var(--muted); }
       h = navBtn("manager", "Dashboard" + (op ? '<span class="count num">' + op + '</span>' : ""), "Dashboard") + who(HOSTEL[s.hostel].name + " manager"); }
     else h = navBtn("admin", "Overview", "Overview") + who("Administrator");
     $("nav").innerHTML = h;
-    ["home", "signin", "me", "manager", "admin"].forEach(function (v) { $("view-" + v).hidden = ui.view !== v; });
+    ["home", "signin", "staff", "me", "manager", "admin"].forEach(function (v) { $("view-" + v).hidden = ui.view !== v; });
+    $("staff-link").hidden = !!s;
   }
   function who(label) { return '<span class="who"><span>' + esc(label) + '</span><button data-action="signout">Sign out</button></span>'; }
   function stateTag(free) { return free === 0 ? '<span class="state none">Fully booked</span>' : free <= 3 ? '<span class="state low">Only ' + free + ' left</span>' : ""; }
@@ -1156,16 +1219,17 @@ table.t td small { display: block; color: var(--muted); }
       TYPES.map(function (t) { return '<button type="button" class="pill" data-ft="' + t.id + '" aria-pressed="' + (ui.ft === t.id) + '">' + t.short + '<span class="num">' + countFree(t.id, g) + '</span></button>'; }).join("");
     var t = TYPE[ui.ft], n = t ? countFree(t.id, g) : totalFree(g);
     $("f-price").textContent = t ? money(t.price) : "From " + money(14000);
-    $("f-sub").textContent = (t ? t.name + " · " : "") + "per bed for 9 months, plus 5% service fee";
+    $("f-sub").textContent = (t ? t.name + " · " : "") + "per bed for 9 months, no extra fees";
     $("f-btn").textContent = app && app.status !== "applied" ? "View my application" : n ? "Apply · " + n + (n === 1 ? " bed free" : " beds free") : "Join the waiting list";
 
     $("types").innerHTML = TYPES.map(function (t) {
+      var hold = 0; ROOMS.forEach(function (r) { if (r.type === t.id) r.keys.forEach(function (k) { if (OCC[k] && OCC[k].status === "reserved") hold++; }); });
       var f = countFree(t.id, g), by = HOSTELS.map(function (h) { var c = h.rooms.filter(function (r) { return r.type === t.id; }).length; return c ? h.name + " " + c + (c === 1 ? " room" : " rooms") : ""; }).filter(Boolean).join(" · ");
-      return '<article class="tcard' + (f ? "" : " full") + '"><div class="tc-top"><span class="beds-ico" aria-hidden="true">' + new Array(t.beds + 1).join("<i></i>") + '</span>' + (t.premium ? '<span class="chip">Includes ' + money(2000) + ' premium</span>' : "") + '</div>' +
-        '<h3>' + t.name + '</h3><div class="p num">' + money(t.price) + '<small> per bed, 9 months</small></div>' +
-        '<div class="avail"><span class="num"><b>' + f + '</b>/' + t.total + ' free' + (g ? " for you" : "") + '</span><span class="meter" role="img" aria-label="' + f + ' of ' + t.total + ' beds free"><i style="width:' + (f / t.total * 100).toFixed(1) + '%"></i></span>' + stateTag(f) + '</div>' +
-        '<p class="room-note" style="margin:0">' + by + '</p>' +
-        '<button class="btn block' + (f ? "" : " ghost") + '" data-action="apply" data-tid="' + t.id + '">' + (f ? "Apply for this room" : "Join the waiting list") + '</button></article>';
+      return '<article class="tcard' + (f ? "" : " full") + '"><span class="beds-ico" aria-hidden="true">' + new Array(t.beds + 1).join("<i></i>") + '</span>' +
+        '<div><h3>' + t.name + '</h3><p class="room-note">' + by + (t.premium ? ' · includes ' + money(2000) + ' premium' : "") + '</p></div>' +
+        '<div class="tc-price"><b class="num">' + money(t.price) + '</b><small>per bed, 9 months</small></div>' +
+        '<div class="tc-avail"><span class="state ' + (!f ? "none" : f <= 3 ? "low" : "ok") + '">' + (f ? f + " of " + t.total + " available" : "Fully booked") + '</span>' + (hold ? '<small>' + hold + ' on hold, unpaid</small>' : "") + '</div>' +
+        '<button class="btn sm' + (f ? "" : " ghost") + '" data-action="apply" data-tid="' + t.id + '">' + (f ? "Apply" : "Join waiting list") + '</button></article>';
     }).join("");
 
     $("hostels").innerHTML = HOSTELS.map(function (h, i) {
@@ -1202,12 +1266,12 @@ table.t td small { display: block; color: var(--muted); }
   /* ---------- Room maps ---------- */
   // mode "view": anyone browsing. mode "pick": a student choosing a bed of one room type.
   function roomTiles(rooms, mode, gender, sel, app) {
-    return '<div class="floor">' + rooms.map(function (r) {
+    return '<div class="floor"' + (mode === "pick" ? ' role="radiogroup" aria-label="Choose one bed"' : "") + '>' + rooms.map(function (r) {
       var rg = roomGender(r, app), blocked = mode === "pick" && rg && rg !== gender, anyFree = false;
       var beds = r.keys.map(function (k) {
         var taken = !!OCC[k] && OCC[k] !== app, ok = !taken && !blocked; if (!taken) anyFree = true;
         if (mode === "view") return '<span class="bed viewonly' + (taken ? " taken" : "") + '" aria-label="' + bedName(k) + (taken ? ", taken" : ", free") + '">' + (r.beds === 1 ? "" : bedLetter(k)) + '</span>';
-        return '<button type="button" class="bed' + (ok ? "" : " taken") + (k === sel ? " sel" : "") + '" data-action="sel" data-key="' + k + '"' + (ok ? "" : " disabled") + ' aria-pressed="' + (k === sel) + '" aria-label="' + bedName(k) + (ok ? ", free" : ", not available") + '">' + (r.beds === 1 ? "" : bedLetter(k)) + '</button>';
+        return '<button type="button" class="bed' + (ok ? "" : " taken") + (k === sel ? " sel" : "") + '" data-action="sel" data-key="' + k + '"' + (ok ? "" : " disabled") + ' role="radio" aria-checked="' + (k === sel) + '" aria-label="' + bedName(k) + (ok ? ", free" : ", not available") + '">' + (r.beds === 1 ? "" : bedLetter(k)) + '</button>';
       }).join("");
       return '<div class="rm' + (blocked ? " blocked" : anyFree ? "" : " full") + '"><span class="rm-no">Room ' + r.no + (mode === "view" ? " · " + TYPE[r.type].short : "") + '</span><div class="beds' + (r.beds === 1 ? " one" : "") + '">' + beds + '</div>' +
         (rg && r.beds > 1 ? '<span class="gtag">' + gWord(rg) + ' room</span>' : "") + '</div>';
@@ -1223,55 +1287,74 @@ table.t td small { display: block; color: var(--muted); }
       '<div class="actions"><button class="btn block" data-action="apply">Apply for a bed</button></div></div>', '[aria-selected="true"]');
   }
 
-  /* ---------- Sign in ---------- */
+  /* ---------- Demo email ---------- */
+  // There is no mail server in this demo, so every email the system would send is shown on screen instead
+  function sendMail(to, subject, html, extra) {
+    var m = { to: to, subject: subject, html: html, ts: Date.now() };
+    if (extra) for (var k in extra) m[k] = extra[k];
+    state.mail.unshift(m); state.mail = state.mail.slice(0, 30); return m;
+  }
+  function mailHTML(m) {
+    return '<div class="mail"><div class="mail-h"><span class="mail-tag">Demo: this email would be sent</span><b>' + esc(m.subject) + '</b><small>To ' + esc(m.to) + ' · from RoomRight · ' + timeStr(m.ts) + '</small></div><div class="mail-b">' + m.html + '</div></div>';
+  }
+
+  /* ---------- Students: sign in, sign up, verify ---------- */
   function kindOpt(v, t, sub) { return '<label class="kind"><input type="radio" name="skind" value="' + v + '"' + (ui.skind === v ? " checked" : "") + '><span><b>' + t + '</b><small>' + sub + '</small></span></label>'; }
   function renderSignin() {
-    document.querySelectorAll(".role").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.role === ui.role)); });
-    var h;
-    if (ui.role === "student") {
-      var up = (ui.sauth || (Object.keys(state.profiles).length ? "in" : "up")) === "up", ret = ui.skind === "returning";
-      h = '<div class="authtabs" role="tablist" aria-label="Student account"><button role="tab" type="button" data-action="auth" data-tab="in" aria-selected="' + !up + '">Sign in</button><button role="tab" type="button" data-action="auth" data-tab="up" aria-selected="' + up + '">Create an account</button></div>';
-      if (!up) h += '<div><h3 class="panel-title">Welcome back</h3><p class="panel-sub">New students sign in with the email they signed up with. Returning students can also use their student ID.</p></div>' +
-        '<form id="f-student" novalidate style="display:grid;gap:14px">' +
-        field("s-id", "Email or student ID", "text", "", "Student ID sign in works for returning students only", 'autocomplete="username" spellcheck="false" placeholder="you@example.com or 20241234"') +
-        field("s-pw", "Password", "password", "", "", 'autocomplete="current-password"') +
-        '<button class="btn block" type="submit">Sign in</button>' +
-        '<p class="panel-sub" style="margin:0">No account yet? <button class="linkbtn" type="button" data-action="auth" data-tab="up">Create one</button></p></form>';
-      else h += '<div><h3 class="panel-title">Create your student account</h3><p class="panel-sub">You can book a bed before you are admitted, and before you get your student ID. Add the ID when the university gives it to you.</p></div>' +
-        '<form id="f-signup" novalidate style="display:grid;gap:14px">' +
-        '<fieldset class="kinds"><legend class="legend-t">Which describes you?</legend>' +
-          kindOpt("new", "I am new to LUG", "No student ID yet. You sign in with your email.") +
-          kindOpt("returning", "I am a returning student", "I have a student ID and stayed in a hostel last year.") + '</fieldset>' +
-        '<div class="grid2">' + field("su-name", "Full name", "text", "", "As on your admission letter", 'autocomplete="name"') +
-          selectField("su-gender", "I am", [["", "Choose"], ["F", "Female"], ["M", "Male"]], "", "Shared rooms are single gender") + '</div>' +
-        '<div id="su-new" style="display:grid;gap:14px"' + (ret ? " hidden" : "") + '>' +
-          field("su-email", "Email", "email", "", "You sign in with this", 'autocomplete="email" placeholder="you@example.com"') +
-          selectField("su-adm", "Admission", [["admitted", "Admitted, waiting for my student ID"], ["pending", "Still waiting for my admission decision"]], "admitted", "If you are not admitted, the hostel fee is refunded") + '</div>' +
-        '<div id="su-ret" class="grid2"' + (ret ? "" : " hidden") + '>' +
-          field("su-sid", "Student ID", "text", "", "8 digits", 'inputmode="numeric" maxlength="8" placeholder="20241234"') +
-          selectField("su-stay", "Hostel last year", [["yes", "I stayed in Maria or Camille"], ["no", "I did not stay in a hostel"], ["two", "I have already stayed two years"]], "yes") + '</div>' +
-        field("su-phone", "Phone number", "tel", "", "For WhatsApp updates from Hostel Management", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') +
-        '<div class="grid2">' + field("su-pw", "Password", "password", "", "At least 6 characters", 'autocomplete="new-password"') +
-          field("su-pw2", "Confirm password", "password", "", "", 'autocomplete="new-password"') + '</div>' +
-        '<p class="demo-note">Demo only. Everything you type stays in this browser. Do not use a real password.</p>' +
-        '<button class="btn block" type="submit">Create account</button></form>';
-    } else if (ui.role === "manager") {
-      h = '<div><h3 class="panel-title">Hostel manager sign in</h3><p class="panel-sub">See your rooms, your residents, who is arriving, and problems students report.</p></div><form id="f-manager" novalidate style="display:grid;gap:14px">' +
-        selectField("m-hostel", "Your hostel", [["maria", "Maria"], ["camille", "Camille"]], "maria") + field("m-code", "Access code", "text", "", "", 'autocomplete="off" spellcheck="false"') +
-        '<p class="demo-note">Demo access codes: <code>' + CODES.maria + '</code> for Maria, <code>' + CODES.camille + '</code> for Camille.</p>' +
-        '<button class="btn block" type="submit">Sign in as hostel manager</button></form>';
-    } else {
-      h = '<div><h3 class="panel-title">Administrator sign in</h3><p class="panel-sub">Every application, payment, upgrade request, waiting list and problem report.</p></div><form id="f-admin" novalidate style="display:grid;gap:14px">' +
-        field("a-code", "Access code", "text", "", "", 'autocomplete="off" spellcheck="false"') +
-        '<p class="demo-note">Demo access code: <code>' + CODES.admin + '</code></p><button class="btn block" type="submit">Sign in as administrator</button></form>';
+    var h, v = ui.verify && state.profiles[ui.verify];
+    if (v && !v.verified) {
+      var m = state.mail.filter(function (x) { return x.uid === v.uid; })[0];
+      h = '<div><h3 class="panel-title">Verify your email</h3><p class="panel-sub">We sent a 6 digit code to <b>' + esc(v.email) + '</b>. Enter it to activate your account. You cannot use your account until it is verified.</p></div>' +
+        '<form id="f-verify" novalidate style="display:grid;gap:14px">' + field("v-code", "Verification code", "text", "", "The code expires after 30 minutes", 'inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 digits"') +
+        '<button class="btn block" type="submit">Verify my account</button><div class="r-actions" style="justify-content:space-between"><button class="linkbtn" type="button" data-action="resend">Send a new code</button><button class="linkbtn" type="button" data-action="auth" data-tab="in">Back to sign in</button></div></form>' +
+        (m ? mailHTML(m) : "");
+      $("signin-panel").innerHTML = h; return;
     }
+    var up = (ui.sauth || (Object.keys(state.profiles).length ? "in" : "up")) === "up", ret = ui.skind === "returning";
+    h = '<div class="authtabs" role="tablist" aria-label="Student account"><button role="tab" type="button" data-action="auth" data-tab="in" aria-selected="' + !up + '">Sign in</button><button role="tab" type="button" data-action="auth" data-tab="up" aria-selected="' + up + '">Create an account</button></div>';
+    if (!up) h += '<div><h3 class="panel-title">Welcome back</h3><p class="panel-sub">Sign in with your email. Returning students can also use their student ID.</p></div>' +
+      '<form id="f-student" novalidate style="display:grid;gap:14px">' +
+      field("s-id", "Email or student ID", "text", "", "Student ID sign in works for returning students only", 'autocomplete="username" spellcheck="false" placeholder="you@example.com or 20241234"') +
+      field("s-pw", "Password", "password", "", "", 'autocomplete="current-password"') +
+      '<button class="btn block" type="submit">Sign in</button>' +
+      '<p class="panel-sub" style="margin:0">No account yet? <button class="linkbtn" type="button" data-action="auth" data-tab="up">Create one</button></p></form>';
+    else h += '<div><h3 class="panel-title">Create your student account</h3><p class="panel-sub">You can book a bed before you are admitted, and before you get your student ID. We email you a code to verify your account.</p></div>' +
+      '<form id="f-signup" novalidate style="display:grid;gap:14px">' +
+      '<fieldset class="kinds"><legend class="legend-t">Which describes you?</legend>' +
+        kindOpt("new", "I am new to LUG", "No student ID yet. You sign in with your email.") +
+        kindOpt("returning", "I am a returning student", "I have a student ID and stayed in a hostel last year.") + '</fieldset>' +
+      '<div class="grid2">' + field("su-name", "Full name", "text", "", "As on your admission letter", 'autocomplete="name"') +
+        selectField("su-gender", "I am", [["", "Choose"], ["F", "Female"], ["M", "Male"]], "", "Shared rooms are single gender") + '</div>' +
+      field("su-email", "Email", "email", "", "We send your verification code here", 'autocomplete="email" placeholder="you@example.com"') +
+      '<div id="su-new"' + (ret ? " hidden" : "") + '>' +
+        selectField("su-adm", "Admission", [["admitted", "Admitted, waiting for my student ID"], ["pending", "Still waiting for my admission decision"]], "admitted", "If you are not admitted, the hostel fee is refunded") + '</div>' +
+      '<div id="su-ret" class="grid2"' + (ret ? "" : " hidden") + '>' +
+        field("su-sid", "Student ID", "text", "", "8 digits", 'inputmode="numeric" maxlength="8" placeholder="20241234"') +
+        selectField("su-stay", "Hostel last year", [["yes", "I stayed in Maria or Camille"], ["no", "I did not stay in a hostel"], ["two", "I have already stayed two years"]], "yes") + '</div>' +
+      field("su-phone", "Phone number", "tel", "", "For WhatsApp updates from Hostel Management", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') +
+      '<div class="grid2">' + field("su-pw", "Password", "password", "", "At least 6 characters", 'autocomplete="new-password"') +
+        field("su-pw2", "Confirm password", "password", "", "", 'autocomplete="new-password"') + '</div>' +
+      '<p class="demo-note">Demo only. Everything you type stays in this browser. Do not use a real password.</p>' +
+      '<button class="btn block" type="submit">Create account</button></form>';
     $("signin-panel").innerHTML = h;
+  }
+  function sendVerify(p) {
+    p.vcode = String(Math.floor(100000 + Math.random() * 900000)); p.vexp = Date.now() + 30 * 6e4;
+    sendMail(p.email, "Verify your RoomRight account", '<p>Hi ' + esc(p.name.split(" ")[0]) + ',</p><p>Use this code to verify your RoomRight account:</p><p class="mail-code">' + p.vcode + '</p>' +
+      '<p>Or open the link to verify straight away:</p><p><button class="btn sm" type="button" data-action="verify-link" data-uid="' + p.uid + '" data-c="' + p.vcode + '">Verify my account</button></p><p class="room-note">The code expires after 30 minutes. If you did not sign up, ignore this email.</p>', { uid: p.uid });
+  }
+  function verifyAccount(uid, c) {
+    var p = state.profiles[uid]; if (!p) return;
+    var err = !p.vcode || Date.now() > p.vexp ? "That code has expired. Send a new one." : c !== p.vcode ? "That code is not right. Check the email and try again." : "";
+    if (err) { ui.verify = uid; renderSignin(); setErr("v-code", err); return; }
+    p.verified = true; delete p.vcode; delete p.vexp; ui.verify = null;
+    logEvent("Account verified: " + p.name, "info"); startStudent(p, true);
   }
   function startStudent(p, isNew) {
     state.session = { role: "student", uid: p.uid };
     var intent = ui.intent; ui.intent = null;
     go(myApp() && !intent ? "me" : "home");
-    toast(isNew ? "Account created. Welcome, " + p.name.split(" ")[0] + "." : "Signed in as " + p.name + ".");
+    toast(isNew ? "Account verified. Welcome, " + p.name.split(" ")[0] + "." : "Signed in as " + p.name + ".");
     if (intent) apply(intent.tid);
   }
   function signinStudent() {
@@ -1287,6 +1370,10 @@ table.t td small { display: block; color: var(--muted); }
       if (!p) { setErr("s-id", "No account uses that email. Check it, or create an account."); return; }
     }
     if (!setErr("s-pw", p.pw === hash(pw) ? "" : "That password is not right.")) return;
+    if (!p.verified) {
+      if (!p.vcode || Date.now() > p.vexp) sendVerify(p);
+      ui.verify = p.uid; save(); renderSignin(); toast("Verify your email before you sign in."); return;
+    }
     startStudent(p, false);
   }
   function signupStudent() {
@@ -1294,9 +1381,8 @@ table.t td small { display: block; color: var(--muted); }
     var email = $("su-email").value.trim().toLowerCase(), sid = $("su-sid").value.trim(), stay = $("su-stay").value;
     var ok = setErr("su-name", name.length < 3 ? "Enter your full name." : "");
     ok = setErr("su-gender", gender ? "" : "Choose female or male.") && ok;
-    if (k === "new") {
-      ok = setErr("su-email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "Enter a valid email address." : findProfile(function (x) { return x.email === email; }) ? "An account already uses this email. Sign in instead." : "") && ok;
-    } else {
+    ok = setErr("su-email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "Enter a valid email address." : findProfile(function (x) { return x.email === email; }) ? "An account already uses this email. Sign in instead." : "") && ok;
+    if (k === "returning") {
       var used = findProfile(function (x) { return x.sid === sid; }) || state.apps.some(function (a) { return a.sid === sid; });
       ok = setErr("su-sid", !/^\d{8}$/.test(sid) ? "Student ID must be 8 digits." : used ? "An account already uses this student ID." : "") && ok;
       ok = setErr("su-stay", stay === "no" ? "Hostel places are for freshers and students who stayed in a hostel last year. Contact Hostel Management if you have a medical exception or are a hostel representative." :
@@ -1306,11 +1392,11 @@ table.t td small { display: block; color: var(--muted); }
     ok = setErr("su-pw", pw.length >= 6 ? "" : "Use at least 6 characters.") && ok;
     ok = setErr("su-pw2", $("su-pw2").value === pw ? "" : "The passwords do not match.") && ok;
     if (!ok) { var bad = $("signin-panel").querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
-    var p = { uid: "U" + pad(state.useq++, 4), kind: k, name: name, gender: gender, phone: phone, email: k === "new" ? email : "", sid: k === "returning" ? sid : "",
-      adm: k === "new" ? $("su-adm").value : "admitted", elig: k === "new" ? "fresher" : "returning", pw: hash(pw), ts: Date.now() };
-    state.profiles[p.uid] = p;
-    logEvent("New student account: " + name + (k === "new" ? (p.adm === "pending" ? ", awaiting admission" : ", no student ID yet") : ", returning student"), "info");
-    startStudent(p, true);
+    var p = { uid: "U" + pad(state.useq++, 4), kind: k, name: name, gender: gender, phone: phone, email: email, sid: k === "returning" ? sid : "",
+      adm: k === "new" ? $("su-adm").value : "admitted", elig: k === "new" ? "fresher" : "returning", pw: hash(pw), ts: Date.now(), verified: false };
+    state.profiles[p.uid] = p; sendVerify(p); ui.verify = p.uid;
+    logEvent("New student account: " + name + (k === "new" ? (p.adm === "pending" ? ", awaiting admission" : ", no student ID yet") : ", returning student") + ", waiting for email verification", "info");
+    save(); renderSignin(); window.scrollTo(0, 0); toast("Account created. Check your email for the code.");
   }
   function addSid() {
     var p = me(), sid = $("as-sid").value.trim();
@@ -1320,21 +1406,85 @@ table.t td small { display: block; color: var(--muted); }
     state.apps.forEach(function (a) { if (a.uid === p.uid) a.sid = sid; });
     logEvent(p.name + " added student ID " + sid, "info"); commit(); toast("Student ID added. Keep signing in with your email.");
   }
+
+  /* ---------- Staff: sign in, code requests, administrator reset ---------- */
+  function renderStaff() {
+    document.querySelectorAll(".role").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.role === ui.role)); });
+    var h, mode = ui.smode, hopts = [["maria", "Maria"], ["camille", "Camille"]];
+    if (ui.role !== "admin") {
+      if (mode === "request") h = '<div><h3 class="panel-title">Request a new access code</h3><p class="panel-sub">Your request goes to the administrator\'s email. Only the administrator can create or change access codes.</p></div>' +
+        '<form id="f-mreq" novalidate style="display:grid;gap:14px">' + selectField("mr-hostel", "Your hostel", hopts, "maria") +
+        '<div class="grid2">' + field("mr-name", "Your name", "text", "", "", 'autocomplete="name"') + field("mr-contact", "Phone or email", "text", "", "Where the administrator can reach you", 'autocomplete="tel"') + '</div>' +
+        '<div class="field"><label for="mr-note">Anything to add? (optional)</label><textarea id="mr-note" rows="2" maxlength="300" placeholder="For example: I changed phones and lost the code."></textarea></div>' +
+        '<button class="btn block" type="submit">Send request to the administrator</button><button class="linkbtn" type="button" data-action="smode" data-m="" style="justify-self:start">Back to sign in</button></form>';
+      else if (mode === "requested") { var rq = state.codeReqs[0];
+        h = '<div><h3 class="panel-title">Request sent</h3><p class="panel-sub">The administrator has been emailed and will review request <b>' + rq.no + '</b>. If they approve it, they set a new code and give it to you. You cannot reset or change the code yourself.</p></div>' +
+          (state.mail[0] && state.mail[0].req === rq.no ? mailHTML(state.mail[0]) : "") + '<button class="btn quiet block" type="button" data-action="smode" data-m="">Back to sign in</button>'; }
+      else h = '<div><h3 class="panel-title">Hostel manager sign in</h3><p class="panel-sub">See your rooms, your residents, who is arriving, and problems students report.</p></div><form id="f-manager" novalidate style="display:grid;gap:14px">' +
+        selectField("m-hostel", "Your hostel", hopts, "maria") + field("m-code", "Access code", "text", "", "Given to you by the administrator", 'autocomplete="off" spellcheck="false"') +
+        '<button class="btn block" type="submit">Sign in as hostel manager</button>' +
+        '<button class="linkbtn" type="button" data-action="smode" data-m="request" style="justify-self:start">Forgot your access code? Request a new one</button>' +
+        '<p class="demo-note">Demo: the starting codes are <code>' + CODES.maria + '</code> for Maria and <code>' + CODES.camille + '</code> for Camille, until the administrator changes them.</p></form>';
+    } else {
+      if (mode === "forgot") h = '<div><h3 class="panel-title">Forgot the access code?</h3><p class="panel-sub">Enter the administrator\'s registered email. We send a link to create a new access code.</p></div>' +
+        '<form id="f-aforgot" novalidate style="display:grid;gap:14px">' + field("af-email", "Registered email", "email", "", "", 'autocomplete="email"') +
+        '<button class="btn block" type="submit">Send reset email</button><button class="linkbtn" type="button" data-action="smode" data-m="" style="justify-self:start">Back to sign in</button>' +
+        '<p class="demo-note">Demo: the registered administrator email is <code>' + esc(state.adminEmail) + '</code>.</p></form>' + (ui.resetSent ? '<div class="result"><h3>Check the inbox</h3><p>If that email belongs to the administrator, a reset link is on its way.</p></div>' + (ui.resetSent.html ? mailHTML(ui.resetSent) : "") : "");
+      else if (mode === "reset") h = '<div><h3 class="panel-title">Create a new access code</h3><p class="panel-sub">8 to 24 letters, numbers or dashes. You will use it to sign in from now on.</p></div>' +
+        '<form id="f-areset" novalidate style="display:grid;gap:14px"><div class="grid2">' + field("ar-code", "New access code", "text", "", "", 'autocomplete="off" spellcheck="false"') + field("ar-code2", "Type it again", "text", "", "", 'autocomplete="off" spellcheck="false"') + '</div>' +
+        '<button class="btn block" type="submit">Save new access code</button></form>';
+      else h = '<div><h3 class="panel-title">Administrator sign in</h3><p class="panel-sub">Every application, payment, room allocation, access code and problem report.</p></div><form id="f-admin" novalidate style="display:grid;gap:14px">' +
+        field("a-code", "Access code", "text", "", "", 'autocomplete="off" spellcheck="false"') + '<button class="btn block" type="submit">Sign in as administrator</button>' +
+        '<button class="linkbtn" type="button" data-action="smode" data-m="forgot" style="justify-self:start">Forgot the access code?</button>' +
+        '<p class="demo-note">Demo: the starting code is <code>' + CODES.admin + '</code> until it is changed.</p></form>';
+    }
+    $("staff-panel").innerHTML = h;
+  }
   function signinStaff(role) {
     if (role === "manager") {
       var hid = $("m-hostel").value;
-      if (!setErr("m-code", $("m-code").value.trim().toUpperCase() === CODES[hid] ? "" : "That code does not match " + HOSTEL[hid].name + ".")) return;
+      if (!setErr("m-code", $("m-code").value.trim().toUpperCase() === state.codes[hid].toUpperCase() ? "" : "That code does not match " + HOSTEL[hid].name + ". Request a new one if you have lost it.")) return;
       state.session = { role: "manager", hostel: hid }; go("manager");
     } else {
-      if (!setErr("a-code", $("a-code").value.trim().toUpperCase() === CODES.admin ? "" : "That access code is not right.")) return;
+      if (!setErr("a-code", $("a-code").value.trim().toUpperCase() === state.codes.admin.toUpperCase() ? "" : "That access code is not right.")) return;
       state.session = { role: "admin" }; go("admin");
     }
+  }
+  function requestCode() {
+    var hid = $("mr-hostel").value, name = $("mr-name").value.trim(), contact = $("mr-contact").value.trim(), note = $("mr-note").value.trim();
+    var ok = setErr("mr-name", name.length < 3 ? "Enter your name." : "");
+    ok = setErr("mr-contact", contact.length < 6 ? "Enter a phone number or email." : "") && ok;
+    if (!ok) return;
+    var r = { no: "ACR-" + pad(state.cseq++, 3), hostel: hid, name: name, contact: contact, note: note, ts: Date.now(), status: "pending" };
+    state.codeReqs.unshift(r);
+    sendMail(state.adminEmail, "Access code request from the " + HOSTEL[hid].name + " hostel manager", '<p><b>' + esc(name) + '</b> asks for a new access code for the <b>' + HOSTEL[hid].name + '</b> hostel manager dashboard.</p><p>Contact: ' + esc(contact) + (note ? '<br>Note: ' + esc(note) : "") + '</p><p>Request ' + r.no + '. Sign in as administrator to approve or decline it.</p>', { req: r.no });
+    logEvent("Access code request " + r.no + " from " + name + " for " + HOSTEL[hid].name, "info");
+    ui.smode = "requested"; save(); renderStaff();
+  }
+  function adminForgot() {
+    var email = $("af-email").value.trim().toLowerCase();
+    if (!setErr("af-email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "" : "Enter an email address.")) return;
+    ui.resetSent = { html: "" };
+    if (email === state.adminEmail) {
+      state.resetTok = { tok: code(10), exp: Date.now() + 30 * 6e4 };
+      ui.resetSent = sendMail(state.adminEmail, "Create a new RoomRight access code", '<p>Someone asked to reset the administrator access code.</p><p><button class="btn sm" type="button" data-action="reset-link" data-tok="' + state.resetTok.tok + '">Create a new access code</button></p><p class="room-note">The link works for 30 minutes. If you did not ask for this, ignore this email.</p>');
+      logEvent("Administrator access code reset requested", "info"); save();
+    }
+    renderStaff();
+  }
+  function adminReset() {
+    var c = $("ar-code").value.trim();
+    var ok = setErr("ar-code", /^[A-Za-z0-9-]{8,24}$/.test(c) ? "" : "Use 8 to 24 letters, numbers or dashes.");
+    ok = setErr("ar-code2", $("ar-code2").value.trim() === c ? "" : "The codes do not match.") && ok;
+    if (!ok) return;
+    state.codes.admin = c.toUpperCase(); delete state.resetTok; ui.smode = null; ui.resetSent = null;
+    logEvent("Administrator access code changed by email reset", "info"); save(); renderStaff(); toast("New access code saved. Sign in with it.");
   }
 
   /* ---------- Student: apply, choose, reserve, pay ---------- */
   function apply(tid) {
     var s = state.session;
-    if (!s) { ui.intent = { tid: tid || ui.ft || "" }; ui.role = "student"; go("signin"); toast("Sign in as a student to apply."); return; }
+    if (!s) { ui.intent = { tid: tid || ui.ft || "" }; go("signin"); toast("Sign in or create an account to apply."); return; }
     if (s.role !== "student") { toast("Sign out and sign in as a student to apply."); return; }
     var app = myApp();
     if (app && app.status !== "applied") { go("me"); return; }
@@ -1343,19 +1493,26 @@ table.t td small { display: block; color: var(--muted); }
     var second = TYPES.filter(function (t) { return t.id !== tid; }).sort(function (a, b) { return countFree(b.id, me().gender) - countFree(a.id, me().gender); })[0].id;
     openApply(tid, second);
   }
-  function typeOpts(g) { return TYPES.map(function (t) { var n = countFree(t.id, g); return [t.id, t.name + " · " + money(t.price) + " · " + (n ? n + " free" : "full")]; }); }
+  function optList(name, g, sel) {
+    return '<div class="opts" role="radiogroup" id="' + name + '-box">' + TYPES.map(function (t) {
+      var n = countFree(t.id, g);
+      return '<label class="opt"><input type="radio" name="' + name + '" value="' + t.id + '"' + (t.id === sel ? " checked" : "") + '><span><b>' + t.name + '</b><small class="num">' + money(t.price) + '</small><em class="' + (n ? "" : "none") + '">' + (n ? n + " free" : "Full") + '</em></span></label>';
+    }).join("") + '</div>';
+  }
   function openApply(first, second) {
     var p = me(); ui.sheet = { kind: "apply" };
     showSheet(head("Hostel application", "2026/27 academic year · " + esc(p.name) + " · " + gWord(p.gender)) + stepper(1) +
       '<form class="sheet-body" id="f-apply" novalidate>' +
-      selectField("ap-first", "First choice room", typeOpts(p.gender), first, "The room type you want most") +
-      selectField("ap-second", "Second choice room", typeOpts(p.gender), second, "Used if your first choice is full, so you do not have to apply again") +
+      '<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="legend-t" style="margin-bottom:6px">First choice</legend>' + optList("ap-first", p.gender, first) + '</fieldset>' +
+      '<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="legend-t" style="margin-bottom:6px">Second choice</legend>' + optList("ap-second", p.gender, second) + '<span class="hint">Used if your first choice is full, so you do not have to apply again.</span><span class="err" id="ap-second-box-err"></span></fieldset>' +
       '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6"/></svg><span>You get an application number as soon as you submit. Quote it whenever you ask about your application.</span></p>' +
-      '<div class="actions"><button class="btn block" type="submit">Submit application</button></div></form>', "#ap-first");
+      '<div class="actions"><button class="btn block" type="submit">Submit application</button></div></form>', 'input[name="ap-first"]:checked');
   }
+  function picked(name) { var r = document.querySelector('input[name="' + name + '"]:checked'); return r ? r.value : ""; }
   function submitApply() {
-    var first = $("ap-first").value, second = $("ap-second").value, p = me();
-    if (!setErr("ap-second", first === second ? "Pick a different room type for your second choice." : "")) return;
+    var first = picked("ap-first"), second = picked("ap-second"), p = me();
+    if (!setErr("ap-second-box", first === second ? "Pick a different room type for your second choice." : "")) return;
+    if (myApp()) { closeSheet(); go("me"); return; }   // one application per student
     var app = { id: appId(state.seq++), uid: p.uid, sid: p.sid || "", email: p.email || "", adm: p.adm, name: p.name, gender: p.gender, elig: p.elig, first: first, second: second, type: null, bed: null, status: "applied", ts: Date.now(), invoices: [], token: null };
     state.apps.push(app); logEvent("Application " + app.id + " received from " + app.name + ": " + TYPE[first].short + ", then " + TYPE[second].short); commit();
     var f1 = countFree(first, p.gender), f2 = countFree(second, p.gender), next;
@@ -1367,9 +1524,10 @@ table.t td small { display: block; color: var(--muted); }
       '<div class="sheet-body"><div class="bigid"><small>Your application number</small><b>' + app.id + '</b></div>' + next + '</div>', ".btn");
   }
   function openChooser(app, tid, sel) {
+    if (!app || app.status !== "applied") { closeSheet(); go("me"); return; }   // a student who already holds a bed cannot pick another
     var g = app.gender; tid = tid || (countFree(app.first, g) ? app.first : app.second);
     var free = freeOfType(tid, g);
-    if (!free.length && !sel) { go("me"); closeSheet(); toast(TYPE[tid].name + " is full. Join the waiting list or try your other choice."); return; }
+    if (!free.length) { closeSheet(); go("me"); toast(TYPE[tid].name + " is full. Join the waiting list or try your other choice."); return; }
     if (sel == null || !canTake(sel, g, app)) sel = free[0];
     ui.sheet = { kind: "choose", id: app.id, tid: tid, sel: sel };
     var t = TYPE[tid], body = "";
@@ -1379,13 +1537,16 @@ table.t td small { display: block; color: var(--muted); }
     }); });
     var other = tid === app.first ? app.second : app.first;
     showSheet(head(t.name, app.id + " · " + money(t.price) + " for 9 months · " + free.length + " free for you") + stepper(2) +
-      '<div class="sheet-body"><div class="map-key"><span><i class="mk-free"></i>Free</span><span><i class="mk-sel"></i>Your choice</span><span><i class="mk-taken"></i>Not available</span></div>' + body +
-      '<div class="pick-sum"><div><small>Your bed</small><div class="bedname">' + bedName(sel, true) + '</div></div><div style="text-align:right"><small>Total with 5% service fee</small><b class="num">' + money(t.price + fee(t.price)) + '</b></div></div>' +
+      '<div class="sheet-body"><p class="choice-note">Choose one bed. You can book only one bed, and picking another bed replaces your choice.</p>' +
+      '<div class="map-key"><span><i class="mk-free"></i>Free</span><span><i class="mk-sel"></i>Your bed</span><span><i class="mk-taken"></i>Not available</span></div>' + body +
+      '<div class="pick-sum"><div><small>1 bed selected</small><div class="bedname">' + bedName(sel, true) + '</div></div><div style="text-align:right"><small>Hostel fee, 9 months</small><b class="num">' + money(t.price) + '</b></div></div>' +
       '<div class="actions"><button class="btn block" data-action="reserve">Reserve this bed for ' + RESERVE_HOURS + ' hours</button>' +
       (countFree(other, g) ? '<button class="linkbtn" data-action="choose" data-tid="' + other + '" style="justify-self:center">See my other choice: ' + TYPE[other].name + '</button>' : "") + '</div></div>', ".bed.sel");
   }
   function reserve() {
+    refresh();   // pick up beds other people took a moment ago
     var s = ui.sheet, app = byId(s.id);
+    if (!app || app.status !== "applied") { closeSheet(); go("me"); return; }
     if (!canTake(s.sel, app.gender, app)) { toast("That bed was just taken. Pick another one."); openChooser(app, s.tid); return; }
     app.status = "reserved"; app.bed = s.sel; app.type = s.tid; app.exp = Date.now() + RESERVE_HOURS * 36e5; delete app.waitlist; delete app.expired;
     logEvent(app.id + " reserved " + bedName(app.bed, true) + " for " + RESERVE_HOURS + " hours"); commit(); openPay(app, "booking");
@@ -1400,21 +1561,21 @@ table.t td small { display: block; color: var(--muted); }
       '<div class="holdbox"><div><small>' + (up ? "New bed, held for you" : "Reserved for you") + '</small><div class="bedname">' + bedName(bed, true) + '</div></div><div style="text-align:right"><small>Time left to pay</small><div class="timer num" data-exp="' + exp + '">' + hms(exp - Date.now()) + '</div></div></div>' +
       '<div><div class="legend-t" style="margin-bottom:8px">Pay with</div><fieldset class="methods">' + METHODS.map(function (m) {
         return '<div class="method"><input type="radio" name="method" id="m-' + m[0] + '" value="' + m[0] + '"' + (payForm.method === m[0] ? " checked" : "") + '><label for="m-' + m[0] + '"><span class="logo" style="background:' + m[4] + '">' + m[3] + '</span><span>' + m[1] + '<small>' + m[2] + '</small></span></label></div>'; }).join("") + '</fieldset></div>' +
-      '<div id="momo-wrap"' + (payForm.method === "card" ? " hidden" : "") + '>' + field("p-momo", "Mobile money number", "tel", payForm.momo || "0241234567", "The number that gets the approval prompt", 'inputmode="tel" autocomplete="tel"') + '</div>' +
+      '<div id="momo-wrap"' + (payForm.method === "card" ? " hidden" : "") + '>' + field("p-momo", "Mobile money number", "tel", payForm.momo, "The number that gets the approval prompt", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') + '</div>' +
       '<dl class="rows"><div><dt>' + (up ? "Difference, " + TYPE[app.type].short + " to " + t.short : "Hostel fee, " + t.name + ", 9 months") + '</dt><dd>' + money(amount) + '</dd></div>' +
-      '<div><dt>RoomRight service fee (5%)</dt><dd>' + money(fee(amount)) + '</dd></div><div class="total"><dt>Total to pay</dt><dd>' + money(amount + fee(amount)) + '</dd></div></dl>' +
-      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Demo: no real money moves. In the live system the hostel fee is passed to University Finance when you check in.</span></p>' +
-      '<div class="actions"><button class="btn block" type="submit">Pay ' + money(amount + fee(amount)) + '</button></div></form>', "#m-" + payForm.method);
+      '<div class="total"><dt>Total to pay</dt><dd>' + money(amount) + '</dd></div></dl>' +
+      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>No service fee. Demo: no real money moves.</span></p>' +
+      '<div class="actions"><button class="btn block" type="submit">Pay ' + money(amount) + '</button></div></form>', "#m-" + payForm.method);
   }
   function submitPay() {
     if (paying) return;
-    var s = ui.sheet, app = byId(s.id), up = s.pay === "upgrade", method = payForm.method;
+    var s = ui.sheet, up = s.pay === "upgrade", method = payForm.method;
     if (method !== "card") { payForm.momo = $("p-momo").value.replace(/\s+/g, ""); if (!setErr("p-momo", /^0\d{9}$/.test(payForm.momo) ? "" : "Enter a 10 digit number starting with 0.")) return; }
     paying = true;
     $("sheet").innerHTML = '<div class="processing"><div class="spinner" aria-hidden="true"></div><h3 id="sheet-title">' + (method === "card" ? "Confirming your card payment" : "Approve the payment on your phone") + '</h3><p>Demo: this completes on its own in a moment.</p></div>';
     setTimeout(function () {
-      paying = false;
-      var mName = METHODS.filter(function (m) { return m[0] === method; })[0][1] + (method === "card" ? "" : " · " + payForm.momo.slice(0, 3) + " ••• " + payForm.momo.slice(-4)), inv;
+      paying = false; refresh();
+      var app = byId(s.id), mName = METHODS.filter(function (m) { return m[0] === method; })[0][1] + (method === "card" ? "" : " · " + payForm.momo.slice(0, 3) + " ••• " + payForm.momo.slice(-4)), inv;
       if (up) {
         if (!app.up || app.up.status !== "approved") { closeSheet(); toast("The held bed was released before payment finished. No money was taken."); return; }
         var from = bedName(app.bed, true), t = TYPE[app.up.to];
@@ -1437,16 +1598,41 @@ table.t td small { display: block; color: var(--muted); }
     return '<div class="token-box">' + (qr ? '<div class="qr">' + qr + '</div>' : "") + '<div><div class="code-lbl">Booking token</div><div class="token">' + app.token + '</div>' +
       '<div class="ticket-bed" style="margin-top:8px">' + bedName(app.bed, true) + '</div><div class="room-note">' + TYPE[app.type].name + ' · ' + esc(app.name) + ' · ' + app.id + '</div></div></div>';
   }
-  function invoiceText(app, inv) {
-    return ["RoomRight payment invoice " + inv.no, "Student: " + app.name + " (" + idText(app) + ")", "Application number: " + app.id, "Room type: " + TYPE[app.type].name, "Item: " + inv.label,
-      "Amount: " + money(inv.amount), "Service fee (5%): " + money(inv.service), "Amount paid: " + money(inv.total), "Payment date: " + dateStr(inv.ts) + " " + timeStr(inv.ts), "Paid with: " + inv.method, "Transaction reference: " + inv.ref].join("\n");
-  }
   function invoiceHTML(app, inv) {
     return '<div class="invoice"><div class="invoice-top"><div><div class="code-lbl">Payment invoice</div><b>' + inv.no + '</b></div><span class="status">Paid</span></div><dl class="rows">' +
-      '<div><dt>Student</dt><dd>' + esc(app.name) + ' · ' + esc(idText(app)) + '</dd></div><div><dt>Application number</dt><dd>' + app.id + '</dd></div><div><dt>Room type</dt><dd>' + TYPE[app.type].name + '</dd></div>' +
-      '<div><dt>' + esc(inv.label) + '</dt><dd>' + money(inv.amount) + '</dd></div><div><dt>Service fee (5%)</dt><dd>' + money(inv.service) + '</dd></div><div class="total"><dt>Amount paid</dt><dd>' + money(inv.total) + '</dd></div>' +
+      '<div><dt>Student</dt><dd>' + esc(app.name) + ' · ' + esc(idText(app)) + '</dd></div><div><dt>Application number</dt><dd>' + app.id + '</dd></div><div><dt>Room</dt><dd>' + bedName(app.bed, true) + '</dd></div><div><dt>Room type</dt><dd>' + TYPE[app.type].name + '</dd></div>' +
+      '<div><dt>' + esc(inv.label) + '</dt><dd>' + money(inv.amount) + '</dd></div><div class="total"><dt>Amount paid</dt><dd>' + money(inv.total) + '</dd></div>' +
       '<div><dt>Payment date</dt><dd>' + dateStr(inv.ts) + ', ' + timeStr(inv.ts) + '</dd></div><div><dt>Paid with</dt><dd>' + esc(inv.method) + '</dd></div><div><dt>Transaction reference</dt><dd>' + inv.ref + '</dd></div></dl>' +
-      '<button class="btn quiet sm" data-action="copy-inv" data-id="' + app.id + '" data-inv="' + inv.no + '" style="justify-self:start">Copy invoice</button></div>';
+      '<button class="btn sm" data-action="pdf" data-id="' + app.id + '" data-inv="' + inv.no + '" style="justify-self:start">Download PDF</button></div>';
+  }
+  function ghs(n) { return "GHS " + n.toLocaleString("en-GB", { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  // Builds the invoice as a real PDF file in the browser (jsPDF). The PDF font has no cedi sign, so amounts show as GHS.
+  function downloadInvoice(app, inv) {
+    var J = window.jspdf && window.jspdf.jsPDF;
+    if (!J) { toast("The PDF tool did not load. Check your connection and try again."); return; }
+    var d = new J({ unit: "mm", format: "a4" }), L = 18, R = 192, y;
+    d.setFillColor(181, 18, 27); d.rect(0, 0, 210, 34, "F");
+    d.setTextColor(255, 255, 255); d.setFont("helvetica", "bold"); d.setFontSize(20); d.text("RoomRight", L, 16);
+    d.setFont("helvetica", "normal"); d.setFontSize(10); d.text("Hostel booking for Lancaster University Ghana", L, 24);
+    d.setFont("helvetica", "bold"); d.setFontSize(13); d.text("PAYMENT INVOICE", R, 16, { align: "right" });
+    d.setFont("helvetica", "normal"); d.setFontSize(10); d.text(inv.no, R, 24, { align: "right" });
+    y = 48;
+    function sect(t) { d.setFont("helvetica", "bold"); d.setFontSize(9); d.setTextColor(181, 18, 27); d.text(t.toUpperCase(), L, y); y += 3; d.setDrawColor(225, 225, 230); d.line(L, y, R, y); y += 7; }
+    function row(k, v) { d.setFontSize(11); d.setFont("helvetica", "normal"); d.setTextColor(98, 98, 107); d.text(k, L, y); d.setFont("helvetica", "bold"); d.setTextColor(24, 24, 27); d.text(String(v), R, y, { align: "right" }); y += 8; }
+    sect("Student"); row("Name", app.name); row("Student ID", app.sid || "Not yet issued"); if (app.email) row("Email", app.email); row("Application number", app.id);
+    y += 3; sect("Room"); row("Hostel", roomOf(app.bed).hostel.name); row("Room and bed", bedName(app.bed)); row("Room type", TYPE[app.type].name); row("Tenancy", "2026/27 academic year, 9 months");
+    y += 3; sect("Payment"); row(inv.label, ghs(inv.amount)); row("Payment date", dateStr(inv.ts) + ", " + timeStr(inv.ts)); row("Paid with", inv.method.replace(/•/g, "*")); row("Transaction reference", inv.ref);
+    d.setFillColor(245, 245, 247); d.rect(L, y - 2, R - L, 14, "F"); d.setFontSize(13); d.setFont("helvetica", "bold"); d.setTextColor(24, 24, 27);
+    d.text("Amount paid", L + 4, y + 7); d.text(ghs(inv.total), R - 4, y + 7, { align: "right" }); y += 24;
+    if (app.token) {
+      if (window.qrcode) { try { var q = window.qrcode(0, "M"); q.addData("ROOMRIGHT|" + app.id + "|" + app.token); q.make(); var n = q.getModuleCount(), c = 34 / n; d.setFillColor(18, 18, 20);
+        for (var r = 0; r < n; r++) for (var k = 0; k < n; k++) if (q.isDark(r, k)) d.rect(L + k * c, y + r * c, c, c, "F"); } catch (e) {} }
+      d.setFont("helvetica", "normal"); d.setFontSize(9); d.setTextColor(98, 98, 107); d.text("Booking token", L + 42, y + 10);
+      d.setFont("helvetica", "bold"); d.setFontSize(16); d.setTextColor(163, 16, 26); d.text(app.token, L + 42, y + 18);
+      d.setFont("helvetica", "normal"); d.setFontSize(9); d.setTextColor(98, 98, 107); d.text("Show this token or QR code at the hostel when you check in.", L + 42, y + 25);
+    }
+    d.setFontSize(8); d.setTextColor(140, 140, 149); d.text("Demo invoice from RoomRight. No real payment was taken. Not an official Lancaster University Ghana document.", L, 285);
+    d.save(inv.no + ".pdf"); toast("Invoice " + inv.no + " downloaded as a PDF.");
   }
 
   /* ---------- Student: my application ---------- */
@@ -1473,14 +1659,14 @@ table.t td small { display: block; color: var(--muted); }
           (f2 ? '<button class="btn white" data-action="choose" data-tid="' + app.second + '">Second choice: ' + TYPE[app.second].short + '</button>' : "") + '</div>';
       }
     } else if (st === "reserved") {
-      next = '<h3>' + bedName(app.bed, true) + ' is reserved for you</h3><p>Pay within the time left or the bed goes back on offer.</p><div class="row"><span class="timer num" data-exp="' + app.exp + '">' + hms(app.exp - Date.now()) + '</span><button class="btn" data-action="pay">Pay ' + money(TYPE[app.type].price + fee(TYPE[app.type].price)) + '</button><button class="linkbtn" data-action="release">Release this bed</button></div>';
+      next = '<h3>' + bedName(app.bed, true) + ' is reserved for you</h3><p>Pay within the time left or the bed goes back on offer.</p><div class="row"><span class="timer num" data-exp="' + app.exp + '">' + hms(app.exp - Date.now()) + '</span><button class="btn" data-action="pay">Pay ' + money(TYPE[app.type].price) + '</button><button class="linkbtn" data-action="release">Release this bed</button></div>';
     } else if (st === "paid") next = '<h3>You are booked. See you at ' + roomOf(app.bed).hostel.name + '.</h3><p>Show your booking token or QR code at the hostel. The manager confirms it and gives you your keys.</p>';
     else next = '<h3>You are checked in</h3><p>' + bedName(app.bed, true) + ' is your bed for the 9 month tenancy.</p>';
 
     var right = "";
     if (app.token) right += '<div class="panel"><div><h3 class="panel-title">Booking token</h3><p class="panel-sub">Your proof that the bed is yours.</p></div>' + tokenHTML(app) + '</div>';
     if (app.invoices.length) right += '<div class="panel"><h3 class="panel-title">Invoices</h3><div>' + app.invoices.map(function (i) {
-      return '<div class="inv-row"><span><b>' + i.no + '</b><br><span class="room-note">' + esc(i.label) + ' · ' + dateStr(i.ts) + '</span></span><span style="text-align:right"><b class="num">' + money(i.total) + '</b><br><button class="linkbtn" data-action="invoice" data-inv="' + i.no + '">View</button></span></div>'; }).join("") + '</div></div>';
+      return '<div class="inv-row"><span><b>' + i.no + '</b><br><span class="room-note">' + esc(i.label) + ' · ' + dateStr(i.ts) + '</span></span><span style="text-align:right"><b class="num">' + money(i.total) + '</b><br><button class="linkbtn" data-action="invoice" data-inv="' + i.no + '">View</button> · <button class="linkbtn" data-action="pdf" data-id="' + app.id + '" data-inv="' + i.no + '">PDF</button></span></div>'; }).join("") + '</div></div>';
     if (!p.sid) right = '<form class="panel" id="f-addsid" novalidate><div><h3 class="panel-title">Got your student ID?</h3><p class="panel-sub">' + (p.adm === "pending" ? "You told us you are waiting for your admission decision. Once you are admitted and get your ID, add it here." : "Add it once the university gives it to you, usually a week or two after resumption.") + ' You keep signing in with your email.</p></div>' +
       '<div class="grid2">' + field("as-sid", "Student ID", "text", "", "8 digits", 'inputmode="numeric" maxlength="8" placeholder="20261234"') + '<div style="align-self:center"><button class="btn block" type="submit">Add my student ID</button></div></div></form>' + right;
     var mine = sortReports(myReports());
@@ -1499,7 +1685,7 @@ table.t td small { display: block; color: var(--muted); }
     var up = app.up, cur = TYPE[app.type], body;
     if (up && up.status === "pending") body = '<p class="panel-sub">You asked to move to <b>' + TYPE[up.to].name + '</b>. The housing office is reviewing it. Your current bed is safe meanwhile.</p><button class="linkbtn" data-action="up-cancel" style="justify-self:start">Withdraw request</button>';
     else if (up && up.status === "approved") { var diff = TYPE[up.to].price - cur.price;
-      body = '<p class="panel-sub">Approved. <b>' + bedName(up.bed, true) + '</b> is held for you for <span class="num" data-exp="' + up.exp + '">' + hms(up.exp - Date.now()) + '</span>.</p><button class="btn" data-action="up-pay" style="justify-self:start">Pay the ' + money(diff + fee(diff)) + ' difference</button>'; }
+      body = '<p class="panel-sub">Approved. <b>' + bedName(up.bed, true) + '</b> is held for you for <span class="num" data-exp="' + up.exp + '">' + hms(up.exp - Date.now()) + '</span>.</p><button class="btn" data-action="up-pay" style="justify-self:start">Pay the ' + money(diff) + ' difference</button>'; }
     else {
       var opts = TYPES.filter(function (t) { return t.price > cur.price; });
       body = (up && up.status === "declined" ? '<p class="panel-sub">Your last request was declined. You can ask again.</p>' : up && up.status === "expired" ? '<p class="panel-sub">Your approved upgrade was not paid in time and was released.</p>' : "") +
@@ -1714,7 +1900,7 @@ table.t td small { display: block; color: var(--muted); }
     var ups = apps.filter(function (a) { return a.up && (a.up.status === "pending" || a.up.status === "approved"); });
     var waits = apps.filter(function (a) { return a.waitlist && a.status === "applied"; });
     var kpis = '<div class="kpis"><div class="kpi red"><b class="num">' + taken + '/' + TOTAL_BEDS + '</b><span>Beds taken</span></div><div class="kpi"><b class="num">' + apps.length + '</b><span>Applications</span></div>' +
-      '<div class="kpi"><b class="num">' + n("reserved") + '</b><span>Awaiting payment</span></div><div class="kpi"><b class="num m">' + money(fees) + '</b><span>Hostel fees collected</span></div><div class="kpi"><b class="num m">' + money(service) + '</b><span>Service fees (5%)</span></div>' +
+      '<div class="kpi"><b class="num">' + n("reserved") + '</b><span>Awaiting payment</span></div><div class="kpi"><b class="num m">' + money(fees) + '</b><span>Hostel fees collected</span></div>' +
       (function () { var o = state.reports.filter(function (r) { return r.status !== "resolved"; }), u = o.filter(function (r) { return r.urgent; }).length; return '<div class="kpi' + (u ? " alert" : "") + '"><b class="num">' + o.length + '</b><span>Open problem reports' + (u ? ", " + u + " urgent" : "") + '</span></div>'; })() + '</div>';
     var bars = '<div class="bars">' + TYPES.map(function (t) { var used = t.total - countFree(t.id);
       return '<div class="bar-row"><span>' + t.name + '</span><span class="bar" role="img" aria-label="' + used + ' of ' + t.total + ' beds taken"><i style="width:' + (used / t.total * 100).toFixed(1) + '%"></i></span><span class="v num"><b>' + used + '</b>/' + t.total + '</span></div>'; }).join("") +
@@ -1729,16 +1915,65 @@ table.t td small { display: block; color: var(--muted); }
     el.innerHTML = '<div class="page-head"><p class="kicker">Administrator · Housing office</p><h2>Every bed, application and payment.</h2><p>Search by application number, approve room upgrades, watch the waiting lists and see what has been paid.</p></div>' + kpis +
       '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Beds taken by room type</h3><p class="panel-sub">Red bars are room types. Black bars are the two hostels.</p></div>' + bars + '</div>' +
       '<div class="stack"><div class="panel"><div><h3 class="panel-title">Upgrade requests</h3></div><div class="up-list">' + upHTML + '</div></div><div class="panel"><div><h3 class="panel-title">Waiting lists</h3></div><div class="up-list">' + waitHTML + '</div></div></div></div>' +
+      '<div style="margin-bottom:22px">' + accessPanel() + '</div>' +
       '<div style="margin-bottom:22px">' + reportsPanel(state.reports, true, "Problem reports, all hostels", "Room problems go to each hostel manager. Booking and payment questions come to you. You can reply to any of them.") + '</div>' +
-      '<div class="panel" style="margin-bottom:22px"><div class="panel-head"><div><h3 class="panel-title">Applications</h3><p class="panel-sub">Newest first. Showing ' + rows.length + ' of ' + apps.length + '.</p></div><input id="aq" type="search" placeholder="Search LUG2026... or a name" value="' + esc(ui.aq) + '" aria-label="Search applications"></div>' +
+      '<div class="panel" style="margin-bottom:22px"><div class="panel-head"><div><h3 class="panel-title">Applications and room allocations</h3><p class="panel-sub">Newest first. Showing ' + rows.length + ' of ' + apps.length + '.</p></div><input id="aq" type="search" placeholder="Search LUG2026... or a name" value="' + esc(ui.aq) + '" aria-label="Search applications"></div>' +
       '<div class="tablewrap"><table class="t"><thead><tr><th>Application</th><th>Student</th><th>Choices</th><th>Bed</th><th>Status</th><th></th></tr></thead><tbody>' +
       (rows.map(function (a) { return '<tr><td><b>' + a.id + '</b><small>' + dateStr(a.ts) + '</small></td><td>' + esc(a.name) + '<small>' + gWord(a.gender) + ' · ' + esc(idText(a)) + (a.email ? ' · ' + esc(a.email) : "") + '</small></td><td>' + TYPE[a.first].short + '<small>then ' + (TYPE[a.second] ? TYPE[a.second].short : "none") + '</small></td>' +
         '<td>' + (a.bed ? bedName(a.bed, true) : a.waitlist ? "Waiting list" : "Not chosen") + '</td><td><span class="st ' + a.status + '">' + STATUS[a.status] + '</span>' + (a.status === "reserved" ? '<small class="num" data-exp="' + a.exp + '">' + hms(a.exp - Date.now()) + '</small>' : "") + '</td>' +
-        '<td>' + (a.status === "reserved" ? '<button class="btn sm quiet" data-action="expire" data-id="' + a.id + '">Expire now</button>' : "") + '</td></tr>'; }).join("") || '<tr><td colspan="6">No application matches that search.</td></tr>') + '</tbody></table></div>' +
+        '<td style="white-space:nowrap">' + (a.bed && holding(a) ? '<button class="btn sm" data-action="admin-move" data-id="' + a.id + '">Change room</button> ' : "") + (a.status === "reserved" ? '<button class="btn sm quiet" data-action="expire" data-id="' + a.id + '">Expire now</button>' : "") + '</td></tr>'; }).join("") || '<tr><td colspan="6">No application matches that search.</td></tr>') + '</tbody></table></div>' +
       '<p class="room-note" style="margin:0">"Expire now" is a demo shortcut: it skips the rest of the 24 hours so you can show a reservation running out.</p></div>' +
       '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Payments</h3><p class="panel-sub">Latest ' + Math.min(12, pays.length) + ' of ' + pays.length + ' invoices.</p></div><div class="tablewrap"><table class="t"><thead><tr><th>Invoice</th><th>Student</th><th>For</th><th>Paid</th><th>Reference</th></tr></thead><tbody>' +
       pays.slice(0, 12).map(function (p) { return '<tr><td><b>' + p.i.no + '</b><small>' + dateStr(p.i.ts) + '</small></td><td>' + esc(p.a.name) + '<small>' + p.a.id + '</small></td><td>' + esc(p.i.label) + '</td><td class="num"><b>' + money(p.i.total) + '</b><small>' + esc(p.i.method) + '</small></td><td>' + p.i.ref + '</td></tr>'; }).join("") + '</tbody></table></div></div>' +
       '<div class="panel"><div><h3 class="panel-title">Allocation log</h3><p class="panel-sub">Every booking, move, refusal and expiry.</p></div><ol class="log">' + logHTML(null, 30) + '</ol></div></div>';
+  }
+
+  function accessPanel() {
+    var who = [["maria", "Maria hostel manager"], ["camille", "Camille hostel manager"], ["admin", "Administrator (you)"]];
+    var rows = who.map(function (w) {
+      if (ui.codeEdit === w[0]) return '<form class="up-opt" id="f-code" novalidate style="grid-template-columns:minmax(0,1fr)"><b>' + w[1] + '</b><div class="code-row">' +
+        field("c-new", "New access code", "text", "", "8 to 24 letters, numbers or dashes", 'autocomplete="off" spellcheck="false"') +
+        '<button class="btn sm quiet" type="button" data-action="code-gen" data-hid="' + w[0] + '">Generate</button><button class="btn sm" type="submit">Save</button></div><button class="linkbtn" type="button" data-action="code-cancel" style="justify-self:start">Cancel</button></form>';
+      return '<div class="up-opt"><span><b>' + w[1] + '</b><small class="num">Code: ' + (ui.showCodes ? esc(state.codes[w[0]]) : "••••••••") + '</small></span><button class="btn sm quiet" data-action="code-edit" data-hid="' + w[0] + '">Change code</button></div>';
+    }).join("");
+    var reqs = state.codeReqs.filter(function (r) { return r.status === "pending"; });
+    var reqHTML = reqs.length ? reqs.map(function (r) {
+      return '<div class="up-opt" style="grid-template-columns:minmax(0,1fr)"><span><b>' + r.no + ' · ' + HOSTEL[r.hostel].name + ' · ' + esc(r.name) + '</b><small>' + esc(r.contact) + (r.note ? ' · ' + esc(r.note) : "") + ' · ' + ago(r.ts) + '</small></span>' +
+        '<span style="display:flex;gap:6px"><button class="btn sm" data-action="code-approve" data-no="' + r.no + '">Approve, set new code</button><button class="btn sm quiet" data-action="code-decline" data-no="' + r.no + '">Decline</button></span></div>';
+    }).join("") : '<p class="panel-sub">No access code requests waiting.</p>';
+    return '<div class="staff-grid" style="margin-bottom:0"><div class="panel"><div class="panel-head"><div><h3 class="panel-title">Hostel manager access</h3><p class="panel-sub">Only you can create or change access codes. Managers can only ask for a new one.</p></div>' +
+      '<button class="btn sm quiet" data-action="codes-toggle">' + (ui.showCodes ? "Hide codes" : "Show codes") + '</button></div><div class="up-list">' + rows + '</div>' +
+      (ui.issued ? '<div class="result good"><h3>New code for ' + ui.issued.who + '</h3><p>The code is <b class="num">' + esc(ui.issued.code) + '</b>. Give it to ' + esc(ui.issued.to) + ' privately. The old code no longer works.</p></div>' : "") + '</div>' +
+      '<div class="panel"><div><h3 class="panel-title">Access code requests</h3><p class="panel-sub">Requests from managers who lost their code. Each one is also emailed to ' + esc(state.adminEmail) + '.</p></div><div class="up-list">' + reqHTML + '</div></div></div>';
+  }
+  function newCode(hid) { return (hid === "admin" ? "ADMIN" : HOSTEL[hid].name.toUpperCase()) + "-" + code(6); }
+  function saveCode() {
+    var hid = ui.codeEdit, c = $("c-new").value.trim();
+    if (!setErr("c-new", /^[A-Za-z0-9-]{8,24}$/.test(c) ? "" : "Use 8 to 24 letters, numbers or dashes.")) return;
+    state.codes[hid] = c.toUpperCase(); ui.codeEdit = null;
+    ui.issued = { who: hid === "admin" ? "the administrator" : HOSTEL[hid].name, code: state.codes[hid], to: hid === "admin" ? "nobody else" : "the " + HOSTEL[hid].name + " hostel manager" };
+    logEvent("Administrator changed the " + (hid === "admin" ? "administrator" : HOSTEL[hid].name + " manager") + " access code", "info"); commit();
+  }
+  function openAdminMove(id, result) {
+    var a = byId(id); if (!a || !a.bed) return; ui.sheet = { kind: "amove", id: id };
+    var groups = HOSTELS.map(function (h) {
+      var opts = h.keys.filter(function (k) { return k !== a.bed && !OCC[k] && canTake(k, a.gender, a); }).map(function (k) {
+        var t = TYPE[roomOf(k).type]; return '<option value="' + k + '">' + bedName(k) + ' · ' + t.name + (t.id === a.type ? "" : " (different room type)") + '</option>'; }).join("");
+      return opts ? '<optgroup label="' + h.name + '">' + opts + '</optgroup>' : ""; }).join("");
+    showSheet(head("Change room for " + esc(a.name), a.id + " · " + gWord(a.gender) + " · " + esc(idText(a))) +
+      '<form class="sheet-body" id="f-amove" novalidate><dl class="rows"><div><dt>Current bed</dt><dd><b>' + bedName(a.bed, true) + '</b></dd></div><div><dt>Room type</dt><dd>' + TYPE[a.type].name + '</dd></div><div><dt>Status</dt><dd>' + STATUS[a.status] + '</dd></div></dl>' +
+      (groups ? '<div class="field"><label for="am-bed">Move to</label><select id="am-bed">' + groups + '</select><span class="hint">Only free beds this student can take are listed. Shared rooms stay single gender.</span><span class="err" id="am-bed-err"></span></div>' +
+        '<div class="actions"><button class="btn block dark" type="submit">Change allocation</button></div>' : '<p class="tour-note">No free beds this student can move to right now.</p>') +
+      (result ? '<div class="result good"><h3>Allocation changed</h3><p>' + result + '</p></div>' : "") + '</form>', result ? ".result" : "#am-bed");
+  }
+  function adminMove() {
+    var key = $("am-bed").value, id = ui.sheet.id; refresh();
+    var a = byId(id);
+    if (!a || !a.bed || OCC[key] || !canTake(key, a.gender, a)) { openAdminMove(id); setErr("am-bed", "That bed was just taken or no longer fits this student. Pick another one."); return; }
+    var from = bedName(a.bed, true), oldType = a.type; a.bed = key; a.type = roomOf(key).type;
+    var diff = TYPE[a.type].price - TYPE[oldType].price;
+    logEvent("Administrator moved " + a.id + " from " + from + " to " + bedName(key, true) + (diff ? " (room type changed)" : ""), "info"); commit();
+    openAdminMove(id, esc(a.name) + " is now in " + bedName(key, true) + ". " + from + " is free again." + (diff ? " The room type changed, so a fee difference of " + money(Math.abs(diff)) + " should be settled with Finance." : ""));
   }
 
   /* ---------- Sample activity from other students ---------- */
@@ -1775,11 +2010,13 @@ table.t td small { display: block; color: var(--muted); }
   }
 
   /* ---------- Rendering and routing ---------- */
-  function renderAll() { renderNav(); renderHome(); if (ui.view === "signin") renderSignin(); renderMe(); renderManager(); renderAdmin(); }
+  function renderAll() { renderNav(); renderHome(); if (ui.view === "signin") renderSignin(); if (ui.view === "staff") renderStaff(); renderMe(); renderManager(); renderAdmin(); }
   function commit() { index(); save(); renderAll(); }
   function go(view) {
     var s = state.session, need = { me: "student", manager: "manager", admin: "admin" }[view];
-    if (need && (!s || s.role !== need)) { ui.role = need; view = "signin"; }
+    if (need && (!s || s.role !== need)) { if (need !== "student") ui.role = need; view = need === "student" ? "signin" : "staff"; }
+    if (view === "staff" && s && s.role === "student") view = "home";   // students never see staff sign in
+    if (view === "staff") ui.smode = null;
     if (view === "home" && s && s.role !== "student") view = s.role;
     ui.view = view; commit(); window.scrollTo(0, 0);
   }
@@ -1793,14 +2030,14 @@ table.t td small { display: block; color: var(--muted); }
     var el = e.target.closest("[data-action], [data-go], [data-fg], [data-ft], [data-demo], .role");
     if (!el) return;
     var d = el.dataset, app = myApp();
-    if (el.classList.contains("role")) { ui.role = d.role; renderSignin(); return; }
+    if (el.classList.contains("role")) { ui.role = d.role; ui.smode = null; renderStaff(); return; }
     if (d.demo) { runDemo(d.demo); return; }
     if (d.go) { if (!$("overlay").hidden) closeSheet(); if (d.role) ui.role = d.role; go(d.go); return; }
     if (d.fg !== undefined) { ui.fg = d.fg; renderHome(); return; }
     if (d.ft !== undefined) { ui.ft = d.ft; renderHome(); return; }
     switch (d.action) {
       case "close": closeSheet(); break;
-      case "signout": state.session = null; if (!$("overlay").hidden) closeSheet(); go("home"); toast("Signed out."); break;
+      case "signout": var wasStaff = state.session && state.session.role !== "student"; state.session = null; if (!$("overlay").hidden) closeSheet(); go(wasStaff ? "staff" : "home"); toast("Signed out."); break;
       case "reset": state = freshState(); if (!$("overlay").hidden) closeSheet(); ui.view = "home"; index(); buildModel(); commit(); toast("Demo data reset."); break;
       case "apply": if (!$("overlay").hidden) closeSheet(); apply(d.tid); break;
       case "rooms": openRooms(d.hid, +d.floor || 0); break;
@@ -1822,8 +2059,21 @@ table.t td small { display: block; color: var(--muted); }
       case "resident": openResident(d.id); break;
       case "move": openResident(d.id, guardMove(byId(d.id), $("mv-bed").value)); break;
       case "ci-fill": var nx = state.apps.filter(function (a) { return a.status === "paid" && roomOf(a.bed).hostel.id === state.session.hostel; })[0]; if (nx) { $("ci-token").value = nx.token; checkToken(); } else toast("Nobody is waiting to check in."); break;
-      case "auth": ui.sauth = d.tab; renderSignin(); var f0 = $("signin-panel").querySelector("input"); if (f0) f0.focus(); break;
+      case "auth": ui.sauth = d.tab; ui.verify = null; renderSignin(); var f0 = $("signin-panel").querySelector("input"); if (f0) f0.focus(); break;
       case "report-new": openReportForm(); break;
+      case "resend": var pv = state.profiles[ui.verify]; if (pv) { sendVerify(pv); save(); renderSignin(); toast("New code sent to " + pv.email + "."); } break;
+      case "verify-link": verifyAccount(d.uid, d.c); break;
+      case "smode": ui.smode = d.m || null; ui.resetSent = null; renderStaff(); break;
+      case "reset-link": if (state.resetTok && state.resetTok.tok === d.tok && Date.now() < state.resetTok.exp) { ui.smode = "reset"; renderStaff(); } else toast("That link has expired. Ask for a new one."); break;
+      case "codes-toggle": ui.showCodes = !ui.showCodes; renderAdmin(); break;
+      case "code-edit": ui.codeEdit = d.hid; ui.issued = null; renderAdmin(); $("c-new").focus(); break;
+      case "code-cancel": ui.codeEdit = null; renderAdmin(); break;
+      case "code-gen": $("c-new").value = newCode(d.hid); break;
+      case "code-approve": var cr = state.codeReqs.filter(function (x) { return x.no === d.no; })[0]; if (cr) { cr.status = "approved"; state.codes[cr.hostel] = newCode(cr.hostel);
+        ui.issued = { who: HOSTEL[cr.hostel].name, code: state.codes[cr.hostel], to: cr.name + " (" + cr.contact + ")" }; logEvent("Access code request " + cr.no + " approved: new " + HOSTEL[cr.hostel].name + " manager code set", "info"); commit(); } break;
+      case "code-decline": var cd = state.codeReqs.filter(function (x) { return x.no === d.no; })[0]; if (cd) { cd.status = "declined"; logEvent("Access code request " + cd.no + " declined", "info"); commit(); } break;
+      case "admin-move": openAdminMove(d.id); break;
+      case "pdf": var pa = byId(d.id) || myApp(), pi = pa && pa.invoices.filter(function (x) { return x.no === d.inv; })[0]; if (pi) downloadInvoice(pa, pi); break;
       case "report": openReport(d.no); break;
       case "r-status": setReportStatus(d.no, d.s); break;
       case "rf": ui.rf = d.rf; renderManager(); renderAdmin(); break;
@@ -1841,6 +2091,12 @@ table.t td small { display: block; color: var(--muted); }
     else if (id === "f-pay") submitPay();
     else if (id === "f-checkin") checkToken();
     else if (id === "f-signup") signupStudent();
+    else if (id === "f-verify") verifyAccount(ui.verify, $("v-code").value.trim());
+    else if (id === "f-mreq") requestCode();
+    else if (id === "f-aforgot") adminForgot();
+    else if (id === "f-areset") adminReset();
+    else if (id === "f-code") saveCode();
+    else if (id === "f-amove") adminMove();
     else if (id === "f-addsid") addSid();
     else if (id === "f-report") submitReport();
     else if (id === "f-reply") submitReply();
@@ -1867,9 +2123,20 @@ table.t td small { display: block; color: var(--muted); }
   $("overlay").addEventListener("click", function (e) { if (e.target === this && !paying) closeSheet(); });
 
   /* ---------- Boot ---------- */
-  state = load(); index();
+  state = load();
+  if (state.session && state.session.role === "student" && !(state.profiles[state.session.uid] && state.profiles[state.session.uid].verified)) state.session = null;
+  index();
   if (checkExpiry()) index();
-  var s0 = state.session; ui.view = !s0 ? "home" : s0.role === "student" ? "home" : s0.role;
+  var s0 = state.session; ui.view = !s0 ? (location.hash === "#staff" ? "staff" : "home") : s0.role === "student" ? "home" : s0.role;
+  // Another tab (another student) booked or freed a bed: update this tab straight away
+  window.addEventListener("storage", function (e) {
+    if (e.key !== STORE_KEY || paying) return;
+    var before = totalFree(); refresh(); renderAll(); if (ui.view === "home") paintWindows();
+    var sh = ui.sheet;
+    if (sh && sh.kind === "choose") { var ca = byId(sh.id); if (ca && !canTake(sh.sel, ca.gender, ca)) toast("Someone just booked the bed you picked. Choose another one."); openChooser(ca, sh.tid, sh.sel); }
+    var after = totalFree(); if (after < before && !(sh && sh.kind === "choose")) toast("A bed was just booked. " + after + " beds are free now.");
+  });
+  window.addEventListener("hashchange", function () { if (location.hash === "#staff" && !state.session) go("staff"); });
   buildModel(); commit();
   setInterval(tick, 1000);
   setTimeout(simulate, 30000);
