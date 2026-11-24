@@ -1,0 +1,16 @@
+# Only the settings RoomRight changes; everything else uses Supabase defaults.
+project_id = "roomright"
+
+[auth]
+site_url = "https://rendrstudiogh.github.io/RENDR/roomright/"
+
+[auth.email]
+enable_confirmations = true   # students must verify their email before signing in
+
+# Paystack calls this with its own signature, not a Supabase login
+[functions.paystack-webhook]
+verify_jwt = false
+
+# Called by pg_cron with a shared secret, or by an administrator
+[functions.admissions-sync]
+verify_jwt = false

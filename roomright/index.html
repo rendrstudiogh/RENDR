@@ -714,6 +714,43 @@ table.t td small { display: block; color: var(--muted); }
   .tcard .beds-ico { width: 40px; grid-row: 1 / span 2; }
   .opts, .code-row { grid-template-columns: minmax(0, 1fr); }
 }
+/* ---------- v6: photos, locations, policy, records, payments ---------- */
+.gallery { display: flex; gap: 8px; overflow-x: auto; scroll-snap-type: x mandatory; padding-bottom: 4px; }
+.gallery img { height: 170px; width: auto; max-width: 85%; border-radius: var(--r-md); object-fit: cover; scroll-snap-align: start; flex: none; background: var(--canvas); }
+.ph { border-radius: var(--r-md); background: var(--canvas); box-shadow: inset 0 0 0 1.5px var(--line); padding: 18px; display: grid; gap: 4px; justify-items: start; color: var(--muted); font-size: .88rem; }
+.ph b { color: var(--fg); }
+.invlist { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 190px), 1fr)); gap: 6px; }
+.invlist li { display: flex; justify-content: space-between; gap: 10px; background: var(--canvas); border-radius: var(--r-sm); padding: 8px 12px; font-size: .88rem; }
+.invlist li b { font-variant-numeric: tabular-nums; }
+details.more summary { cursor: pointer; font-weight: 700; font-size: .9rem; color: var(--red-ink); }
+details.more[open] summary { margin-bottom: 10px; }
+.locgrid { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(0, .8fr); gap: 22px; align-items: start; }
+.mapbox { border-radius: var(--r-lg); overflow: hidden; box-shadow: var(--shadow-sm), inset 0 0 0 1px var(--line); background: var(--canvas); aspect-ratio: 4 / 3; max-width: 100%; }
+.mapbox iframe { width: 100%; height: 100%; border: 0; display: block; }
+.dlist { display: grid; gap: 6px; margin: 0; padding: 0; list-style: none; }
+.dlist li { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 2px 10px; background: var(--canvas); border-radius: var(--r-sm); padding: 9px 12px; font-size: .88rem; }
+.dlist small { color: var(--muted); }
+.dlist a { color: var(--red-ink); font-weight: 700; font-size: .85rem; align-self: center; }
+a.btn { text-decoration: none; }
+.atabs { display: flex; gap: 4px; flex-wrap: wrap; background: var(--canvas); padding: 4px; border-radius: 999px; margin: -8px 0 22px; justify-self: start; width: fit-content; max-width: 100%; }
+.atabs button { border: 0; background: transparent; padding: 8px 14px; border-radius: 999px; font-weight: 700; font-size: .88rem; color: var(--muted); cursor: pointer; }
+.atabs button[aria-selected="true"] { background: var(--card); color: var(--fg); box-shadow: var(--shadow-sm); }
+.thumbs { display: flex; gap: 8px; flex-wrap: wrap; }
+.thumbs figure { margin: 0; position: relative; }
+.thumbs img { width: 96px; height: 72px; object-fit: cover; border-radius: 8px; display: block; }
+.thumbs button { position: absolute; top: 4px; right: 4px; border: 0; width: 22px; height: 22px; border-radius: 50%; background: rgba(0, 0, 0, .7); color: #FFFFFF; cursor: pointer; font-size: .8rem; line-height: 1; }
+.policy { max-width: 760px; display: grid; gap: 22px; }
+.policy h3 { font-size: 1.25rem; font-weight: 800; }
+.policy ul { margin: 8px 0 0; padding-left: 20px; display: grid; gap: 6px; }
+.policy table { border-collapse: collapse; width: 100%; font-size: .92rem; }
+.policy td, .policy th { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+.fsect { display: grid; gap: 12px; border-top: 1px solid var(--line); padding-top: 14px; }
+.fsect > b { font-size: .95rem; }
+.note-row { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 10px; padding: 10px 12px; background: var(--canvas); border-radius: var(--r-md); font-size: .9rem; }
+.note-row.unread { background: var(--red-soft); }
+.note-row small { display: block; color: var(--muted); }
+input[type="file"] { font-size: .88rem; max-width: 100%; }
+@media (max-width: 900px) { .locgrid { grid-template-columns: minmax(0, 1fr); } }
 </style>
 </head>
 <body>
@@ -735,7 +772,7 @@ table.t td small { display: block; color: var(--muted); }
       <div class="hero-copy">
         <p class="kicker"><span class="pulse" aria-hidden="true"></span><span><b class="num" id="t-beds">0</b> of 87 beds free · Lancaster University Ghana 2026/27</span></p>
         <h1 id="hero-title">Your exact bed, <span class="hl">locked in.<svg viewBox="0 0 200 20" preserveAspectRatio="none" aria-hidden="true"><path d="M3 14 C 40 4, 70 18, 105 10 S 170 4, 197 12"/></svg></span></h1>
-        <p class="lede">Apply for Maria or Camille hostel, choose your own room and bed, and reserve it for 24 hours while you pay. No queues, no double booking.</p>
+        <p class="lede">Apply for Maria or Camille hostel, choose your own room and bed, and reserve it for 15 days while you pay. No queues, no double booking.</p>
         <form class="search" id="finder" aria-label="Find a room" novalidate>
           <div class="s-row" id="f-gender-row"><span class="lbl" id="lbl-g">Show beds open to</span>
             <div class="pills" role="group" aria-labelledby="lbl-g">
@@ -766,7 +803,7 @@ table.t td small { display: block; color: var(--muted); }
 
   <div class="wrap promise">
     <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6M9 17h3"/></svg></span><b>Your own application number</b><span>Every application gets a number you can quote when you ask about it.</span></div>
-    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><b>Reserved for 24 hours</b><span>Nobody else can take your bed while you arrange payment.</span></div>
+    <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2.5 2.5M9 2h6"/></svg></span><b>Reserved for 15 days</b><span>Nobody else can take your bed while you arrange payment.</span></div>
     <div><span class="ico"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><rect x="4" y="4" width="6" height="6"/><rect x="14" y="4" width="6" height="6"/><rect x="4" y="14" width="6" height="6"/><path d="M14 14h3v3h-3zM20 14v6h-6"/></svg></span><b>Invoice and QR token</b><span>Pay, and you get an invoice and a booking token to show at check-in.</span></div>
   </div>
 
@@ -786,6 +823,15 @@ table.t td small { display: block; color: var(--muted); }
       <p>Shared rooms are single gender: once the first student books a bed, the other beds in that room are offered only to students of the same gender.</p>
     </div>
     <div class="cards" id="hostels"></div>
+  </section>
+
+  <section class="wrap section" style="padding-top:0" aria-labelledby="loc-title">
+    <div class="sec-title">
+      <p class="kicker">Location</p>
+      <h2 id="loc-title">Where the hostels are</h2>
+      <p>See Maria and Camille on Google Maps, and how far each hostel is from the buildings where lectures happen.</p>
+    </div>
+    <div id="locations"></div>
   </section>
 
   <section class="wrap section" style="padding-top:0" aria-label="What you get and the rules">
@@ -843,7 +889,7 @@ table.t td small { display: block; color: var(--muted); }
     <ol class="steps five">
       <li><b>Apply</b><span>Give your first and second room choice. You get an application number straight away.</span></li>
       <li><b>Choose your bed</b><span>See every free bed in your room type and pick the one you want.</span></li>
-      <li><b>Reserve for 24 hours</b><span>The bed is yours while you pay. If you do not pay in time, it goes back on offer.</span></li>
+      <li><b>Reserve for 15 days</b><span>The bed is yours while you pay. If you do not pay in time, it goes back on offer.</span></li>
       <li><b>Pay</b><span>By mobile money or card. You get an invoice and a booking token with a QR code.</span></li>
       <li><b>Check in</b><span>Show your token at the hostel. The manager confirms it and gives you your keys.</span></li>
     </ol>
@@ -890,6 +936,15 @@ table.t td small { display: block; color: var(--muted); }
   </div>
 </section>
 
+<section id="view-policy" class="wrap page" hidden>
+  <div class="page-head">
+    <p class="kicker">Rules and regulations</p>
+    <h2>Hostel policy, terms and conditions</h2>
+    <p>Read these before you apply. You must accept them before you can complete a booking.</p>
+  </div>
+  <div class="policy" id="policy-body"></div>
+</section>
+
 <section id="view-me" class="wrap page" hidden></section>
 <section id="view-manager" class="wrap page" hidden></section>
 <section id="view-admin" class="wrap page" hidden></section>
@@ -898,7 +953,7 @@ table.t td small { display: block; color: var(--muted); }
 <footer>
   <div class="wrap">
     <span><b style="color:var(--fg)">RoomRight</b> for Lancaster University Ghana · Demo build. Rooms, beds and prices follow the 2026/27 hostel documents. Residents and bookings are sample data and no real payment is taken. Not an official university service.</span>
-    <span style="display:flex;gap:16px;flex-wrap:wrap"><button class="linkbtn" id="staff-link" data-go="staff">Staff login</button><button class="linkbtn" data-action="reset">Reset demo data</button></span>
+    <span style="display:flex;gap:16px;flex-wrap:wrap"><button class="linkbtn" data-go="policy">Hostel policy</button><button class="linkbtn" id="staff-link" data-go="staff">Staff login</button><button class="linkbtn" data-action="reset">Reset demo data</button></span>
   </div>
 </footer>
 
@@ -909,13 +964,15 @@ table.t td small { display: block; color: var(--muted); }
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcode-generator/1.4.4/qrcode.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <script>
 (function () {
   "use strict";
 
   /* ---------- Config: rooms and prices from the 2026/27 hostel documents ---------- */
-  var RESERVE_HOURS = 24;       // how long a reserved bed waits for payment
-  var STORE_KEY = "roomright-lug-v3";
+  var RESERVE_DAYS = 15, RESERVE_HOURS = RESERVE_DAYS * 24;   // how long a reserved bed waits for payment
+  var STORE_KEY = "roomright-lug-v4", MEDIA_KEY = "roomright-lug-media-v1";
   var CODES = { maria: "MARIA-2026", camille: "CAMILLE-2026", admin: "ADMIN-2026" };   // demo access codes
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
@@ -957,7 +1014,7 @@ table.t td small { display: block; color: var(--muted); }
   function pick(a) { return a[Math.floor(Math.random() * a.length)]; }
   function pad(n, w) { return String(n).padStart(w || 2, "0"); }
   function money(n) { return "GH₵ " + n.toLocaleString("en-GB", { minimumFractionDigits: n % 1 ? 2 : 0, maximumFractionDigits: 2 }); }
-  function hms(ms) { var s = Math.max(0, Math.ceil(ms / 1000)); return pad(Math.floor(s / 3600)) + ":" + pad(Math.floor(s % 3600 / 60)) + ":" + pad(s % 60); }
+  function hms(ms) { var s = Math.max(0, Math.ceil(ms / 1000)), d = Math.floor(s / 86400); s %= 86400; return (d ? d + (d === 1 ? " day " : " days ") : "") + pad(Math.floor(s / 3600)) + ":" + pad(Math.floor(s % 3600 / 60)) + ":" + pad(s % 60); }
   function dateStr(ts) { return new Date(ts).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }); }
   function timeStr(ts) { return new Date(ts).toLocaleTimeString("en-GB", { hour: "2-digit", minute: "2-digit" }); }
   function roomOf(key) { return ROOM[+key.split("-")[0]]; }
@@ -989,7 +1046,7 @@ table.t td small { display: block; color: var(--muted); }
     s.apps.push(a); return a;
   }
   function freshState() {
-    var s = { apps: [], log: [], inv: 1, seq: 1, session: null, profiles: {}, useq: 1, reports: [], rseq: 1, codes: { maria: CODES.maria, camille: CODES.camille, admin: CODES.admin }, adminEmail: "housing.admin@roomright.demo", codeReqs: [], cseq: 2, mail: [] }, now = Date.now(), g = 0;
+    var s = { apps: [], log: [], inv: 1, seq: 1, session: null, profiles: {}, useq: 1, reports: [], rseq: 1, codes: { maria: CODES.maria, camille: CODES.camille, admin: CODES.admin }, adminEmail: "housing.admin@roomright.demo", codeReqs: [], cseq: 2, mail: [], notes: [], admissions: {}, admImport: null, inventory: defaultInventory(), places: { maria: { lat: "", lng: "", desc: "On the Lancaster University Ghana campus" }, camille: { lat: "", lng: "", desc: "On the Lancaster University Ghana campus" }, buildings: [] } }, now = Date.now(), g = 0;
     var occupied = { t1: 4, t1b: 3, t2: 27, t3: 8, t3p: 6, t4: 16 };   // the two cheapest-per-head premium and 4-bed types start full
     TYPES.forEach(function (t) {
       var left = occupied[t.id];
@@ -1034,7 +1091,7 @@ table.t td small { display: block; color: var(--muted); }
     add(wl, "booking", false, "I am on the waiting list for four in a room. Can I also be considered for three in a room?", "open", 12);
     s.reports.sort(function (a, b) { return b.upd - a.upd; });
   }
-  function valid(s) { return s && Array.isArray(s.apps) && s.profiles && Array.isArray(s.reports) && s.codes && Array.isArray(s.codeReqs); }
+  function valid(s) { return s && Array.isArray(s.apps) && s.profiles && Array.isArray(s.reports) && s.codes && Array.isArray(s.codeReqs) && Array.isArray(s.notes) && s.admissions && s.inventory && s.places; }
   // Shared data lives in localStorage; who is signed in is kept per browser tab, so two tabs can be two different people
   function readSession() { try { return JSON.parse(sessionStorage.getItem(STORE_KEY + "-session") || "null"); } catch (e) { return null; } }
   function load() {
@@ -1052,6 +1109,20 @@ table.t td small { display: block; color: var(--muted); }
   // Re-read what other tabs have saved, right before anything that takes a bed
   function refresh() {
     try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (valid(s)) { s.session = state.session; state = s; index(); } } catch (e) {}
+  }
+  // Room photos live in their own storage slot so the main data stays small
+  function loadMedia() { try { var m = JSON.parse(localStorage.getItem(MEDIA_KEY) || "null"); if (m && m.photos) return m; } catch (e) {} return { photos: {} }; }
+  function saveMedia() { try { localStorage.setItem(MEDIA_KEY, JSON.stringify(media)); return true; } catch (e) { return false; } }
+  var media = loadMedia();
+  // What is in each room type, from the university's hostel pricing policy. The housing office can edit it.
+  function defaultInventory() {
+    var inv = {};
+    TYPES.forEach(function (t) {
+      var list = [["Single bed", t.beds], ["Mattress", t.beds], ["Study desk", t.beds], ["Air conditioner", 1], ["Ceiling fan", 1], ["Table-top fridge", 1], ["Prepaid electricity meter", 1]];
+      if (t.id === "t1b") list.push(["Balcony and private hallway", 1]);
+      inv[t.id] = list;
+    });
+    return inv;
   }
   function logEvent(text, kind) { state.log.unshift({ ts: Date.now(), text: text, kind: kind || "ok" }); state.log = state.log.slice(0, 60); }
 
@@ -1088,7 +1159,7 @@ table.t td small { display: block; color: var(--muted); }
     var mine = state.apps.filter(function (a) { return a.uid === p.uid && a.status !== "cancelled"; });
     return mine[mine.length - 1] || null;
   }
-  function idText(a) { return a.sid ? "ID " + a.sid : "No student ID yet"; }
+  function idText(a) { return a.sid ? "ID " + a.sid : a.tagl ? "TAGL ID " + a.tagl : "No student ID yet"; }
   function hash(str) { var h = 5381; for (var i = 0; i < str.length; i++) h = ((h << 5) + h + str.charCodeAt(i)) | 0; return "h" + (h >>> 0).toString(36); }   // demo only, not secure
   function findProfile(fn) { for (var k in state.profiles) if (fn(state.profiles[k])) return state.profiles[k]; return null; }
   function viewGender() { var p = me(); return p ? p.gender : ui.fg; }
@@ -1197,14 +1268,14 @@ table.t td small { display: block; color: var(--muted); }
   function navBtn(view, long, short) { return '<button data-go="' + view + '"' + (ui.view === view ? ' aria-current="page"' : "") + '><span class="long">' + long + '</span><span class="short">' + short + '</span></button>'; }
   function renderNav() {
     var s = state.session, h;
-    if (!s) h = navBtn("home", "Hostels", "Hostels") + '<button class="btn" data-go="signin">Sign in</button>';
-    else if (s.role === "student") { var un = myReports().filter(function (r) { return r.unread; }).length, bd = un ? '<span class="count num">' + un + '</span>' : "";
+    if (!s) h = navBtn("home", "Hostels", "Hostels") + navBtn("policy", "Hostel policy", "Policy") + '<button class="btn" data-go="signin">Sign in</button>';
+    else if (s.role === "student") { var un = myReports().filter(function (r) { return r.unread; }).length + myNotes().filter(function (n) { return !n.read; }).length, bd = un ? '<span class="count num">' + un + '</span>' : "";
       h = navBtn("home", "Find a room", "Find") + navBtn("me", "My application" + bd, "Mine" + bd) + who(me().name.split(" ")[0]); }
     else if (s.role === "manager") { var op = openReports(s.hostel).length;
       h = navBtn("manager", "Dashboard" + (op ? '<span class="count num">' + op + '</span>' : ""), "Dashboard") + who(HOSTEL[s.hostel].name + " manager"); }
     else h = navBtn("admin", "Overview", "Overview") + who("Administrator");
     $("nav").innerHTML = h;
-    ["home", "signin", "staff", "me", "manager", "admin"].forEach(function (v) { $("view-" + v).hidden = ui.view !== v; });
+    ["home", "signin", "staff", "policy", "me", "manager", "admin"].forEach(function (v) { $("view-" + v).hidden = ui.view !== v; });
     $("staff-link").hidden = !!s;
   }
   function who(label) { return '<span class="who"><span>' + esc(label) + '</span><button data-action="signout">Sign out</button></span>'; }
@@ -1226,7 +1297,7 @@ table.t td small { display: block; color: var(--muted); }
       var hold = 0; ROOMS.forEach(function (r) { if (r.type === t.id) r.keys.forEach(function (k) { if (OCC[k] && OCC[k].status === "reserved") hold++; }); });
       var f = countFree(t.id, g), by = HOSTELS.map(function (h) { var c = h.rooms.filter(function (r) { return r.type === t.id; }).length; return c ? h.name + " " + c + (c === 1 ? " room" : " rooms") : ""; }).filter(Boolean).join(" · ");
       return '<article class="tcard' + (f ? "" : " full") + '"><span class="beds-ico" aria-hidden="true">' + new Array(t.beds + 1).join("<i></i>") + '</span>' +
-        '<div><h3>' + t.name + '</h3><p class="room-note">' + by + (t.premium ? ' · includes ' + money(2000) + ' premium' : "") + '</p></div>' +
+        '<div><h3>' + t.name + '</h3><p class="room-note">' + by + (t.premium ? ' · includes ' + money(2000) + ' premium' : "") + '</p><button class="linkbtn" data-action="typeinfo" data-tid="' + t.id + '" style="font-size:.82rem">Photos and what is in the room</button></div>' +
         '<div class="tc-price"><b class="num">' + money(t.price) + '</b><small>per bed, 9 months</small></div>' +
         '<div class="tc-avail"><span class="state ' + (!f ? "none" : f <= 3 ? "low" : "ok") + '">' + (f ? f + " of " + t.total + " available" : "Fully booked") + '</span>' + (hold ? '<small>' + hold + ' on hold, unpaid</small>' : "") + '</div>' +
         '<button class="btn sm' + (f ? "" : " ghost") + '" data-action="apply" data-tid="' + t.id + '">' + (f ? "Apply" : "Join waiting list") + '</button></article>';
@@ -1242,6 +1313,7 @@ table.t td small { display: block; color: var(--muted); }
         '<dl class="h-mix">' + mix + '</dl><div class="card-foot"><button class="btn quiet" data-action="rooms" data-hid="' + h.id + '">See every room</button><span class="room-note">Lounge and reception on the ground floor</span></div></div></article>';
     }).join("");
     $("hostels").classList.toggle("settled", !ui.animate); ui.animate = false;
+    renderLocations();
     paintWindows();
   }
 
@@ -1312,25 +1384,30 @@ table.t td small { display: block; color: var(--muted); }
     }
     var up = (ui.sauth || (Object.keys(state.profiles).length ? "in" : "up")) === "up", ret = ui.skind === "returning";
     h = '<div class="authtabs" role="tablist" aria-label="Student account"><button role="tab" type="button" data-action="auth" data-tab="in" aria-selected="' + !up + '">Sign in</button><button role="tab" type="button" data-action="auth" data-tab="up" aria-selected="' + up + '">Create an account</button></div>';
-    if (!up) h += '<div><h3 class="panel-title">Welcome back</h3><p class="panel-sub">Sign in with your email. Returning students can also use their student ID.</p></div>' +
+    if (!up) h += '<div><h3 class="panel-title">Welcome back</h3><p class="panel-sub">Sign in with your email, your TAGL ID if you are a new student, or your student ID if you are returning.</p></div>' +
       '<form id="f-student" novalidate style="display:grid;gap:14px">' +
-      field("s-id", "Email or student ID", "text", "", "Student ID sign in works for returning students only", 'autocomplete="username" spellcheck="false" placeholder="you@example.com or 20241234"') +
+      field("s-id", "Email, TAGL ID or student ID", "text", "", "TAGL ID for new students, student ID for returning students", 'autocomplete="username" spellcheck="false" placeholder="you@example.com, TAGL2026001 or 20241234"') +
       field("s-pw", "Password", "password", "", "", 'autocomplete="current-password"') +
       '<button class="btn block" type="submit">Sign in</button>' +
       '<p class="panel-sub" style="margin:0">No account yet? <button class="linkbtn" type="button" data-action="auth" data-tab="up">Create one</button></p></form>';
-    else h += '<div><h3 class="panel-title">Create your student account</h3><p class="panel-sub">You can book a bed before you are admitted, and before you get your student ID. We email you a code to verify your account.</p></div>' +
+    else h += '<div><h3 class="panel-title">Create your student account</h3><p class="panel-sub">New students register with the TAGL ID on their admission letter. Returning students use their student ID. We check your details against the admission records and email you a code to verify your account.</p></div>' +
       '<form id="f-signup" novalidate style="display:grid;gap:14px">' +
       '<fieldset class="kinds"><legend class="legend-t">Which describes you?</legend>' +
-        kindOpt("new", "I am new to LUG", "No student ID yet. You sign in with your email.") +
-        kindOpt("returning", "I am a returning student", "I have a student ID and stayed in a hostel last year.") + '</fieldset>' +
-      '<div class="grid2">' + field("su-name", "Full name", "text", "", "As on your admission letter", 'autocomplete="name"') +
-        selectField("su-gender", "I am", [["", "Choose"], ["F", "Female"], ["M", "Male"]], "", "Shared rooms are single gender") + '</div>' +
-      field("su-email", "Email", "email", "", "We send your verification code here", 'autocomplete="email" placeholder="you@example.com"') +
-      '<div id="su-new"' + (ret ? " hidden" : "") + '>' +
-        selectField("su-adm", "Admission", [["admitted", "Admitted, waiting for my student ID"], ["pending", "Still waiting for my admission decision"]], "admitted", "If you are not admitted, the hostel fee is refunded") + '</div>' +
+        kindOpt("new", "I am a new student", "Use the TAGL ID from your admission letter.") +
+        kindOpt("returning", "I am a returning student", "Use your student ID. You stayed in a hostel last year.") + '</fieldset>' +
+      '<div id="su-new" style="display:grid;gap:14px"' + (ret ? " hidden" : "") + '><div class="grid2">' +
+        field("su-tagl", "TAGL ID", "text", "", "From your admission letter", 'autocomplete="off" spellcheck="false" placeholder="TAGL2026001"') +
+        selectField("su-adm", "Admission", [["admitted", "Admitted, waiting for my student ID"], ["pending", "Still waiting for my admission decision"]], "admitted", "If you are not admitted, the hostel fee is refunded") + '</div></div>' +
       '<div id="su-ret" class="grid2"' + (ret ? "" : " hidden") + '>' +
         field("su-sid", "Student ID", "text", "", "8 digits", 'inputmode="numeric" maxlength="8" placeholder="20241234"') +
         selectField("su-stay", "Hostel last year", [["yes", "I stayed in Maria or Camille"], ["no", "I did not stay in a hostel"], ["two", "I have already stayed two years"]], "yes") + '</div>' +
+      '<div class="grid2">' + field("su-name", "Full name", "text", "", "As on your admission letter", 'autocomplete="name"') +
+        selectField("su-gender", "I am", [["", "Choose"], ["F", "Female"], ["M", "Male"]], "", "Shared rooms are single gender") + '</div>' +
+      '<div class="grid2">' + field("su-dob", "Date of birth", "date", "", "You must be 18 or older to apply", 'autocomplete="bday" max="' + new Date().toISOString().slice(0, 10) + '"') +
+        field("su-email", "Email", "email", "", "We send your verification code here", 'autocomplete="email" placeholder="you@example.com"') + '</div>' +
+      '<div class="grid2">' + field("su-prog", "Programme of study", "text", "", "As on your admission letter", 'list="prog-list" autocomplete="off"') +
+        selectField("su-year", "Current year of study", [["", "Choose"], ["Foundation", "Foundation"], ["Year 1", "Year 1"], ["Year 2", "Year 2"], ["Year 3", "Year 3"], ["Year 4", "Year 4"]], "") + '</div>' +
+      '<datalist id="prog-list">' + programmes().map(function (x) { return '<option value="' + esc(x) + '">'; }).join("") + '</datalist>' +
       field("su-phone", "Phone number", "tel", "", "For WhatsApp updates from Hostel Management", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') +
       '<div class="grid2">' + field("su-pw", "Password", "password", "", "At least 6 characters", 'autocomplete="new-password"') +
         field("su-pw2", "Confirm password", "password", "", "", 'autocomplete="new-password"') + '</div>' +
@@ -1357,17 +1434,33 @@ table.t td small { display: block; color: var(--muted); }
     toast(isNew ? "Account verified. Welcome, " + p.name.split(" ")[0] + "." : "Signed in as " + p.name + ".");
     if (intent) apply(intent.tid);
   }
+  function ageOn(dob) { var b = new Date(dob + "T00:00:00"), n = new Date(), a = n.getFullYear() - b.getFullYear(); if (n.getMonth() < b.getMonth() || (n.getMonth() === b.getMonth() && n.getDate() < b.getDate())) a--; return a; }
+  function nameTokens(n) { return String(n || "").toLowerCase().replace(/[^a-z\s]/g, " ").split(/\s+/).filter(Boolean); }
+  function programmes() { var set = {}; for (var k in state.admissions) if (state.admissions[k].programme) set[state.admissions[k].programme] = 1; return Object.keys(set).sort(); }
+  // Checks a new account against the Admission Department records the administrator uploaded
+  function checkAdmission(id, name, dob) {
+    if (!Object.keys(state.admissions).length) return { status: "unchecked" };
+    var r = state.admissions[id.toUpperCase()];
+    if (!r) return { status: "missing" };
+    if (r.dob && r.dob !== dob) return { status: "dob", rec: r };
+    var mine = nameTokens(name), theirs = nameTokens(r.name);
+    if (r.name && mine.filter(function (t) { return theirs.indexOf(t) > -1; }).length < Math.min(2, theirs.length)) return { status: "name", rec: r };
+    return { status: "ok", rec: r };
+  }
   function signinStudent() {
     var id = $("s-id").value.trim(), pw = $("s-pw").value, p;
-    if (!setErr("s-id", id ? "" : "Enter your email or student ID.")) return;
-    if (/^\d+$/.test(id)) {
+    if (!setErr("s-id", id ? "" : "Enter your email, TAGL ID or student ID.")) return;
+    if (id.indexOf("@") > -1) {
+      p = findProfile(function (x) { return x.email && x.email === id.toLowerCase(); });
+      if (!p) { setErr("s-id", "No account uses that email. Check it, or create an account."); return; }
+    } else if (/^\d+$/.test(id)) {
       if (!setErr("s-id", /^\d{8}$/.test(id) ? "" : "A student ID has 8 digits.")) return;
       p = findProfile(function (x) { return x.sid === id; });
       if (!p) { setErr("s-id", "No returning student account uses that ID. Create an account first."); return; }
-      if (p.kind !== "returning") { setErr("s-id", "Student ID sign in is only for returning students. Sign in with the email you signed up with."); return; }
+      if (p.kind !== "returning") { setErr("s-id", "Student ID sign in is only for returning students. Use your TAGL ID or email."); return; }
     } else {
-      p = findProfile(function (x) { return x.email && x.email === id.toLowerCase(); });
-      if (!p) { setErr("s-id", "No account uses that email. Check it, or create an account."); return; }
+      p = findProfile(function (x) { return x.tagl && x.tagl === id.toUpperCase(); });
+      if (!p) { setErr("s-id", "No account uses that TAGL ID. Check it, or create an account."); return; }
     }
     if (!setErr("s-pw", p.pw === hash(pw) ? "" : "That password is not right.")) return;
     if (!p.verified) {
@@ -1378,24 +1471,35 @@ table.t td small { display: block; color: var(--muted); }
   }
   function signupStudent() {
     var k = ui.skind, name = $("su-name").value.trim(), gender = $("su-gender").value, phone = $("su-phone").value.replace(/\s+/g, ""), pw = $("su-pw").value;
-    var email = $("su-email").value.trim().toLowerCase(), sid = $("su-sid").value.trim(), stay = $("su-stay").value;
-    var ok = setErr("su-name", name.length < 3 ? "Enter your full name." : "");
-    ok = setErr("su-gender", gender ? "" : "Choose female or male.") && ok;
-    ok = setErr("su-email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "Enter a valid email address." : findProfile(function (x) { return x.email === email; }) ? "An account already uses this email. Sign in instead." : "") && ok;
-    if (k === "returning") {
+    var email = $("su-email").value.trim().toLowerCase(), sid = $("su-sid").value.trim(), tagl = $("su-tagl").value.trim().toUpperCase(), stay = $("su-stay").value;
+    var dob = $("su-dob").value, prog = $("su-prog").value.trim(), year = $("su-year").value, idv = k === "new" ? tagl : sid, idf = k === "new" ? "su-tagl" : "su-sid";
+    var ok = true;
+    if (k === "new") ok = setErr("su-tagl", !/^[A-Z][A-Z0-9-]{3,19}$/.test(tagl) || !/\d/.test(tagl) ? "Enter the TAGL ID from your admission letter, letters and numbers." : findProfile(function (x) { return x.tagl === tagl; }) ? "An account already uses this TAGL ID." : "") && ok;
+    else {
       var used = findProfile(function (x) { return x.sid === sid; }) || state.apps.some(function (a) { return a.sid === sid; });
       ok = setErr("su-sid", !/^\d{8}$/.test(sid) ? "Student ID must be 8 digits." : used ? "An account already uses this student ID." : "") && ok;
       ok = setErr("su-stay", stay === "no" ? "Hostel places are for freshers and students who stayed in a hostel last year. Contact Hostel Management if you have a medical exception or are a hostel representative." :
         stay === "two" ? "Students can stay in the hostel for two years at most." : "") && ok;
     }
+    ok = setErr("su-name", name.length < 3 ? "Enter your full name." : "") && ok;
+    ok = setErr("su-gender", gender ? "" : "Choose female or male.") && ok;
+    ok = setErr("su-dob", !dob ? "Enter your date of birth." : ageOn(dob) < 18 ? "You must be 18 or older to apply for hostel accommodation." : "") && ok;
+    ok = setErr("su-email", !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "Enter a valid email address." : findProfile(function (x) { return x.email === email; }) ? "An account already uses this email. Sign in instead." : "") && ok;
+    ok = setErr("su-prog", prog.length < 2 ? "Enter your programme of study." : "") && ok;
+    ok = setErr("su-year", year ? "" : "Choose your current year of study.") && ok;
     ok = setErr("su-phone", /^0\d{9}$/.test(phone) ? "" : "Enter a 10 digit number starting with 0.") && ok;
     ok = setErr("su-pw", pw.length >= 6 ? "" : "Use at least 6 characters.") && ok;
     ok = setErr("su-pw2", $("su-pw2").value === pw ? "" : "The passwords do not match.") && ok;
+    var chk = ok ? checkAdmission(idv, name, dob) : null;
+    if (chk && chk.status === "missing") ok = setErr(idf, "We cannot find this " + (k === "new" ? "TAGL ID" : "student ID") + " in the admission records. Check it, or contact the Admissions office.");
+    if (chk && chk.status === "dob") ok = setErr("su-dob", "Your date of birth does not match the admission records for this ID.");
+    if (chk && chk.status === "name") ok = setErr("su-name", "Your name does not match the admission records for this ID.");
     if (!ok) { var bad = $("signin-panel").querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
-    var p = { uid: "U" + pad(state.useq++, 4), kind: k, name: name, gender: gender, phone: phone, email: email, sid: k === "returning" ? sid : "",
+    var p = { uid: "U" + pad(state.useq++, 4), kind: k, name: name, gender: gender, phone: phone, email: email, sid: k === "returning" ? sid : "", tagl: k === "new" ? tagl : "",
+      dob: dob, programme: prog, year: year, admCheck: chk.status,
       adm: k === "new" ? $("su-adm").value : "admitted", elig: k === "new" ? "fresher" : "returning", pw: hash(pw), ts: Date.now(), verified: false };
     state.profiles[p.uid] = p; sendVerify(p); ui.verify = p.uid;
-    logEvent("New student account: " + name + (k === "new" ? (p.adm === "pending" ? ", awaiting admission" : ", no student ID yet") : ", returning student") + ", waiting for email verification", "info");
+    logEvent("New student account: " + name + " (" + (k === "new" ? "TAGL ID " + tagl : "student ID " + sid) + ")" + (chk.status === "ok" ? ", matches admission records" : ", not yet checked against admission records") + ", waiting for email verification", "info");
     save(); renderSignin(); window.scrollTo(0, 0); toast("Account created. Check your email for the code.");
   }
   function addSid() {
@@ -1501,19 +1605,35 @@ table.t td small { display: block; color: var(--muted); }
   }
   function openApply(first, second) {
     var p = me(); ui.sheet = { kind: "apply" };
+    if (p.dob && ageOn(p.dob) < 18) { showSheet(head("Hostel application", esc(p.name)) + '<div class="sheet-body"><div class="result bad"><h3>You cannot apply yet</h3><p>Hostel accommodation is for students aged 18 or older. Contact Hostel Management if you think this is wrong.</p></div></div>'); return; }
+    var rel = [["", "Choose"], ["Parent", "Parent"], ["Guardian", "Guardian"], ["Sibling", "Brother or sister"], ["Spouse", "Spouse"], ["Relative", "Other relative"], ["Other", "Other"]];
     showSheet(head("Hostel application", "2026/27 academic year · " + esc(p.name) + " · " + gWord(p.gender)) + stepper(1) +
       '<form class="sheet-body" id="f-apply" novalidate>' +
+      '<div class="fsect" style="border:0;padding:0"><b>Your details</b><dl class="rows"><div><dt>' + (p.tagl ? "TAGL ID" : "Student ID") + '</dt><dd>' + esc(p.tagl || p.sid) + '</dd></div><div><dt>Programme of study</dt><dd>' + esc(p.programme || "Not given") + '</dd></div><div><dt>Year of study</dt><dd>' + esc(p.year || "Not given") + '</dd></div><div><dt>Date of birth</dt><dd>' + (p.dob ? dateStr(new Date(p.dob + "T00:00:00")) : "Not given") + '</dd></div></dl></div>' +
+      '<div class="fsect"><b>Parent or guardian</b><div class="grid2">' + field("ag-name", "Full name", "text", "", "", 'autocomplete="off"') + field("ag-phone", "Contact number", "tel", "", "", 'inputmode="tel" placeholder="024 123 4567"') + '</div>' +
+        field("ag-email", "Email address", "email", "", "", 'placeholder="parent@example.com"') + '</div>' +
+      '<div class="fsect"><b>Next of kin</b><div class="grid2">' + field("ak-name", "Full name", "text", "", "", 'autocomplete="off"') + field("ak-phone", "Contact number", "tel", "", "", 'inputmode="tel" placeholder="024 123 4567"') + '</div>' +
+        selectField("ak-rel", "Relationship to you", rel, "") + '</div>' +
+      '<div class="fsect"><b>Room choices</b>' +
       '<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="legend-t" style="margin-bottom:6px">First choice</legend>' + optList("ap-first", p.gender, first) + '</fieldset>' +
-      '<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="legend-t" style="margin-bottom:6px">Second choice</legend>' + optList("ap-second", p.gender, second) + '<span class="hint">Used if your first choice is full, so you do not have to apply again.</span><span class="err" id="ap-second-box-err"></span></fieldset>' +
+      '<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="legend-t" style="margin-bottom:6px">Second choice</legend>' + optList("ap-second", p.gender, second) + '<span class="hint">Used if your first choice is full, so you do not have to apply again.</span><span class="err" id="ap-second-box-err"></span></fieldset></div>' +
       '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M5 4h14v16H5zM9 9h6M9 13h6"/></svg><span>You get an application number as soon as you submit. Quote it whenever you ask about your application.</span></p>' +
-      '<div class="actions"><button class="btn block" type="submit">Submit application</button></div></form>', 'input[name="ap-first"]:checked');
+      '<div class="actions"><button class="btn block" type="submit">Submit application</button></div></form>', "#ag-name");
   }
   function picked(name) { var r = document.querySelector('input[name="' + name + '"]:checked'); return r ? r.value : ""; }
   function submitApply() {
-    var first = picked("ap-first"), second = picked("ap-second"), p = me();
-    if (!setErr("ap-second-box", first === second ? "Pick a different room type for your second choice." : "")) return;
+    var first = picked("ap-first"), second = picked("ap-second"), p = me(), phoneOk = function (v) { return /^(0\d{9}|\+\d{10,15})$/.test(v.replace(/\s+/g, "")); };
+    var g = { name: $("ag-name").value.trim(), phone: $("ag-phone").value.replace(/\s+/g, ""), email: $("ag-email").value.trim() }, kin = { name: $("ak-name").value.trim(), phone: $("ak-phone").value.replace(/\s+/g, ""), rel: $("ak-rel").value };
+    var ok = setErr("ag-name", g.name.length < 3 ? "Enter your parent or guardian's full name." : "");
+    ok = setErr("ag-phone", phoneOk(g.phone) ? "" : "Enter a phone number, like 0241234567 or +447700900123.") && ok;
+    ok = setErr("ag-email", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(g.email) ? "" : "Enter a valid email address.") && ok;
+    ok = setErr("ak-name", kin.name.length < 3 ? "Enter your next of kin's full name." : "") && ok;
+    ok = setErr("ak-phone", phoneOk(kin.phone) ? "" : "Enter a phone number, like 0241234567 or +447700900123.") && ok;
+    ok = setErr("ak-rel", kin.rel ? "" : "Choose how they are related to you.") && ok;
+    ok = setErr("ap-second-box", first === second ? "Pick a different room type for your second choice." : "") && ok;
+    if (!ok) { var bad = $("sheet").querySelector('[aria-invalid="true"]'); if (bad && bad.focus) bad.focus(); return; }
     if (myApp()) { closeSheet(); go("me"); return; }   // one application per student
-    var app = { id: appId(state.seq++), uid: p.uid, sid: p.sid || "", email: p.email || "", adm: p.adm, name: p.name, gender: p.gender, elig: p.elig, first: first, second: second, type: null, bed: null, status: "applied", ts: Date.now(), invoices: [], token: null };
+    var app = { id: appId(state.seq++), uid: p.uid, sid: p.sid || "", tagl: p.tagl || "", dob: p.dob, programme: p.programme, year: p.year, guardian: g, kin: kin, email: p.email || "", adm: p.adm, name: p.name, gender: p.gender, elig: p.elig, first: first, second: second, type: null, bed: null, status: "applied", ts: Date.now(), invoices: [], token: null };
     state.apps.push(app); logEvent("Application " + app.id + " received from " + app.name + ": " + TYPE[first].short + ", then " + TYPE[second].short); commit();
     var f1 = countFree(first, p.gender), f2 = countFree(second, p.gender), next;
     if (f1) next = '<p style="margin:0">Your first choice, <b>' + TYPE[first].name + '</b>, has ' + f1 + ' free ' + (f1 === 1 ? "bed" : "beds") + '. Choose yours now.</p><div class="actions"><button class="btn block" data-action="choose" data-tid="' + first + '">Choose my bed</button></div>';
@@ -1537,10 +1657,10 @@ table.t td small { display: block; color: var(--muted); }
     }); });
     var other = tid === app.first ? app.second : app.first;
     showSheet(head(t.name, app.id + " · " + money(t.price) + " for 9 months · " + free.length + " free for you") + stepper(2) +
-      '<div class="sheet-body"><p class="choice-note">Choose one bed. You can book only one bed, and picking another bed replaces your choice.</p>' +
+      '<div class="sheet-body">' + galleryHTML(tid) + '<details class="more"><summary>What is in a ' + t.name.toLowerCase() + '</summary>' + inventoryHTML(tid) + '</details><p class="choice-note">Choose one bed. You can book only one bed, and picking another bed replaces your choice.</p>' +
       '<div class="map-key"><span><i class="mk-free"></i>Free</span><span><i class="mk-sel"></i>Your bed</span><span><i class="mk-taken"></i>Not available</span></div>' + body +
       '<div class="pick-sum"><div><small>1 bed selected</small><div class="bedname">' + bedName(sel, true) + '</div></div><div style="text-align:right"><small>Hostel fee, 9 months</small><b class="num">' + money(t.price) + '</b></div></div>' +
-      '<div class="actions"><button class="btn block" data-action="reserve">Reserve this bed for ' + RESERVE_HOURS + ' hours</button>' +
+      '<div class="actions"><button class="btn block" data-action="reserve">Reserve this bed for ' + RESERVE_DAYS + ' days</button>' +
       (countFree(other, g) ? '<button class="linkbtn" data-action="choose" data-tid="' + other + '" style="justify-self:center">See my other choice: ' + TYPE[other].name + '</button>' : "") + '</div></div>', ".bed.sel");
   }
   function reserve() {
@@ -1549,7 +1669,7 @@ table.t td small { display: block; color: var(--muted); }
     if (!app || app.status !== "applied") { closeSheet(); go("me"); return; }
     if (!canTake(s.sel, app.gender, app)) { toast("That bed was just taken. Pick another one."); openChooser(app, s.tid); return; }
     app.status = "reserved"; app.bed = s.sel; app.type = s.tid; app.exp = Date.now() + RESERVE_HOURS * 36e5; delete app.waitlist; delete app.expired;
-    logEvent(app.id + " reserved " + bedName(app.bed, true) + " for " + RESERVE_HOURS + " hours"); commit(); openPay(app, "booking");
+    logEvent(app.id + " reserved " + bedName(app.bed, true) + " for " + RESERVE_DAYS + " days"); commit(); openPay(app, "booking");
   }
   var METHODS = [["mtn", "MTN MoMo", "Approve on your phone", "MTN", "#E0A800"], ["telecel", "Telecel Cash", "Approve on your phone", "T", "#C8102E"], ["at", "AT Money", "Approve on your phone", "AT", "#1F4AA8"], ["card", "Bank card", "Visa or Mastercard", "CARD", "#121214"]];
   var payForm = { method: "mtn", momo: "" };
@@ -1559,17 +1679,19 @@ table.t td small { display: block; color: var(--muted); }
     showSheet(head(up ? "Pay for your upgrade" : "Pay for your bed", app.id + " · " + t.name) + (up ? "" : stepper(3)) +
       '<form class="sheet-body" id="f-pay" novalidate>' +
       '<div class="holdbox"><div><small>' + (up ? "New bed, held for you" : "Reserved for you") + '</small><div class="bedname">' + bedName(bed, true) + '</div></div><div style="text-align:right"><small>Time left to pay</small><div class="timer num" data-exp="' + exp + '">' + hms(exp - Date.now()) + '</div></div></div>' +
-      '<div><div class="legend-t" style="margin-bottom:8px">Pay with</div><fieldset class="methods">' + METHODS.map(function (m) {
+      '<div><div class="legend-t" style="margin-bottom:8px">Pay with Paystack</div><fieldset class="methods">' + METHODS.map(function (m) {
         return '<div class="method"><input type="radio" name="method" id="m-' + m[0] + '" value="' + m[0] + '"' + (payForm.method === m[0] ? " checked" : "") + '><label for="m-' + m[0] + '"><span class="logo" style="background:' + m[4] + '">' + m[3] + '</span><span>' + m[1] + '<small>' + m[2] + '</small></span></label></div>'; }).join("") + '</fieldset></div>' +
       '<div id="momo-wrap"' + (payForm.method === "card" ? " hidden" : "") + '>' + field("p-momo", "Mobile money number", "tel", payForm.momo, "The number that gets the approval prompt", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') + '</div>' +
       '<dl class="rows"><div><dt>' + (up ? "Difference, " + TYPE[app.type].short + " to " + t.short : "Hostel fee, " + t.name + ", 9 months") + '</dt><dd>' + money(amount) + '</dd></div>' +
       '<div class="total"><dt>Total to pay</dt><dd>' + money(amount) + '</dd></div></dl>' +
-      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>No service fee. Demo: no real money moves.</span></p>' +
+      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>Secured by Paystack. No service fee. Demo: Paystack test mode is simulated until the backend is connected, so no real money moves.</span></p>' +
+      (up ? "" : '<div class="field"><label class="check" for="p-terms"><input type="checkbox" id="p-terms"> <span>I have read and accept the <button type="button" class="linkbtn" data-action="policy-sheet">hostel policy, terms and conditions</button></span></label><span class="err" id="p-terms-err"></span></div>') +
       '<div class="actions"><button class="btn block" type="submit">Pay ' + money(amount) + '</button></div></form>', "#m-" + payForm.method);
   }
   function submitPay() {
     if (paying) return;
     var s = ui.sheet, up = s.pay === "upgrade", method = payForm.method;
+    if (!up && !setErr("p-terms", $("p-terms").checked ? "" : "Accept the hostel policy and terms to complete your booking.")) { $("p-terms").focus(); return; }
     if (method !== "card") { payForm.momo = $("p-momo").value.replace(/\s+/g, ""); if (!setErr("p-momo", /^0\d{9}$/.test(payForm.momo) ? "" : "Enter a 10 digit number starting with 0.")) return; }
     paying = true;
     $("sheet").innerHTML = '<div class="processing"><div class="spinner" aria-hidden="true"></div><h3 id="sheet-title">' + (method === "card" ? "Confirming your card payment" : "Approve the payment on your phone") + '</h3><p>Demo: this completes on its own in a moment.</p></div>';
@@ -1585,11 +1707,11 @@ table.t td small { display: block; color: var(--muted); }
       } else {
         if (app.status !== "reserved") { closeSheet(); toast("Your reservation ended before payment finished. No money was taken."); return; }
         inv = invoiceFor(state, app, "Hostel fee, " + TYPE[app.type].name + ", 9 months", TYPE[app.type].price, mName, Date.now());
-        app.status = "paid"; app.invoices.push(inv); app.token = "RR-" + code(8); delete app.exp;
+        app.status = "paid"; app.invoices.push(inv); app.token = "RR-" + code(8); delete app.exp; app.termsAt = Date.now();
         logEvent(app.id + " paid " + money(inv.total) + " for " + bedName(app.bed, true) + " · invoice " + inv.no);
       }
       commit(); go("me");
-      showSheet(head(up ? "Upgrade complete" : "Your bed is booked", "Your invoice and booking token are saved under My application.") + (up ? "" : stepper(4)) +
+      showSheet(head(up ? "Upgrade complete" : "Your bed is ready", "Your invoice and booking token are saved under My application.") + (up ? "" : stepper(4)) +
         '<div class="sheet-body">' + tokenHTML(app) + invoiceHTML(app, inv) + '<div class="actions"><button class="btn block dark" data-action="close">Go to my application</button></div></div>', ".btn.dark");
     }, 2000);
   }
@@ -1654,7 +1776,7 @@ table.t td small { display: block; color: var(--muted); }
         next = '<h3>' + (wf ? "A bed just opened up" : "You are number " + waitPos(app) + " on the waiting list") + '</h3><p>' + (wf ? TYPE[app.waitlist].name + " has " + wf + " free now. Reserve it before someone else does." : "We will show a bed here as soon as one opens in " + TYPE[app.waitlist].name + ".") + '</p><div class="row">' +
           (wf ? '<button class="btn" data-action="choose" data-tid="' + app.waitlist + '">Choose my bed</button>' : "") + (app.waitlist !== app.second && f2 ? '<button class="btn white" data-action="choose" data-tid="' + app.second + '">Take my second choice instead</button>' : "") + '<button class="linkbtn" data-action="unwait">Leave the waiting list</button></div>';
       } else {
-        next = '<h3>' + (app.expired ? "Your reservation ran out" : "Next: choose your bed") + '</h3><p>' + (app.expired ? "You did not pay within " + RESERVE_HOURS + " hours, so the bed went back on offer. Your application is still open." : "Your application is in. Pick the exact bed you want.") + '</p><div class="row">' +
+        next = '<h3>' + (app.expired ? "Your reservation ran out" : "Next: choose your bed") + '</h3><p>' + (app.expired ? "You did not pay within " + RESERVE_DAYS + " days, so the bed went back on offer. Your application is still open." : "Your application is in. Pick the exact bed you want.") + '</p><div class="row">' +
           (f1 ? '<button class="btn" data-action="choose" data-tid="' + app.first + '">Choose a bed: ' + TYPE[app.first].short + '</button>' : '<button class="btn" data-action="wait" data-tid="' + app.first + '">Join waiting list: ' + TYPE[app.first].short + '</button>') +
           (f2 ? '<button class="btn white" data-action="choose" data-tid="' + app.second + '">Second choice: ' + TYPE[app.second].short + '</button>' : "") + '</div>';
       }
@@ -1667,13 +1789,16 @@ table.t td small { display: block; color: var(--muted); }
     if (app.token) right += '<div class="panel"><div><h3 class="panel-title">Booking token</h3><p class="panel-sub">Your proof that the bed is yours.</p></div>' + tokenHTML(app) + '</div>';
     if (app.invoices.length) right += '<div class="panel"><h3 class="panel-title">Invoices</h3><div>' + app.invoices.map(function (i) {
       return '<div class="inv-row"><span><b>' + i.no + '</b><br><span class="room-note">' + esc(i.label) + ' · ' + dateStr(i.ts) + '</span></span><span style="text-align:right"><b class="num">' + money(i.total) + '</b><br><button class="linkbtn" data-action="invoice" data-inv="' + i.no + '">View</button> · <button class="linkbtn" data-action="pdf" data-id="' + app.id + '" data-inv="' + i.no + '">PDF</button></span></div>'; }).join("") + '</div></div>';
-    if (!p.sid) right = '<form class="panel" id="f-addsid" novalidate><div><h3 class="panel-title">Got your student ID?</h3><p class="panel-sub">' + (p.adm === "pending" ? "You told us you are waiting for your admission decision. Once you are admitted and get your ID, add it here." : "Add it once the university gives it to you, usually a week or two after resumption.") + ' You keep signing in with your email.</p></div>' +
+    if (!p.sid) right = '<form class="panel" id="f-addsid" novalidate><div><h3 class="panel-title">Got your student ID?</h3><p class="panel-sub">' + (p.adm === "pending" ? "You told us you are waiting for your admission decision. Once you are admitted and get your ID, add it here." : "Add it once the university gives it to you, usually a week or two after resumption.") + ' You keep signing in with your email or TAGL ID.</p></div>' +
       '<div class="grid2">' + field("as-sid", "Student ID", "text", "", "8 digits", 'inputmode="numeric" maxlength="8" placeholder="20261234"') + '<div style="align-self:center"><button class="btn block" type="submit">Add my student ID</button></div></div></form>' + right;
+    var notes = myNotes();
+    if (notes.length) right = '<div class="panel"><div><h3 class="panel-title">Notifications</h3><p class="panel-sub">We also email these to you.</p></div><div class="rlist">' + notes.slice(0, 6).map(function (n) {
+      return '<div class="note-row' + (n.read ? "" : " unread") + '"><span class="issue">' + (n.read ? "Seen" : "New") + '</span><span><b>' + esc(n.title) + '</b><small>' + esc(n.text) + ' · ' + ago(n.ts) + '</small></span></div>'; }).join("") + '</div></div>' + right;
     var mine = sortReports(myReports());
     right += '<div class="panel"><div class="panel-head"><div><h3 class="panel-title">Problems and requests</h3><p class="panel-sub">Something broken or not right? Tell ' + (app.bed && (st === "paid" || st === "in") ? "the " + roomOf(app.bed).hostel.name + " hostel manager" : "the housing office") + ' and follow their reply here.</p></div>' +
       '<button class="btn sm" data-action="report-new">Report a problem</button></div>' + (mine.length ? '<div class="rlist">' + mine.map(function (r) { return reportRow(r, false); }).join("") + '</div>' : "") + '</div>';
     if (st === "paid" || st === "in") right += upgradePanel(app);
-    if (!right) right = '<div class="panel"><h3 class="panel-title">What happens next</h3><ul class="ticks"><li>Choose your bed and reserve it for ' + RESERVE_HOURS + ' hours.</li><li>Pay by mobile money or card.</li><li>Get your invoice and QR booking token here.</li></ul></div>';
+    if (!right) right = '<div class="panel"><h3 class="panel-title">What happens next</h3><ul class="ticks"><li>Choose your bed and reserve it for ' + RESERVE_DAYS + ' days.</li><li>Pay by mobile money or card.</li><li>Get your invoice and QR booking token here.</li></ul></div>';
 
     el.innerHTML = '<div class="page-head"><p class="kicker">My application</p><h2>' + esc(p.name.split(" ")[0]) + ', here is where you are.</h2></div>' +
       '<div class="me-grid"><div class="stack"><div class="panel"><div class="panel-head"><div><div class="code-lbl">Application number</div><div class="appid">' + app.id + '</div></div><span class="st ' + st + '">' + STATUS[st] + '</span></div>' + track +
@@ -1812,7 +1937,7 @@ table.t td small { display: block; color: var(--muted); }
   function checkExpiry() {
     var now = Date.now(), changed = false;
     state.apps.forEach(function (a) {
-      if (a.status === "reserved" && a.exp <= now) { releaseBed(a, "was not paid within " + RESERVE_HOURS + " hours"); a.expired = true; changed = true; }
+      if (a.status === "reserved" && a.exp <= now) { releaseBed(a, "was not paid within " + RESERVE_DAYS + " days"); a.expired = true; changed = true; }
       if (a.up && a.up.status === "approved" && a.up.exp <= now) { a.up.status = "expired"; delete a.up.bed; logEvent(a.id + " upgrade was not paid in time. The held bed is back on offer", "info"); changed = true; }
     });
     return changed;
@@ -1821,7 +1946,7 @@ table.t td small { display: block; color: var(--muted); }
     var bed = freeOfType(app.up.to, app.gender)[0];
     if (!bed) { toast("No free bed in " + TYPE[app.up.to].name + " for this student right now."); return; }
     app.up.status = "approved"; app.up.bed = bed; app.up.exp = Date.now() + RESERVE_HOURS * 36e5;
-    logEvent("Upgrade approved for " + app.id + ": " + bedName(bed, true) + " held for " + RESERVE_HOURS + " hours"); commit();
+    logEvent("Upgrade approved for " + app.id + ": " + bedName(bed, true) + " held for " + RESERVE_DAYS + " days"); commit();
   }
   // The Allocation Guard: a manager may only move a student within the room type they paid for
   function guardMove(app, key) {
@@ -1852,7 +1977,7 @@ table.t td small { display: block; color: var(--muted); }
           return a ? '<button class="mbed" data-action="resident" data-id="' + a.id + '"><span class="l">' + bedLetter(k) + '</span><span class="n">' + esc(a.name) + (held ? " (upgrade hold)" : "") + '</span><i class="' + (held ? "reserved" : a.status) + '" title="' + STATUS[a.status] + '"></i></button>'
                    : '<div class="mbed free"><span class="l">' + bedLetter(k) + '</span><span class="n">Free</span></div>';
         }).join("") + '</div>'; }).join("") + '</div></div>'; }).join("");
-    var q = ui.mq.toLowerCase(), rows = res.filter(function (a) { return !q || (a.name + " " + a.id + " " + a.sid + " " + (a.email || "")).toLowerCase().indexOf(q) > -1; }).sort(function (a, b) { return roomOf(a.bed).no - roomOf(b.bed).no || a.bed.localeCompare(b.bed); });
+    var q = ui.mq.toLowerCase(), rows = res.filter(function (a) { return !q || (a.name + " " + a.id + " " + a.sid + " " + (a.tagl || "") + " " + (a.email || "")).toLowerCase().indexOf(q) > -1; }).sort(function (a, b) { return roomOf(a.bed).no - roomOf(b.bed).no || a.bed.localeCompare(b.bed); });
     el.innerHTML = '<div class="page-head"><p class="kicker">Hostel manager · ' + h.name + '</p><h2>' + h.name + ' hostel today</h2><p>Who is in every room, who is still to arrive, and check-in by booking token.</p></div>' + kpis +
       '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Rooms and residents</h3><p class="panel-sub">Tap a resident to see their booking or move them. Green is checked in, black is paid and arriving, red is reserved and unpaid.</p></div>' + map + '</div>' +
       '<div class="stack"><form class="panel" id="f-checkin" novalidate><div><h3 class="panel-title">Check a student in</h3><p class="panel-sub">Type the booking token from their phone, or the code under their QR.</p></div>' +
@@ -1881,7 +2006,10 @@ table.t td small { display: block; color: var(--muted); }
     var a = byId(id), h = roomOf(a.bed).hostel; ui.sheet = { kind: "resident", id: id };
     var beds = h.keys.filter(function (k) { return !OCC[k]; }).map(function (k) { return [k, bedName(k) + " · " + TYPE[roomOf(k).type].short]; });
     showSheet(head(esc(a.name), a.id + " · " + gWord(a.gender) + " · " + esc(idText(a))) +
-      '<div class="sheet-body"><dl class="rows"><div><dt>Bed</dt><dd><b>' + bedName(a.bed, true) + '</b></dd></div><div><dt>Paid for</dt><dd>' + TYPE[a.type].name + '</dd></div><div><dt>Status</dt><dd><span class="st ' + a.status + '">' + STATUS[a.status] + '</span></dd></div>' +
+      '<div class="sheet-body"><dl class="rows"><div><dt>Bed</dt><dd><b>' + bedName(a.bed, true) + '</b></dd></div>' +
+      (a.programme ? '<div><dt>Programme</dt><dd>' + esc(a.programme) + ' · ' + esc(a.year) + '</dd></div>' : "") +
+      (a.guardian ? '<div><dt>Parent or guardian</dt><dd>' + esc(a.guardian.name) + ' · ' + esc(a.guardian.phone) + '</dd></div>' : "") +
+      (a.kin ? '<div><dt>Next of kin</dt><dd>' + esc(a.kin.name) + ' (' + esc(a.kin.rel) + ') · ' + esc(a.kin.phone) + '</dd></div>' : "") + '<div><dt>Paid for</dt><dd>' + TYPE[a.type].name + '</dd></div><div><dt>Status</dt><dd><span class="st ' + a.status + '">' + STATUS[a.status] + '</span></dd></div>' +
       (a.invoices[0] ? '<div><dt>Paid</dt><dd>' + money(a.invoices.reduce(function (n, i) { return n + i.amount; }, 0)) + ' hostel fee · ' + dateStr(a.invoices[0].ts) + '</dd></div>' : "") + '</dl>' +
       (a.status === "reserved" ? '<p class="tour-note">This bed is reserved but not paid. It is released automatically if the student does not pay in time.</p>' :
       '<div class="panel" style="padding:16px"><div><h3 class="panel-title" style="font-size:1.1rem">Move to another bed</h3><p class="panel-sub">The Allocation Guard checks the move against the room type the student paid for.</p></div>' +
@@ -1894,6 +2022,7 @@ table.t td small { display: block; color: var(--muted); }
   function renderAdmin() {
     var s = state.session, el = $("view-admin");
     if (!s || s.role !== "admin") { el.innerHTML = ""; return; }
+    if ((ui.atab || "overview") !== "overview") { el.innerHTML = adminHead() + adminTab(ui.atab); return; }
     var apps = state.apps, taken = TOTAL_BEDS - totalFree(), fees = 0, service = 0;
     apps.forEach(function (a) { a.invoices.forEach(function (i) { fees += i.amount; service += i.service; }); });
     var n = function (st) { return apps.filter(function (a) { return a.status === st; }).length; };
@@ -1910,9 +2039,9 @@ table.t td small { display: block; color: var(--muted); }
         (a.up.status === "pending" ? '<span style="display:flex;gap:6px"><button class="btn sm" data-action="up-approve" data-id="' + a.id + '"' + (free ? "" : " disabled") + '>Approve</button><button class="btn sm quiet" data-action="up-decline" data-id="' + a.id + '">Decline</button></span>' : '<span class="st reserved">Awaiting payment</span>') + '</div>'; }).join("") : '<p class="panel-sub">No upgrade requests waiting.</p>';
     var waitHTML = waits.length ? TYPES.map(function (t) { var l = waits.filter(function (a) { return a.waitlist === t.id; }); if (!l.length) return "";
       return '<div class="up-opt"><span><b>' + t.name + '</b><small>' + l.map(function (a, i) { return (i + 1) + ". " + esc(a.name) + " (" + a.id + ")"; }).join(" · ") + '</small></span><span class="st">' + l.length + ' waiting</span></div>'; }).join("") : '<p class="panel-sub">Nobody is on a waiting list.</p>';
-    var q = ui.aq.toLowerCase(), rows = apps.filter(function (a) { return !q || (a.name + " " + a.id + " " + a.sid + " " + (a.email || "")).toLowerCase().indexOf(q) > -1; }).slice().reverse().slice(0, 40);
+    var q = ui.aq.toLowerCase(), rows = apps.filter(function (a) { return !q || (a.name + " " + a.id + " " + a.sid + " " + (a.tagl || "") + " " + (a.email || "")).toLowerCase().indexOf(q) > -1; }).slice().reverse().slice(0, 40);
     var pays = []; apps.forEach(function (a) { a.invoices.forEach(function (i) { pays.push({ a: a, i: i }); }); }); pays.sort(function (x, y) { return y.i.ts - x.i.ts; });
-    el.innerHTML = '<div class="page-head"><p class="kicker">Administrator · Housing office</p><h2>Every bed, application and payment.</h2><p>Search by application number, approve room upgrades, watch the waiting lists and see what has been paid.</p></div>' + kpis +
+    el.innerHTML = adminHead() + kpis +
       '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Beds taken by room type</h3><p class="panel-sub">Red bars are room types. Black bars are the two hostels.</p></div>' + bars + '</div>' +
       '<div class="stack"><div class="panel"><div><h3 class="panel-title">Upgrade requests</h3></div><div class="up-list">' + upHTML + '</div></div><div class="panel"><div><h3 class="panel-title">Waiting lists</h3></div><div class="up-list">' + waitHTML + '</div></div></div></div>' +
       '<div style="margin-bottom:22px">' + accessPanel() + '</div>' +
@@ -1922,7 +2051,7 @@ table.t td small { display: block; color: var(--muted); }
       (rows.map(function (a) { return '<tr><td><b>' + a.id + '</b><small>' + dateStr(a.ts) + '</small></td><td>' + esc(a.name) + '<small>' + gWord(a.gender) + ' · ' + esc(idText(a)) + (a.email ? ' · ' + esc(a.email) : "") + '</small></td><td>' + TYPE[a.first].short + '<small>then ' + (TYPE[a.second] ? TYPE[a.second].short : "none") + '</small></td>' +
         '<td>' + (a.bed ? bedName(a.bed, true) : a.waitlist ? "Waiting list" : "Not chosen") + '</td><td><span class="st ' + a.status + '">' + STATUS[a.status] + '</span>' + (a.status === "reserved" ? '<small class="num" data-exp="' + a.exp + '">' + hms(a.exp - Date.now()) + '</small>' : "") + '</td>' +
         '<td style="white-space:nowrap">' + (a.bed && holding(a) ? '<button class="btn sm" data-action="admin-move" data-id="' + a.id + '">Change room</button> ' : "") + (a.status === "reserved" ? '<button class="btn sm quiet" data-action="expire" data-id="' + a.id + '">Expire now</button>' : "") + '</td></tr>'; }).join("") || '<tr><td colspan="6">No application matches that search.</td></tr>') + '</tbody></table></div>' +
-      '<p class="room-note" style="margin:0">"Expire now" is a demo shortcut: it skips the rest of the 24 hours so you can show a reservation running out.</p></div>' +
+      '<p class="room-note" style="margin:0">"Expire now" is a demo shortcut: it skips the rest of the 15 days so you can show a reservation running out.</p></div>' +
       '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Payments</h3><p class="panel-sub">Latest ' + Math.min(12, pays.length) + ' of ' + pays.length + ' invoices.</p></div><div class="tablewrap"><table class="t"><thead><tr><th>Invoice</th><th>Student</th><th>For</th><th>Paid</th><th>Reference</th></tr></thead><tbody>' +
       pays.slice(0, 12).map(function (p) { return '<tr><td><b>' + p.i.no + '</b><small>' + dateStr(p.i.ts) + '</small></td><td>' + esc(p.a.name) + '<small>' + p.a.id + '</small></td><td>' + esc(p.i.label) + '</td><td class="num"><b>' + money(p.i.total) + '</b><small>' + esc(p.i.method) + '</small></td><td>' + p.i.ref + '</td></tr>'; }).join("") + '</tbody></table></div></div>' +
       '<div class="panel"><div><h3 class="panel-title">Allocation log</h3><p class="panel-sub">Every booking, move, refusal and expiry.</p></div><ol class="log">' + logHTML(null, 30) + '</ol></div></div>';
@@ -1976,6 +2105,251 @@ table.t td small { display: block; color: var(--muted); }
     openAdminMove(id, esc(a.name) + " is now in " + bedName(key, true) + ". " + from + " is free again." + (diff ? " The room type changed, so a fee difference of " + money(Math.abs(diff)) + " should be settled with Finance." : ""));
   }
 
+  /* ---------- Room photos, inventory, locations ---------- */
+  function galleryHTML(tid) {
+    var ph = media.photos[tid] || [], t = TYPE[tid];
+    return ph.length ? '<div class="gallery" aria-label="Photos of ' + t.name + '">' + ph.map(function (src, i) { return '<img src="' + src + '" alt="' + t.name + ', photo ' + (i + 1) + ' of ' + ph.length + '">'; }).join("") + '</div>'
+      : '<div class="ph"><b>Photos coming soon</b><span>The housing office adds real photos of every room type. Until then, see what is in the room below.</span></div>';
+  }
+  function inventoryHTML(tid) {
+    return '<ul class="invlist">' + (state.inventory[tid] || []).map(function (x) { return '<li><span>' + esc(x[0]) + '</span><b>' + x[1] + '</b></li>'; }).join("") + '</ul>';
+  }
+  function openTypeInfo(tid) {
+    var t = TYPE[tid], f = countFree(tid, viewGender()); ui.sheet = { kind: "typeinfo" };
+    var where = HOSTELS.map(function (h) { var rs = h.rooms.filter(function (r) { return r.type === tid; }); if (!rs.length) return ""; var c = state.places[h.id];
+      return '<li><span><b>' + h.name + '</b> · ' + rs.length + (rs.length === 1 ? " room" : " rooms") + '<br><small>' + esc(c.desc) + '</small></span><a href="' + mapsLink(h) + '" target="_blank" rel="noopener">Map</a></li>'; }).join("");
+    showSheet(head(t.name, money(t.price) + " per bed for 9 months · " + (f ? f + " free" : "fully booked")) +
+      '<div class="sheet-body">' + galleryHTML(tid) + '<div><div class="legend-t" style="margin-bottom:8px">What is in the room</div>' + inventoryHTML(tid) + '<p class="tour-note" style="margin-top:6px">From the university\'s hostel policy. Hostel Management confirms the exact list.</p></div>' +
+      '<div><div class="legend-t" style="margin-bottom:8px">Where you can stay</div><ul class="dlist">' + where + '</ul></div>' +
+      '<div class="actions"><button class="btn block" data-action="apply" data-tid="' + tid + '">' + (f ? "Apply for this room" : "Join the waiting list") + '</button></div></div>');
+  }
+  function parseCoords(v) { var m = String(v || "").match(/(-?\d{1,2}\.\d{3,})\s*,\s*(-?\d{1,3}\.\d{3,})/); return m ? { lat: +m[1], lng: +m[2] } : null; }
+  function distM(a, b) { var R = 6371000, r = Math.PI / 180, dLat = (b.lat - a.lat) * r, dLng = (b.lng - a.lng) * r, x = Math.sin(dLat / 2) * Math.sin(dLat / 2) + Math.cos(a.lat * r) * Math.cos(b.lat * r) * Math.sin(dLng / 2) * Math.sin(dLng / 2); return 2 * R * Math.asin(Math.sqrt(x)); }
+  function mapsLink(h) { var c = state.places[h.id]; return "https://www.google.com/maps/search/?api=1&query=" + encodeURIComponent(c.lat ? c.lat + "," + c.lng : h.name + " Hostel, Lancaster University Ghana"); }
+  function renderLocations() {
+    var el = $("locations"); if (!el) return;
+    var P = state.places, key = JSON.stringify(P); if (el.getAttribute("data-k") === key) return; el.setAttribute("data-k", key);
+    var pin = HOSTELS.filter(function (h) { return P[h.id].lat; })[0], q = pin ? P[pin.id].lat + "," + P[pin.id].lng : "Lancaster University Ghana";
+    var cards = HOSTELS.map(function (h) {
+      var c = P[h.id], dl = "";
+      if (c.lat && P.buildings.length) dl = '<ul class="dlist">' + P.buildings.map(function (b) { var m = distM(c, b);
+        return '<li><span>' + esc(b.name) + '<br><small class="num">' + (m < 1000 ? Math.round(m / 10) * 10 + " m" : (m / 1000).toFixed(1) + " km") + ' in a straight line, about ' + Math.max(1, Math.round(m * 1.3 / 80)) + ' min walk</small></span>' +
+          '<a href="https://www.google.com/maps/dir/?api=1&travelmode=walking&origin=' + c.lat + ',' + c.lng + '&destination=' + b.lat + ',' + b.lng + '" target="_blank" rel="noopener">Route</a></li>'; }).join("") + '</ul>';
+      else dl = '<p class="room-note" style="margin:0">' + (c.lat ? "Lecture buildings have not been added yet." : "The exact pin for this hostel has not been set yet.") + '</p>';
+      return '<div class="panel"><div class="panel-head"><div><h3 class="panel-title">' + h.name + '</h3><p class="panel-sub">' + esc(c.desc) + '</p></div><a class="btn sm quiet" href="' + mapsLink(h) + '" target="_blank" rel="noopener">Open in Google Maps</a></div>' + dl + '</div>';
+    }).join("");
+    el.innerHTML = '<div class="locgrid"><div><div class="mapbox"><iframe title="Map showing the hostels" loading="lazy" referrerpolicy="no-referrer-when-downgrade" src="https://www.google.com/maps?q=' + encodeURIComponent(q) + '&z=' + (pin ? 17 : 15) + '&output=embed"></iframe></div><p class="room-note">Map not showing? Use the Open in Google Maps buttons.</p></div><div class="stack">' + cards + '</div></div>';
+  }
+
+  /* ---------- Waitlist notifications ---------- */
+  function myNotes() { var a = myApp(); return a ? state.notes.filter(function (n) { return n.app === a.id; }) : []; }
+  function markNotesRead() { var ch = false; myNotes().forEach(function (n) { if (!n.read) { n.read = true; ch = true; } }); if (ch) { save(); renderNav(); } }
+  // Runs after every change: a waiting student hears about a free bed once, and again if beds fill up and free up later
+  function notifyWaitlist() {
+    state.apps.forEach(function (a) {
+      if (a.status !== "applied" || !a.waitlist) return;
+      var n = countFree(a.waitlist, a.gender), t = TYPE[a.waitlist];
+      if (n && !a.wlNotified) {
+        a.wlNotified = Date.now();
+        state.notes.unshift({ app: a.id, ts: Date.now(), read: false, title: "A bed is free in " + t.name, text: "You are on the waiting list. Reserve it now before someone else does." });
+        if (a.email) sendMail(a.email, "A bed is free in " + t.name, '<p>Hi ' + esc(a.name.split(" ")[0]) + ',</p><p>A bed you were waiting for is free in <b>' + t.name + '</b>. Sign in to RoomRight and reserve it before someone else does.</p><p>Application ' + a.id + '</p>');
+        logEvent(a.id + " notified: a bed is free in " + t.short, "info");
+      } else if (!n && a.wlNotified) delete a.wlNotified;
+    });
+    state.notes = state.notes.slice(0, 200);
+  }
+
+  /* ---------- Policy ---------- */
+  var POLICY_HTML = [
+    '<div><h3>Who can apply</h3><ul><li>Freshers, and students who stayed in the hostel before. Hostel accommodation is for two years on campus at most (Foundation and Year 1, or Year 1 and Year 2, depending on your entry).</li><li>Exceptions are made for students with certified medical conditions (send your documents for consideration) and for elected or nominated Hostel Representatives.</li><li>You must be 18 or older to apply.</li><li>A student can book and pay for one bed only. Paying for extra beds to keep a room to yourself is not allowed.</li></ul></div>',
+    '<div><h3>Fees for 2026/27</h3><table><tr><th>Room</th><th>Period</th><th>Hostel fee</th></tr><tr><td>One in a room</td><td>9 months</td><td>GH₵ 30,000</td></tr><tr><td>Two in a room</td><td>9 months</td><td>GH₵ 20,000</td></tr><tr><td>Three in a room</td><td>9 months</td><td>GH₵ 17,000</td></tr><tr><td>Four in a room</td><td>9 months</td><td>GH₵ 14,000</td></tr></table><ul><li>Rooms with a balcony and private hallway cost GH₵ 2,000 more.</li><li>The fee covers accommodation, furnishing, appliances and fittings, and is paid in full and in advance.</li></ul></div>',
+    '<div><h3>Booking and payment</h3><ul><li>When you reserve a bed, it is held for you for 15 days. If you do not pay within 15 days, the reservation ends and the bed is offered to other students.</li><li>You pay online with Paystack, by mobile money or card. Payments made without applying online are void.</li><li>Your room is allocated once your payment is confirmed. You get an invoice and a booking token to show at check-in.</li><li>You must accept these terms before you can complete a booking.</li></ul></div>',
+    '<div><h3>Tenancy</h3><ul><li>The tenancy is for 9 months, starting on 1 October or 1 January.</li><li>Beds cannot be sold, traded or transferred to other students under any circumstance.</li><li>Only the housing office can change a room allocation. Moves to a different room type need your approval.</li></ul></div>',
+    '<div><h3>In your room</h3><ul><li>Rooms are furnished with single beds and mattresses, ceiling fans, air conditioning, table-top fridges and study desks. The items in your room are listed and handed over to you for the tenancy.</li><li>Every room has its own electricity meter. The students in each room top up the electricity credit themselves.</li><li>If the borehole cannot supply enough water, students are charged for water from Ghana Water Company.</li></ul></div>',
+    '<div><h3>Damage and refunds</h3><ul><li>You pay for repairing or replacing hostel property you damage. Items in each room are inspected once every 3 months.</li><li>Hostel fees are not refundable. A refund is allowed only when a student does not meet the LUG entry requirements.</li></ul></div>',
+    '<p class="room-note">Based on the Lancaster University Ghana Hostel Pricing Policy for the 2026/27 academic year. Report problems in your room from My application.</p>'
+  ].join("");
+  function openPolicySheet() {
+    var back = ui.sheet; ui.sheet = { kind: "policy", back: back };
+    showSheet(head("Hostel policy", "Terms and conditions for 2026/27") + '<div class="sheet-body"><div class="policy">' + POLICY_HTML + '</div><div class="actions"><button class="btn block" data-action="back-pay">Back to payment</button></div></div>');
+  }
+
+  /* ---------- Administrator: tabs ---------- */
+  function adminHead() {
+    var tabs = [["overview", "Overview"], ["payments", "Payments"], ["records", "Admission records"], ["rooms", "Rooms and locations"]], t = ui.atab || "overview";
+    return '<div class="page-head"><p class="kicker">Administrator · Housing office</p><h2>Every bed, application and payment.</h2><p>Search applications, approve upgrades, manage access codes, download payments and keep student records up to date.</p></div>' +
+      '<div class="atabs" role="tablist">' + tabs.map(function (x) { return '<button role="tab" data-action="atab" data-t="' + x[0] + '" aria-selected="' + (t === x[0]) + '">' + x[1] + '</button>'; }).join("") + '</div>';
+  }
+  function adminTab(tab) {
+    if (tab === "payments") return paymentsTab();
+    if (tab === "records") return recordsTab();
+    return roomsTab();
+  }
+  function paymentRows() { var rows = []; state.apps.forEach(function (a) { a.invoices.forEach(function (i) { rows.push({ a: a, i: i }); }); }); return rows.sort(function (x, y) { return y.i.ts - x.i.ts; }); }
+  function payRecord(x) {
+    var a = x.a, i = x.i;
+    return [a.name, a.sid || a.tagl || "", a.id, a.bed ? roomOf(a.bed).hostel.name : "", a.bed ? bedName(a.bed) : "", a.type ? TYPE[a.type].name : "", i.label, i.amount, dateStr(i.ts) + " " + timeStr(i.ts), i.ref, i.method.replace(/•/g, "*"), a.status === "cancelled" ? "Paid, booking withdrawn" : "Successful"];
+  }
+  var PAY_COLS = ["Student", "Student ID or TAGL ID", "Application", "Hostel", "Room and bed", "Room type", "Item", "Amount (GHS)", "Payment date", "Transaction reference", "Method", "Payment status"];
+  function paymentsTab() {
+    var rows = paymentRows(), q = (ui.pq || "").toLowerCase(), total = 0;
+    rows.forEach(function (x) { total += x.i.amount; });
+    var shown = rows.filter(function (x) { return !q || (x.a.name + " " + x.a.id + " " + x.i.no + " " + x.i.ref).toLowerCase().indexOf(q) > -1; });
+    return '<div class="kpis"><div class="kpi red"><b class="num">' + rows.length + '</b><span>Payments</span></div><div class="kpi"><b class="num">' + money(total) + '</b><span>Collected</span></div></div>' +
+      '<div class="panel"><div class="panel-head"><div><h3 class="panel-title">Payment history</h3><p class="panel-sub">Every successful payment. Download it all, or open any student\'s invoice.</p></div>' +
+      '<span style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn sm" data-action="export-xlsx">Download Excel</button><button class="btn sm quiet" data-action="export-pdf">Download PDF</button></span></div>' +
+      '<input id="pq" type="search" placeholder="Search a name, application, invoice or reference" value="' + esc(ui.pq || "") + '" aria-label="Search payments" style="border:0;box-shadow:inset 0 0 0 1.5px var(--line);border-radius:999px;padding:9px 14px;background:var(--card);max-width:420px">' +
+      '<div class="tablewrap"><table class="t"><thead><tr><th>Invoice</th><th>Student</th><th>Room</th><th>Amount</th><th>Reference</th><th>Status</th><th></th></tr></thead><tbody>' +
+      (shown.slice(0, 60).map(function (x) { var a = x.a, i = x.i;
+        return '<tr><td><b>' + i.no + '</b><small>' + dateStr(i.ts) + '</small></td><td>' + esc(a.name) + '<small>' + a.id + '</small></td><td>' + (a.bed ? bedName(a.bed, true) : "None") + '<small>' + esc(i.label) + '</small></td><td class="num"><b>' + money(i.amount) + '</b></td><td>' + i.ref + '</td>' +
+          '<td><span class="st ' + (a.status === "cancelled" ? "" : "in") + '">' + (a.status === "cancelled" ? "Withdrawn" : "Successful") + '</span></td><td style="white-space:nowrap"><button class="btn sm quiet" data-action="admin-inv" data-id="' + a.id + '" data-inv="' + i.no + '">View</button> <button class="btn sm" data-action="pdf" data-id="' + a.id + '" data-inv="' + i.no + '">PDF</button></td></tr>'; }).join("") || '<tr><td colspan="7">No payments match that search.</td></tr>') +
+      '</tbody></table></div>' + (shown.length > 60 ? '<p class="room-note" style="margin:0">Showing the latest 60. The downloads include all ' + rows.length + '.</p>' : "") + '</div>';
+  }
+  function exportName(ext) { return "roomright-payments-" + new Date().toISOString().slice(0, 10) + "." + ext; }
+  function exportXlsx() {
+    if (!window.XLSX) { toast("The spreadsheet tool did not load. Check your connection and try again."); return; }
+    var ws = XLSX.utils.aoa_to_sheet([PAY_COLS].concat(paymentRows().map(payRecord))), wb = XLSX.utils.book_new();
+    ws["!cols"] = PAY_COLS.map(function (c) { return { wch: Math.max(12, c.length + 2) }; });
+    XLSX.utils.book_append_sheet(wb, ws, "Payments"); XLSX.writeFile(wb, exportName("xlsx")); toast("Payment history downloaded as Excel.");
+  }
+  function exportPdf() {
+    var J = window.jspdf && window.jspdf.jsPDF; if (!J) { toast("The PDF tool did not load. Check your connection and try again."); return; }
+    var d = new J({ orientation: "landscape", unit: "mm", format: "a4" });
+    if (!d.autoTable) { toast("The PDF table tool did not load. Check your connection and try again."); return; }
+    d.setFont("helvetica", "bold"); d.setFontSize(14); d.text("RoomRight payment history", 14, 14);
+    d.setFont("helvetica", "normal"); d.setFontSize(9); d.text("Lancaster University Ghana hostels · downloaded " + dateStr(Date.now()) + " " + timeStr(Date.now()) + " · amounts in GHS", 14, 20);
+    d.autoTable({ startY: 25, head: [PAY_COLS], body: paymentRows().map(function (x) { var r = payRecord(x); r[7] = r[7].toLocaleString("en-GB", { minimumFractionDigits: 2 }); return r; }), styles: { fontSize: 7, cellPadding: 1.6 }, headStyles: { fillColor: [181, 18, 27] } });
+    d.save(exportName("pdf")); toast("Payment history downloaded as PDF.");
+  }
+
+  /* ---------- Administrator: admission records ---------- */
+  var COLS = { id: ["taglid", "studentid", "id", "idnumber", "admissionid", "admissionnumber", "tagl"], name: ["name", "fullname", "studentname", "fullnames"], dob: ["dob", "dateofbirth", "birthdate", "birthday"],
+    programme: ["programme", "program", "programmeofstudy", "course", "degree"], year: ["year", "yearofstudy", "currentyear", "currentyearofstudy", "level"], gender: ["gender", "sex"], email: ["email", "emailaddress"], phone: ["phone", "phonenumber", "contact", "mobile", "contactnumber"] };
+  function parseCSV(t) {
+    var rows = [], row = [], f = "", q = false;
+    for (var i = 0; i < t.length; i++) { var c = t[i];
+      if (q) { if (c === '"' && t[i + 1] === '"') { f += '"'; i++; } else if (c === '"') q = false; else f += c; }
+      else if (c === '"') q = true; else if (c === ",") { row.push(f); f = ""; } else if (c === "\n" || c === "\r") { if (c === "\r" && t[i + 1] === "\n") i++; row.push(f); rows.push(row); row = []; f = ""; } else f += c; }
+    if (f || row.length) { row.push(f); rows.push(row); }
+    return rows;
+  }
+  function normDate(v) {
+    if (v instanceof Date && !isNaN(v)) return v.getFullYear() + "-" + pad(v.getMonth() + 1) + "-" + pad(v.getDate());
+    if (typeof v === "number" && v > 1000) { var d = new Date(Math.round((v - 25569) * 864e5)); return d.getUTCFullYear() + "-" + pad(d.getUTCMonth() + 1) + "-" + pad(d.getUTCDate()); }
+    var s = String(v || "").trim(), m;
+    if ((m = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/))) return m[1] + "-" + pad(+m[2]) + "-" + pad(+m[3]);
+    if ((m = s.match(/^(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{4})$/))) return m[3] + "-" + pad(+m[2]) + "-" + pad(+m[1]);   // day first, as written in Ghana
+    return "";
+  }
+  function importRows(rows, file) {
+    var head = (rows[0] || []).map(function (h) { return String(h).toLowerCase().replace(/[^a-z]/g, ""); }), col = {};
+    for (var k in COLS) col[k] = head.findIndex(function (h) { return COLS[k].indexOf(h) > -1; });
+    if (col.id < 0 || col.name < 0 || col.dob < 0) { ui.admMsg = { bad: true, text: "The file needs columns for the ID (TAGL ID or student ID), the full name and the date of birth. Columns found: " + (rows[0] || []).join(", ") }; renderAdmin(); return; }
+    var added = 0, updated = 0, skipped = [], now = Date.now();
+    rows.slice(1).forEach(function (r, i) {
+      var get = function (k) { return col[k] > -1 ? String(r[col[k]] == null ? "" : r[col[k]]).trim() : ""; };
+      var id = get("id").toUpperCase(), name = get("name"), dob = normDate(col.dob > -1 ? r[col.dob] : "");
+      if (!id && !name) return;
+      if (!/^[A-Z0-9-]{4,20}$/.test(id) || name.length < 3 || !dob) { skipped.push("Row " + (i + 2) + ": " + (!id ? "no ID" : !/^[A-Z0-9-]{4,20}$/.test(id) ? "the ID looks wrong" : name.length < 3 ? "no full name" : "date of birth not understood")); return; }
+      var rec = { id: id, kind: /^\d+$/.test(id) ? "returning" : "new", name: name, dob: dob, programme: get("programme"), year: get("year"), gender: get("gender").toUpperCase().slice(0, 1), email: get("email").toLowerCase(), phone: get("phone"), src: file, ts: now };
+      if (state.admissions[id]) updated++; else added++;
+      state.admissions[id] = rec;
+    });
+    state.admImport = { file: file, ts: now, added: added, updated: updated, skipped: skipped.length };
+    ui.admMsg = { bad: false, text: added + " added, " + updated + " updated" + (skipped.length ? ", " + skipped.length + " skipped. " + skipped.slice(0, 4).join(". ") + (skipped.length > 4 ? "." : ".") : ".") };
+    logEvent("Admission records imported from " + file + ": " + added + " added, " + updated + " updated, " + skipped.length + " skipped", "info"); commit();
+  }
+  function importAdmissions(file) {
+    if (!file) return;
+    var ext = file.name.split(".").pop().toLowerCase();
+    if (ext === "csv") { file.text().then(function (t) { importRows(parseCSV(t), file.name); }); return; }
+    if (!window.XLSX) { toast("The spreadsheet tool did not load. Save the file as CSV, or check your connection."); return; }
+    file.arrayBuffer().then(function (b) { var wb = XLSX.read(b, { type: "array", cellDates: true }); importRows(XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], { header: 1, raw: true, defval: "" }), file.name); })
+      .catch(function () { ui.admMsg = { bad: true, text: "That file could not be read. Upload an Excel (.xlsx) or CSV file." }; renderAdmin(); });
+  }
+  function downloadTemplate() {
+    var csv = "ID,Full name,Date of birth,Programme,Year of study,Gender,Email,Phone\nTAGL2026001,Example New Student,2007-05-14,Example programme,Year 1,F,new.student@example.com,0241234567\n20241234,Example Returning Student,2005-11-02,Example programme,Year 2,M,returning.student@example.com,0207654321\n";
+    var a = document.createElement("a"); a.href = URL.createObjectURL(new Blob([csv], { type: "text/csv" })); a.download = "admission-records-template.csv"; document.body.appendChild(a); a.click(); a.remove();
+  }
+  function recheckProfiles() {
+    var n = 0;
+    for (var k in state.profiles) { var p = state.profiles[k]; if (p.admCheck === "ok") continue; var c = checkAdmission(p.tagl || p.sid, p.name, p.dob); p.admCheck = c.status; n++; }
+    logEvent("Student accounts re-checked against admission records (" + n + ")", "info"); commit(); toast(n + (n === 1 ? " account" : " accounts") + " re-checked.");
+  }
+  function recordsTab() {
+    var recs = Object.keys(state.admissions).map(function (k) { return state.admissions[k]; }), q = (ui.rq || "").toLowerCase(), im = state.admImport;
+    var shown = recs.filter(function (r) { return !q || (r.id + " " + r.name + " " + r.programme).toLowerCase().indexOf(q) > -1; }).slice(0, 50);
+    var accts = Object.keys(state.profiles).map(function (k) { return state.profiles[k]; });
+    var label = { ok: "Matches records", unchecked: "Not checked yet", missing: "Not in records", dob: "Date of birth differs", name: "Name differs" };
+    return '<div class="staff-grid"><div class="panel"><div><h3 class="panel-title">Upload admission records</h3><p class="panel-sub">Upload the Admission Department\'s spreadsheet as Excel or CSV. New records are added and existing ones updated. New sign-ups are checked against these records, including the date of birth.</p></div>' +
+      '<div class="field"><label for="adm-file">Spreadsheet file</label><input type="file" id="adm-file" accept=".xlsx,.xls,.csv"><span class="hint">Needs columns for the ID, the full name and the date of birth. Programme, year, gender, email and phone are optional.</span></div>' +
+      (ui.admMsg ? '<div class="result ' + (ui.admMsg.bad ? "bad" : "good") + '"><p style="color:inherit">' + esc(ui.admMsg.text) + '</p></div>' : "") +
+      '<p class="room-note" style="margin:0">' + (im ? "Last import: " + esc(im.file) + ", " + dateStr(im.ts) + " " + timeStr(im.ts) + "." : "No records uploaded yet. Until you upload them, new accounts are marked as not checked.") + ' <button class="linkbtn" data-action="tpl">Download a template</button></p>' +
+      '<p class="room-note" style="margin:0">The live link to the Admission Department\'s Excel file on OneDrive or SharePoint comes with the backend. It needs approval from the university IT team.</p></div>' +
+      '<div class="panel"><div class="panel-head"><div><h3 class="panel-title">Student accounts</h3><p class="panel-sub">How each account compares with the admission records.</p></div><button class="btn sm quiet" data-action="recheck">Re-check all</button></div><div class="up-list">' +
+      (accts.length ? accts.map(function (p) { return '<div class="up-opt"><span><b>' + esc(p.name) + '</b><small>' + esc(p.tagl ? "TAGL ID " + p.tagl : "ID " + p.sid) + ' · ' + esc(p.programme || "") + ' ' + esc(p.year || "") + '</small></span><span class="st ' + (p.admCheck === "ok" ? "in" : p.admCheck === "unchecked" ? "" : "reserved") + '">' + (label[p.admCheck] || "Not checked yet") + '</span></div>'; }).join("") : '<p class="panel-sub">No student accounts yet.</p>') + '</div></div></div>' +
+      '<div class="panel"><div class="panel-head"><div><h3 class="panel-title">Admission records (' + recs.length + ')</h3></div><input id="rq" type="search" placeholder="Search an ID, name or programme" value="' + esc(ui.rq || "") + '" aria-label="Search records" style="border:0;box-shadow:inset 0 0 0 1.5px var(--line);border-radius:999px;padding:9px 14px;background:var(--card)"></div>' +
+      '<div class="tablewrap"><table class="t"><thead><tr><th>ID</th><th>Name</th><th>Date of birth</th><th>Programme</th><th>Year</th><th>Type</th></tr></thead><tbody>' +
+      (shown.map(function (r) { return '<tr><td><b>' + esc(r.id) + '</b></td><td>' + esc(r.name) + '<small>' + esc(r.email) + '</small></td><td>' + esc(r.dob) + '</td><td>' + esc(r.programme) + '</td><td>' + esc(r.year) + '</td><td>' + (r.kind === "new" ? "New (TAGL)" : "Returning") + '</td></tr>'; }).join("") || '<tr><td colspan="6">No records yet.</td></tr>') + '</tbody></table></div></div>';
+  }
+
+  /* ---------- Administrator: rooms, photos, inventory, locations ---------- */
+  function addPhotos(tid, files) {
+    var list = media.photos[tid] = media.photos[tid] || [], room = 4 - list.length;
+    if (room <= 0) { toast("Each room type can have 4 photos. Remove one first."); return; }
+    Array.prototype.slice.call(files, 0, room).forEach(function (f) {
+      if (!/^image\//.test(f.type)) return;
+      var img = new Image(), url = URL.createObjectURL(f);
+      img.onload = function () {
+        var k = Math.min(1, 1000 / Math.max(img.width, img.height)), c = document.createElement("canvas");
+        c.width = Math.round(img.width * k); c.height = Math.round(img.height * k); c.getContext("2d").drawImage(img, 0, 0, c.width, c.height); URL.revokeObjectURL(url);
+        list.push(c.toDataURL("image/jpeg", 0.72));
+        if (!saveMedia()) { list.pop(); toast("This browser has no room for more photos. The backend stores photos without this limit."); }
+        renderAdmin(); renderHome();
+      };
+      img.src = url;
+    });
+  }
+  function roomsTab() {
+    var P = state.places;
+    var types = TYPES.map(function (t) {
+      var ph = media.photos[t.id] || [];
+      return '<div class="panel"><div><h3 class="panel-title">' + t.name + '</h3><p class="panel-sub">' + money(t.price) + ' per bed · ' + HOSTELS.reduce(function (n, h) { return n + h.rooms.filter(function (r) { return r.type === t.id; }).reduce(function (m, r) { return m + r.keys.length; }, 0); }, 0) + ' beds</p></div>' +
+        '<div class="field"><span class="legend-t">Photos (' + ph.length + ' of 4)</span><div class="thumbs">' + ph.map(function (src, i) { return '<figure><img src="' + src + '" alt="' + t.name + ' photo ' + (i + 1) + '"><button type="button" data-action="photo-del" data-tid="' + t.id + '" data-i="' + i + '" aria-label="Remove photo ' + (i + 1) + '">×</button></figure>'; }).join("") + '</div>' +
+        (ph.length < 4 ? '<input type="file" accept="image/*" multiple data-photos="' + t.id + '" aria-label="Add photos of ' + t.name + '">' : "") + '</div>' +
+        '<form class="f-inv field" data-tid="' + t.id + '" novalidate><label for="inv-' + t.id + '">What is in the room</label><textarea id="inv-' + t.id + '" rows="5">' + esc((state.inventory[t.id] || []).map(function (x) { return x[0] + ", " + x[1]; }).join("\n")) + '</textarea><span class="hint">One item per line: item, quantity. For example: Wardrobe, 2</span><span class="err" id="inv-' + t.id + '-err"></span><button class="btn sm quiet" type="submit" style="justify-self:start">Save list</button></form></div>';
+    }).join("");
+    var hostels = HOSTELS.map(function (h) { var c = P[h.id];
+      return '<div class="grid2">' + field("pl-" + h.id, h.name + " location", "text", c.lat ? c.lat + ", " + c.lng : "", "Paste a Google Maps link or coordinates, like 5.6852, -0.1690", 'spellcheck="false"') + field("pd-" + h.id, h.name + " description", "text", c.desc, "") + '</div>'; }).join("");
+    var blds = P.buildings.map(function (b, i) { return '<div class="up-opt"><span><b>' + esc(b.name) + '</b><small class="num">' + b.lat + ', ' + b.lng + '</small></span><button class="btn sm quiet" data-action="bld-del" data-i="' + i + '">Remove</button></div>'; }).join("");
+    return '<div class="panel" style="margin-bottom:22px"><div><h3 class="panel-title">Hostel locations</h3><p class="panel-sub">Set where each hostel is, and the buildings where lectures happen. Students see the map and the walking distance from each hostel.</p></div>' +
+      '<form id="f-places" novalidate style="display:grid;gap:12px">' + hostels + '<button class="btn sm" type="submit" style="justify-self:start">Save locations</button></form>' +
+      '<div class="fsect"><b>Lecture buildings</b><div class="up-list">' + (blds || '<p class="panel-sub">No buildings added yet.</p>') + '</div>' +
+      '<form id="f-bld" novalidate class="grid2">' + field("bd-name", "Building name", "text", "", "", "") + field("bd-loc", "Location", "text", "", "Google Maps link or coordinates", 'spellcheck="false"') + '<button class="btn sm quiet" type="submit" style="justify-self:start">Add building</button></form></div></div>' +
+      '<div class="types-admin" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,420px),1fr));gap:22px">' + types + '</div>';
+  }
+  function savePlaces() {
+    var ok = true;
+    HOSTELS.forEach(function (h) { var v = $("pl-" + h.id).value.trim(), c = v ? parseCoords(v) : { lat: "", lng: "" };
+      if (!c) { ok = setErr("pl-" + h.id, "Paste a Google Maps link that shows coordinates, or type them like 5.6852, -0.1690.") && ok; return; }
+      state.places[h.id].lat = c.lat; state.places[h.id].lng = c.lng; state.places[h.id].desc = $("pd-" + h.id).value.trim() || "On the Lancaster University Ghana campus"; });
+    if (!ok) return;
+    logEvent("Hostel locations updated", "info"); commit(); toast("Locations saved.");
+  }
+  function addBuilding() {
+    var name = $("bd-name").value.trim(), c = parseCoords($("bd-loc").value);
+    var ok = setErr("bd-name", name.length < 2 ? "Enter the building name." : "");
+    ok = setErr("bd-loc", c ? "" : "Paste a Google Maps link that shows coordinates, or type them like 5.6852, -0.1690.") && ok;
+    if (!ok) return;
+    state.places.buildings.push({ name: name, lat: c.lat, lng: c.lng }); logEvent("Lecture building added: " + name, "info"); commit();
+  }
+  function saveInventory(tid, form) {
+    var lines = form.querySelector("textarea").value.split("\n").map(function (l) { return l.trim(); }).filter(Boolean), list = [], bad = 0;
+    lines.forEach(function (l) { var m = l.match(/^(.+?)[,:]\s*(\d{1,2})$/); if (m) list.push([m[1].trim(), +m[2]]); else bad++; });
+    if (!setErr("inv-" + tid, bad ? bad + (bad === 1 ? " line needs" : " lines need") + " an item and a number, like: Wardrobe, 2" : !list.length ? "Add at least one item." : "")) return;
+    state.inventory[tid] = list; logEvent("Inventory updated for " + TYPE[tid].name, "info"); commit(); toast("List saved for " + TYPE[tid].name + ".");
+  }
+
   /* ---------- Sample activity from other students ---------- */
   function simulate() {
     if (totalFree() > 14 && $("overlay").hidden) {
@@ -2011,7 +2385,7 @@ table.t td small { display: block; color: var(--muted); }
 
   /* ---------- Rendering and routing ---------- */
   function renderAll() { renderNav(); renderHome(); if (ui.view === "signin") renderSignin(); if (ui.view === "staff") renderStaff(); renderMe(); renderManager(); renderAdmin(); }
-  function commit() { index(); save(); renderAll(); }
+  function commit() { index(); notifyWaitlist(); save(); renderAll(); }
   function go(view) {
     var s = state.session, need = { me: "student", manager: "manager", admin: "admin" }[view];
     if (need && (!s || s.role !== need)) { if (need !== "student") ui.role = need; view = need === "student" ? "signin" : "staff"; }
@@ -2019,6 +2393,7 @@ table.t td small { display: block; color: var(--muted); }
     if (view === "staff") ui.smode = null;
     if (view === "home" && s && s.role !== "student") view = s.role;
     ui.view = view; commit(); window.scrollTo(0, 0);
+    if (view === "me") markNotesRead();
   }
   function copyText(text) {
     var done = function () { toast("Invoice copied."); };
@@ -2061,6 +2436,17 @@ table.t td small { display: block; color: var(--muted); }
       case "ci-fill": var nx = state.apps.filter(function (a) { return a.status === "paid" && roomOf(a.bed).hostel.id === state.session.hostel; })[0]; if (nx) { $("ci-token").value = nx.token; checkToken(); } else toast("Nobody is waiting to check in."); break;
       case "auth": ui.sauth = d.tab; ui.verify = null; renderSignin(); var f0 = $("signin-panel").querySelector("input"); if (f0) f0.focus(); break;
       case "report-new": openReportForm(); break;
+      case "typeinfo": openTypeInfo(d.tid); break;
+      case "policy-sheet": openPolicySheet(); break;
+      case "back-pay": var bk = ui.sheet && ui.sheet.back; if (bk && bk.kind === "pay") openPay(byId(bk.id), bk.pay); else closeSheet(); break;
+      case "atab": ui.atab = d.t; renderAdmin(); window.scrollTo(0, 0); break;
+      case "export-xlsx": exportXlsx(); break;
+      case "export-pdf": exportPdf(); break;
+      case "admin-inv": var ia = byId(d.id), ii = ia && ia.invoices.filter(function (x) { return x.no === d.inv; })[0]; if (ii) showSheet(head("Invoice " + ii.no, esc(ia.name) + " · paid " + dateStr(ii.ts)) + '<div class="sheet-body">' + invoiceHTML(ia, ii) + '</div>'); break;
+      case "tpl": downloadTemplate(); break;
+      case "recheck": recheckProfiles(); break;
+      case "photo-del": (media.photos[d.tid] || []).splice(+d.i, 1); saveMedia(); renderAdmin(); break;
+      case "bld-del": state.places.buildings.splice(+d.i, 1); commit(); break;
       case "resend": var pv = state.profiles[ui.verify]; if (pv) { sendVerify(pv); save(); renderSignin(); toast("New code sent to " + pv.email + "."); } break;
       case "verify-link": verifyAccount(d.uid, d.c); break;
       case "smode": ui.smode = d.m || null; ui.resetSent = null; renderStaff(); break;
@@ -2091,6 +2477,9 @@ table.t td small { display: block; color: var(--muted); }
     else if (id === "f-pay") submitPay();
     else if (id === "f-checkin") checkToken();
     else if (id === "f-signup") signupStudent();
+    else if (id === "f-places") savePlaces();
+    else if (id === "f-bld") addBuilding();
+    else if (e.target.classList.contains("f-inv")) saveInventory(e.target.getAttribute("data-tid"), e.target);
     else if (id === "f-verify") verifyAccount(ui.verify, $("v-code").value.trim());
     else if (id === "f-mreq") requestCode();
     else if (id === "f-aforgot") adminForgot();
@@ -2109,11 +2498,14 @@ table.t td small { display: block; color: var(--muted); }
   document.addEventListener("input", function (e) {
     var t = e.target, pos;
     if (t.id === "mq") { ui.mq = t.value; pos = t.selectionStart; renderManager(); $("mq").focus(); $("mq").setSelectionRange(pos, pos); }
+    else if (t.id === "pq" || t.id === "rq") { ui[t.id] = t.value; pos = t.selectionStart; renderAdmin(); $(t.id).focus(); $(t.id).setSelectionRange(pos, pos); }
     else if (t.id === "aq") { ui.aq = t.value; pos = t.selectionStart; renderAdmin(); $("aq").focus(); $("aq").setSelectionRange(pos, pos); }
     else if (t.getAttribute("aria-invalid")) setErr(t.id, "");
   });
   document.addEventListener("change", function (e) {
     var t = e.target; if (t.tagName === "SELECT" && t.getAttribute("aria-invalid")) setErr(t.id, "");
+    if (t.id === "adm-file") importAdmissions(t.files[0]);
+    if (t.getAttribute("data-photos")) addPhotos(t.getAttribute("data-photos"), t.files);
   });
   document.addEventListener("keydown", function (e) {
     if (e.key === "Escape" && !$("overlay").hidden && !paying) { closeSheet(); return; }
@@ -2136,6 +2528,7 @@ table.t td small { display: block; color: var(--muted); }
     if (sh && sh.kind === "choose") { var ca = byId(sh.id); if (ca && !canTake(sh.sel, ca.gender, ca)) toast("Someone just booked the bed you picked. Choose another one."); openChooser(ca, sh.tid, sh.sel); }
     var after = totalFree(); if (after < before && !(sh && sh.kind === "choose")) toast("A bed was just booked. " + after + " beds are free now.");
   });
+  $("policy-body").innerHTML = POLICY_HTML;
   window.addEventListener("hashchange", function () { if (location.hash === "#staff" && !state.session) go("staff"); });
   buildModel(); commit();
   setInterval(tick, 1000);
