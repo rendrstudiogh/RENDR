@@ -26,7 +26,9 @@ suite of functional, security and two-session race tests run clean on PostgreSQL
 
 ## Set up (about 30 minutes)
 
-1. **Create the project.** In Supabase, create a project in the region closest to Ghana (Europe West is usually closest). Install the Supabase CLI, then from this repository run:
+1. **Create the project.** In Supabase, create a project in the region closest to Ghana (Europe West is usually closest).
+   **Easiest way:** open SQL Editor, New query, paste the whole of `supabase/setup.sql`, press Run. It builds everything in one transaction, so a failure changes nothing.
+   Or, with the Supabase CLI, from this repository run:
    ```
    supabase link --project-ref <your-project-ref>
    supabase db push
