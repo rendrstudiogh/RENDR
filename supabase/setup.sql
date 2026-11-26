@@ -730,6 +730,17 @@ do $$ declare t text; begin
   end loop;
 end $$;
 
+-- Explicit access, so this works when the project does NOT grant API access to new tables
+-- automatically (the safer setting). Users only ever get SELECT; RLS below decides which rows.
+grant usage on schema public to anon, authenticated, service_role;
+grant select on public.settings, public.hostels, public.lecture_buildings, public.room_types, public.rooms, public.beds,
+  public.room_photos, public.bed_state to anon, authenticated;
+grant select on public.admissions, public.profiles, public.applications, public.payments, public.invoices, public.upgrades,
+  public.reports, public.report_messages, public.notifications, public.access_requests, public.audit_log to authenticated;
+-- The edge functions use the service role
+grant all on all tables in schema public to service_role;
+grant usage, select on all sequences in schema public to service_role;
+
 -- The holds view bypasses RLS, so only the functions may read it
 revoke all on public.live_holds from anon, authenticated;
 
@@ -786,7 +797,8 @@ grant execute on function
   to authenticated;
 -- Helpers that RLS policies call must stay executable by the roles the policies run as
 grant execute on function public.is_admin(), public.my_hostel(), public.can_see_app(text) to anon, authenticated;
--- start_payment, set_access_code, confirm_payment, release_expired, notify_waitlist: service role only (Supabase grants it everything)
+-- start_payment, set_access_code, confirm_payment, release_expired, notify_waitlist: service role only
+grant execute on all functions in schema public to service_role;
 
 alter default privileges in schema public revoke execute on functions from public, anon, authenticated;
 
