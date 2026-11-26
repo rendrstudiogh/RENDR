@@ -1,9 +1,10 @@
 // Starts a Paystack payment for the signed-in student's reserved bed (or approved upgrade).
 // The amount comes from the database, never from the browser.
-import { admin, caller, cors, json, PAYSTACK, paystackKey, readable } from "../_shared/http.ts";
+import { admin, caller, cors, json, notConfigured, PAYSTACK, paystackKey, readable } from "../_shared/http.ts";
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  const off = notConfigured(); if (off) return off;
   const who = await caller(req);
   if (!who) return json({ error: "Sign in again to pay." }, 401);
   const { purpose = "booking" } = await req.json().catch(() => ({}));

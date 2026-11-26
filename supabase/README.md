@@ -23,12 +23,26 @@ suite of functional, security and two-session race tests run clean on PostgreSQL
 | Apply, choose a bed, reserve | Yes | `submit_application` and `reserve_bed`. The database refuses a bed someone else just took, or a room of the other gender |
 | Release a bed, waiting list, add student ID | Yes | `release_my_reservation`, `join_waitlist`, `leave_waitlist`, `add_student_id` |
 | Notifications | Yes | Read from `notifications`, marked read with `mark_notifications_read` |
-| Payment, invoices, booking token | No | Stage 2 (Paystack). A reserved bed shows its deadline and nothing pretends to take money |
+| Payment, invoices, booking token | Yes (stage 2) | Paystack checkout through `paystack-init` and `paystack-webhook` (both deployed). Needs the Paystack secret key stored in Supabase, see below. Test mode invoices say so |
 | Problem reports, upgrades | No | Show "not connected yet" |
 | Manager and administrator pages | No | The staff page links to the demo |
 
 **Demo mode.** Add `?demo=1` to the address for the demo with sample students. If the live system cannot be reached,
 the site opens the demo by itself with a red banner saying nothing there is a real booking.
+
+### Switching payment on (stage 2)
+
+In the Supabase dashboard, **Edge Functions, Secrets**, add:
+
+| Name | Value |
+| --- | --- |
+| `PAYSTACK_SECRET_KEY` | Your Paystack **test** secret key (`sk_test_...`). Never put it in the website or this repository |
+| `SITE_URL` | The address of the `roomright/` page on GitHub Pages |
+| `SITE_ORIGIN` | The same address with nothing after the domain, for example `https://rendrstudiogh.github.io` |
+
+Then in Paystack, **Settings, API Keys and Webhooks**, set the test webhook URL to
+`https://ewvvpliiescxoesijyap.supabase.co/functions/v1/paystack-webhook`. Until the secret is stored, both functions
+answer "Online payment is not set up yet".
 
 ### Before real students use it
 

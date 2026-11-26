@@ -3,7 +3,7 @@
 //  2. The site, right after the popup closes, posting {reference} so the student is not kept waiting
 // Either way the transaction is re-checked with Paystack's verify API before anything is recorded,
 // and confirm_payment is idempotent, so duplicates are harmless.
-import { admin, cors, json, PAYSTACK, paystackKey } from "../_shared/http.ts";
+import { admin, cors, json, notConfigured, PAYSTACK, paystackKey } from "../_shared/http.ts";
 
 const enc = new TextEncoder();
 const hex = (b: ArrayBuffer) => [...new Uint8Array(b)].map((x) => x.toString(16).padStart(2, "0")).join("");
@@ -27,6 +27,7 @@ async function settle(reference: string) {
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
+  const off = notConfigured(); if (off) return off;
   const raw = await req.text();
   const sig = req.headers.get("x-paystack-signature");
 

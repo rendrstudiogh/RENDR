@@ -1880,7 +1880,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       '<div class="ticket-bed" style="margin-top:8px">' + bedName(app.bed, true) + '</div><div class="room-note">' + TYPE[app.type].name + ' · ' + esc(app.name) + ' · ' + app.id + '</div></div></div>';
   }
   function invoiceHTML(app, inv) {
-    return '<div class="invoice"><div class="invoice-top"><div><div class="code-lbl">Payment invoice</div><b>' + inv.no + '</b></div><span class="status">Paid</span></div><dl class="rows">' +
+    return '<div class="invoice"><div class="invoice-top"><div><div class="code-lbl">Payment invoice</div><b>' + inv.no + '</b></div><span class="status">' + (inv.test ? "Paid · Paystack test mode" : "Paid") + '</span></div><dl class="rows">' +
       '<div><dt>Student</dt><dd>' + esc(app.name) + ' · ' + esc(idText(app)) + '</dd></div><div><dt>Application number</dt><dd>' + app.id + '</dd></div><div><dt>Room</dt><dd>' + bedName(app.bed, true) + '</dd></div><div><dt>Room type</dt><dd>' + TYPE[app.type].name + '</dd></div>' +
       '<div><dt>' + esc(inv.label) + '</dt><dd>' + money(inv.amount) + '</dd></div><div class="total"><dt>Amount paid</dt><dd>' + money(inv.total) + '</dd></div>' +
       '<div><dt>Payment date</dt><dd>' + dateStr(inv.ts) + ', ' + timeStr(inv.ts) + '</dd></div><div><dt>Paid with</dt><dd>' + esc(inv.method) + '</dd></div><div><dt>Transaction reference</dt><dd>' + inv.ref + '</dd></div></dl>' +
@@ -1912,7 +1912,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       d.setFont("helvetica", "bold"); d.setFontSize(16); d.setTextColor(163, 16, 26); d.text(app.token, L + 42, y + 18);
       d.setFont("helvetica", "normal"); d.setFontSize(9); d.setTextColor(98, 98, 107); d.text("Show this token or QR code at the hostel when you check in.", L + 42, y + 25);
     }
-    d.setFontSize(8); d.setTextColor(140, 140, 149); d.text("Demo invoice from RoomRight. No real payment was taken. Not an official Lancaster University Ghana document.", L, 285);
+    d.setFontSize(8); d.setTextColor(140, 140, 149); d.text(!LIVE.on ? "Demo invoice from RoomRight. No real payment was taken. Not an official Lancaster University Ghana document." : inv.test ? "Paystack test mode: no real money was taken. Prototype invoice, not an official Lancaster University Ghana document." : "Invoice from RoomRight. Not an official Lancaster University Ghana document.", L, 285);
     d.save(inv.no + ".pdf"); toast("Invoice " + inv.no + " downloaded as a PDF.");
   }
 
@@ -2579,7 +2579,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   /* ---------- Live backend (Supabase) ---------- */
   // Every write goes through a database function that re-checks the rules (see supabase/migrations).
   // The browser never decides who gets a bed: it asks, and shows what the database answered.
-  var LIVE_LATER = { "report-new": 1, "report": 1, "up-request": 1, "up-cancel": 1, "up-pay": 1, "invoice": 1, "pdf": 1, "reset": 1, "verify-link": 1 };
+  var LIVE_LATER = { "report-new": 1, "report": 1, "up-request": 1, "up-cancel": 1, "up-pay": 1, "reset": 1, "verify-link": 1 };
   var NET_MSG = "We could not reach RoomRight. Check your connection and try again.";
   // Database rules fail with "RR_CODE: message". Turn any error into { code, msg } for the screen.
   function liveErr(e) {
@@ -2643,11 +2643,21 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       var u = d && d.session && d.session.user; if (!u) { liveClearMe(); return null; }
       return Promise.all([q(sb.from("profiles").select("id,role,kind,full_name,gender,email,phone,tagl_id,student_id,dob,programme,year_of_study,adm_check").eq("id", u.id).maybeSingle()),
         q(sb.from("applications").select("*").eq("student", u.id).eq("academic_year", LIVE.year).neq("status", "cancelled").order("created_at", { ascending: false }).limit(1)),
-        q(sb.from("notifications").select("id,title,body,read_at,created_at").eq("user_id", u.id).order("created_at", { ascending: false }).limit(20))
+        q(sb.from("notifications").select("id,title,body,read_at,created_at").eq("user_id", u.id).order("created_at", { ascending: false }).limit(20)),
+        q(sb.from("invoices").select("no,application_id,payment_id,label,amount_ghs,created_at").order("created_at")),
+        q(sb.from("payments").select("id,application_id,reference,status,channel,paid_at,raw,created_at").order("created_at", { ascending: false }))
       ]).then(function (r) {
         if (!r[0] || r[0].role !== "student") { liveClearMe(); return r[0] ? liveProfile(r[0]) : null; }
         var p = liveProfile(r[0]); state.profiles = {}; state.profiles[p.uid] = p; state.session = { role: "student", uid: p.uid };
         state.apps = r[1].map(function (a) { return liveApp(a, p); });
+        var pays = {}; r[4].forEach(function (x) { pays[x.id] = x; });
+        state.apps.forEach(function (a) {
+          a.invoices = r[3].filter(function (i) { return i.application_id === a.id; }).map(function (i) { var pm = pays[i.payment_id] || {};
+            return { no: i.no, label: i.label, amount: +i.amount_ghs, total: +i.amount_ghs, ts: Date.parse(pm.paid_at || i.created_at), ref: pm.reference || "", method: payMethod(pm), test: !!(pm.raw && pm.raw.domain === "test") }; });
+          var pend = r[4].filter(function (x) { return x.application_id === a.id && x.status === "pending" && Date.now() - Date.parse(x.created_at) < 2 * 864e5; })[0];
+          a.pendingRef = pend ? pend.reference : null;
+          a.refund = r[4].some(function (x) { return x.application_id === a.id && x.status === "needs_refund"; });
+        });
         state.notes = r[2].map(function (n) { return { id: n.id, ts: Date.parse(n.created_at), read: !!n.read_at, title: n.title, text: n.body }; });
         return p;
       });
@@ -2712,7 +2722,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     return liveLoadMe().then(function (p) {
       if (!p) { LIVE.sb.auth.signOut(); toast("This account has no student profile. Contact Hostel Management."); return; }
       if (p.role !== "student") { LIVE.sb.auth.signOut(); liveClearMe(); go("staff"); toast("Staff accounts use the staff pages."); return; }
-      index(); startStudent(p, isNew);
+      index(); startStudent(p, isNew); liveSettlePending();
     });
   }
   function liveResend() {
@@ -2757,15 +2767,100 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
         });
       });
   }
-  // Payment is the next stage. Until then a reserved bed shows how long it is held, and nothing pretends to take money.
+  // How the student paid, from Paystack's own record of the payment
+  function payMethod(pm) {
+    var a = (pm && pm.raw && pm.raw.authorization) || {};
+    if (!pm || !pm.channel) return "Paystack";
+    if (pm.channel === "card") return (a.brand ? a.brand.charAt(0).toUpperCase() + a.brand.slice(1) : "Card") + (a.last4 ? " •••• " + a.last4 : "");
+    if (pm.channel === "mobile_money") return (a.bank || "Mobile money") + (a.last4 ? " ••• " + a.last4 : "");
+    return pm.channel.replace(/_/g, " ");
+  }
+  // Calls an edge function. Its error body is { error: "readable message" }.
+  function liveFn(name, body) {
+    return timeout(LIVE.sb.functions.invoke(name, { body: body }), 30000).then(function (r) {
+      if (!r.error) return r.data;
+      var ctx = r.error.context;
+      return (ctx && ctx.json ? ctx.json().catch(function () { return {}; }) : Promise.resolve({})).then(function (b) {
+        throw { code: "", msg: (b && b.error) || (ctx && ctx.status ? "Payment service error (" + ctx.status + "). Try again in a minute." : NET_MSG) };
+      });
+    }, function () { throw { code: "", msg: NET_MSG }; });
+  }
+  // Paystack's checkout script, loaded only when someone pays
+  function loadPaystack() {
+    if (window.PaystackPop) return Promise.resolve();
+    return timeout(new Promise(function (ok, no) {
+      var sc = document.createElement("script"); sc.src = "https://js.paystack.co/v2/inline.js"; sc.async = true;
+      sc.onload = function () { window.PaystackPop ? ok() : no(); }; sc.onerror = no; document.head.appendChild(sc);
+    }), 15000).catch(function () { throw { code: "", msg: "Paystack's checkout could not load. Check your connection and try again." }; });
+  }
   function liveHeld(app, kind) {
     if (kind !== "booking" || !app || app.status !== "reserved") { closeSheet(); go("me"); return; }
-    var t = TYPE[app.type]; ui.sheet = { kind: "held", id: app.id };
-    showSheet(head("Your bed is reserved", app.id + " · " + t.name) + stepper(3) +
-      '<div class="sheet-body"><div class="holdbox"><div><small>Reserved for you</small><div class="bedname">' + bedName(app.bed, true) + '</div></div><div style="text-align:right"><small>Time left to pay</small><div class="timer num" data-exp="' + app.exp + '">' + hms(app.exp - Date.now()) + '</div></div></div>' +
-      '<dl class="rows"><div><dt>Hostel fee, ' + t.name + ', 9 months</dt><dd>' + money(t.price) + '</dd></div><div><dt>Held until</dt><dd>' + dateStr(app.exp) + ', ' + timeStr(app.exp) + '</dd></div></dl>' +
-      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Online payment with Paystack opens soon. Nobody else can take this bed while it is reserved for you. We will tell you under My application and by email when you can pay.</span></p>' +
-      '<div class="actions"><button class="btn block dark" data-action="close">Go to my application</button></div></div>', ".btn.dark");
+    var t = TYPE[app.type]; ui.sheet = { kind: "pay", id: app.id, pay: "booking" };
+    showSheet(head("Pay for your bed", app.id + " · " + t.name) + stepper(3) +
+      '<form class="sheet-body" id="f-pay" novalidate><div class="holdbox"><div><small>Reserved for you</small><div class="bedname">' + bedName(app.bed, true) + '</div></div><div style="text-align:right"><small>Time left to pay</small><div class="timer num" data-exp="' + app.exp + '">' + hms(app.exp - Date.now()) + '</div></div></div>' +
+      '<dl class="rows"><div><dt>Hostel fee, ' + t.name + ', 9 months</dt><dd>' + money(t.price) + '</dd></div><div class="total"><dt>Total to pay</dt><dd>' + money(t.price) + '</dd></div></dl>' +
+      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.4 8.3-8 9-4.6-.7-8-4.5-8-9V6l8-3z"/><path d="M8.5 12l2.5 2.5 4.5-5"/></svg><span>You pay on Paystack\'s secure checkout, with mobile money (MTN, Telecel, AT) or a bank card. No service fee. The amount is set by the university, not by this page.</span></p>' +
+      (app.termsAt ? "" : '<div class="field"><label class="check" for="p-terms"><input type="checkbox" id="p-terms"> <span>I have read and accept the <button type="button" class="linkbtn" data-action="policy-sheet">hostel policy, terms and conditions</button></span></label><span class="err" id="p-terms-err"></span></div>') +
+      '<div class="actions"><button class="btn block" type="submit">Pay ' + money(t.price) + ' with Paystack</button>' +
+      (app.pendingRef ? '<button class="linkbtn" type="button" data-action="pay-check" data-ref="' + esc(app.pendingRef) + '" style="justify-self:center">I already paid. Check my payment</button>' : "") + '</div></form>', '[type="submit"]');
+  }
+  function livePay() {
+    var app = myApp(), terms = $("p-terms"), btn = $("f-pay") && $("f-pay").querySelector('[type="submit"]');
+    if (!app || app.status !== "reserved") { closeSheet(); go("me"); return; }
+    if (terms && !setErr("p-terms", terms.checked ? "" : "Accept the hostel policy and terms to complete your booking.")) { terms.focus(); return; }
+    if (LIVE.busy) return;
+    LIVE.busy = true; if (btn) { btn.disabled = true; btn.textContent = "Starting your payment…"; }
+    var fail = function (e) { LIVE.busy = false; paying = false; if (btn && document.body.contains(btn)) { btn.disabled = false; btn.textContent = "Pay " + money(TYPE[app.type].price) + " with Paystack"; } toast(e && e.msg || NET_MSG); };
+    (app.termsAt ? Promise.resolve() : liveCall("accept_terms", {})).then(function () { app.termsAt = Date.now(); return loadPaystack(); })
+      .then(function () { return liveFn("paystack-init", { purpose: "booking" }); })
+      .then(function (init) {
+        LIVE.busy = false; paying = true; app.pendingRef = init.reference;
+        payWait(init.reference);
+        try {
+          new window.PaystackPop().resumeTransaction(init.access_code, {
+            onSuccess: function () { liveConfirm(init.reference, 0); },
+            onCancel: function () { paying = false; payWait(init.reference, true); },
+            onError: function (e) { paying = false; toast("Paystack: " + ((e && e.message) || "the checkout stopped. Try again.")); payWait(init.reference, true); }
+          });
+        } catch (e) { paying = false; toast("Paystack's checkout could not open. Try again."); payWait(init.reference, true); }
+      })
+      .catch(fail);
+  }
+  // Shown under the Paystack window, and after it closes, so a mobile money approval that arrives late is never lost
+  function payWait(ref, closed) {
+    var app = myApp(); ui.sheet = { kind: "paywait", ref: ref };
+    showSheet(head(closed ? "Did you finish paying?" : "Complete your payment", app ? app.id + " · " + bedName(app.bed, true) : "") +
+      '<div class="sheet-body">' + (closed ? '<p style="margin:0">If you approved the payment on your phone or card, check it now. If you cancelled, your bed stays reserved until <b>' + (app ? dateStr(app.exp) + ", " + timeStr(app.exp) : "your deadline") + '</b>.</p>'
+        : '<div class="processing" style="padding:8px 0"><div class="spinner" aria-hidden="true"></div><p>Finish in the Paystack window. For mobile money, approve the prompt on your phone.</p></div>') +
+      '<div class="actions"><button class="btn block" data-action="pay-check" data-ref="' + esc(ref) + '">I have paid. Check my payment</button>' +
+      (closed ? '<button class="btn block quiet" data-action="pay-again">Try paying again</button>' : "") + '</div></div>', ".btn");
+  }
+  // Asks the server to verify the payment with Paystack. Mobile money can take a little while, so it asks a few times.
+  function liveConfirm(ref, tries) {
+    paying = true; ui.sheet = { kind: "paywait", ref: ref };
+    $("sheet").innerHTML = '<div class="processing"><div class="spinner" aria-hidden="true"></div><h3 id="sheet-title">Confirming your payment with Paystack</h3><p>This takes a few seconds. Please keep this page open.</p></div>';
+    liveFn("paystack-webhook", { reference: ref }).then(function (out) {
+      if (out.state === "paid") return liveReload().then(function () {
+        paying = false; var app = myApp(), inv = app && app.invoices[app.invoices.length - 1];
+        go("me");
+        showSheet(head("Your bed is ready", "Your invoice and booking token are saved under My application.") + stepper(4) +
+          '<div class="sheet-body">' + (app && app.token ? tokenHTML(app) : "") + (inv ? invoiceHTML(app, inv) : "") + '<div class="actions"><button class="btn block dark" data-action="close">Go to my application</button></div></div>', ".btn.dark");
+      });
+      if (out.state === "needs_refund") return liveReload().then(function () { paying = false;
+        showSheet(head("We received your payment", "Your bed could not be kept") + '<div class="sheet-body"><div class="result bad"><h3>The housing office will contact you</h3><p>Your reservation had ended and someone else took the bed before the payment arrived, or the amount did not match. You will be given another bed or a full refund. Quote reference <b>' + esc(ref) + '</b>.</p></div><div class="actions"><button class="btn block dark" data-action="close">Go to my application</button></div></div>', ".btn.dark"); });
+      if (out.state === "not_paid" && tries < 5) { setTimeout(function () { liveConfirm(ref, tries + 1); }, 4000); return; }
+      paying = false; payWait(ref, true);
+      toast(out.state === "not_paid" ? "Paystack has not confirmed this payment yet. If you approved it, check again in a minute." : "We could not confirm the payment yet. Check again in a minute.");
+    }, function (e) { paying = false; payWait(ref, true); toast(e.msg); });
+  }
+  // A payment that was started and maybe finished in an earlier visit (for example the tab was closed): check it once
+  var checkedRefs = {};
+  function liveSettlePending() {
+    var app = myApp(); if (!app || app.status !== "reserved" || !app.pendingRef || checkedRefs[app.pendingRef]) return;
+    checkedRefs[app.pendingRef] = 1;
+    liveFn("paystack-webhook", { reference: app.pendingRef }).then(function (out) {
+      if (out.state === "paid" || out.state === "needs_refund") liveReload().then(function () { toast(out.state === "paid" ? "Your earlier payment went through. Your bed is booked." : "We received a payment but could not keep your bed. The housing office will contact you."); });
+    }, function () {});
   }
   // Release, join or leave the waiting list
   function liveAction(fn, args, okMsg, close) {
@@ -2851,6 +2946,8 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     switch (d.action) {
       case "close": closeSheet(); break;
       case "golive": location.href = location.pathname; break;
+      case "pay-check": liveConfirm(d.ref, 3); break;
+      case "pay-again": paying = false; openPay(myApp(), "booking"); break;
       case "signout": if (LIVE.on) { liveSignout(); break; }
         var wasStaff = state.session && state.session.role !== "student"; state.session = null; if (!$("overlay").hidden) closeSheet(); go(wasStaff ? "staff" : "home"); toast("Signed out."); break;
       case "reset": state = freshState(); if (!$("overlay").hidden) closeSheet(); ui.view = "home"; index(); buildModel(); commit(); toast("Demo data reset."); break;
@@ -2918,7 +3015,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     else if (id === "f-manager") signinStaff("manager");
     else if (id === "f-admin") signinStaff("admin");
     else if (id === "f-apply") submitApply();
-    else if (id === "f-pay") submitPay();
+    else if (id === "f-pay") { if (LIVE.on) livePay(); else submitPay(); }
     else if (id === "f-checkin") checkToken();
     else if (id === "f-signup") signupStudent();
     else if (id === "f-places") savePlaces();
@@ -2931,7 +3028,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     else if (id === "f-code") saveCode();
     else if (id === "f-amove") adminMove();
     else if (id === "f-addsid") addSid();
-    else if (LIVE.on && (id === "f-report" || id === "f-reply" || id === "f-pay")) toast("This is not connected to the live system yet.");
+    else if (LIVE.on && (id === "f-report" || id === "f-reply")) toast("This is not connected to the live system yet.");
     else if (id === "f-report") submitReport();
     else if (id === "f-reply") submitReply();
   });
@@ -2988,7 +3085,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
         ui.view = state.session ? (fromLink ? "me" : "home") : location.hash === "#staff" ? "staff" : "home";
         if (/access_token|error_description/.test(hash) && history.replaceState) history.replaceState(null, "", siteUrl() + location.search);
         modeBar("live"); index(); buildModel(); commit();
-        liveSubscribe(); setInterval(livePoll, 30000);
+        liveSubscribe(); setInterval(livePoll, 30000); liveSettlePending();
         document.addEventListener("visibilitychange", function () { if (!document.hidden) livePoll(true); });
         LIVE.sb.auth.onAuthStateChange(function (ev) { if (ev === "SIGNED_OUT" && state.session) { liveClearMe(); index(); go("home"); } });
         if (fromLink && me()) toast("Email confirmed. Welcome, " + me().name.split(" ")[0] + ".");

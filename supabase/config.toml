@@ -7,6 +7,10 @@ site_url = "https://rendrstudiogh.github.io/RENDR/roomright/"
 [auth.email]
 enable_confirmations = true   # students must verify their email before signing in
 
+# Checks the student's sign in itself (see _shared/http.ts), so it works with the newer Supabase signing keys
+[functions.paystack-init]
+verify_jwt = false
+
 # Paystack calls this with its own signature, not a Supabase login
 [functions.paystack-webhook]
 verify_jwt = false
