@@ -1,7 +1,7 @@
 # RoomRight backend (Supabase + Paystack)
 
-The live site in `roomright/` still runs as a self-contained demo (data stays in the browser).
-This folder is the real backend it will be wired to. It is tested: the migrations, seed and a
+The site in `roomright/` now runs on this backend for students (stage 1, see below). Staff pages and
+payment still use the demo until their stages land. This folder is the backend. It is tested: the migrations, seed and a
 suite of functional, security and two-session race tests run clean on PostgreSQL 16.
 
 ## Live project
@@ -13,6 +13,37 @@ suite of functional, security and two-session race tests run clean on PostgreSQL
 
 `setup.sql` has been run on this project. Secret keys never go in this repository or the website.
 
+## Stage 1: what is live
+
+| Part | Live | Notes |
+| --- | --- | --- |
+| Student sign up | Yes | Supabase Auth. The database trigger checks the ID, age, gender and admission records and its `RR_` code is shown on the right field |
+| Email confirmation | Yes | A link, not a code. Sign in is by email and password |
+| Live bed board | Yes | Read from `bed_state`, updated over Realtime, re-read every 30 seconds if Realtime drops |
+| Apply, choose a bed, reserve | Yes | `submit_application` and `reserve_bed`. The database refuses a bed someone else just took, or a room of the other gender |
+| Release a bed, waiting list, add student ID | Yes | `release_my_reservation`, `join_waitlist`, `leave_waitlist`, `add_student_id` |
+| Notifications | Yes | Read from `notifications`, marked read with `mark_notifications_read` |
+| Payment, invoices, booking token | No | Stage 2 (Paystack). A reserved bed shows its deadline and nothing pretends to take money |
+| Problem reports, upgrades | No | Show "not connected yet" |
+| Manager and administrator pages | No | The staff page links to the demo |
+
+**Demo mode.** Add `?demo=1` to the address for the demo with sample students. If the live system cannot be reached,
+the site opens the demo by itself with a red banner saying nothing there is a real booking.
+
+### Before real students use it
+
+1. **Run `migrations/20261126000100_live_signup.sql`** in the SQL Editor (paste, Run). It makes gender and name required
+   in the sign up trigger and stops the browser calling `check_eligibility` directly. `setup.sql` already includes it for new projects.
+2. **Authentication, URL Configuration.** Set the Site URL to the GitHub Pages address of `roomright/`, and add the same
+   address to Redirect URLs, or the confirmation link will send students to the wrong place.
+3. **Custom SMTP (Authentication, Emails, SMTP settings).** Supabase's built-in email is meant for testing: it is heavily
+   rate limited and may only deliver to your own team's addresses. Check the limits shown on that page. Without your own
+   SMTP (for example Resend, Brevo or Postmark), students will not get their confirmation links.
+4. **Upload the admission records first.** While the `admissions` table is empty every account is marked `unchecked`
+   and accepted, so anyone can sign up with an invented TAGL ID and reserve a bed.
+5. **Do not open applications before stage 2.** A student can reserve but not pay yet, so every reservation would expire
+   after 15 days. Keep `applications_open` set to `false` in `settings` until payment is live.
+
 ## What is here
 
 | Path | What it does |
@@ -20,6 +51,7 @@ suite of functional, security and two-session race tests run clean on PostgreSQL
 | `migrations/..._schema.sql` | Tables: hostels, room types (price + inventory), rooms, beds, admission records, profiles, applications, payments, invoices, upgrades, problem reports, notifications, staff access requests, audit log |
 | `migrations/..._logic.sql` | Every rule: sign up checks (TAGL ID or student ID, date of birth, 18+, admission records), apply, reserve for 15 days, waiting list notices, payment confirmation, upgrades, admin room change, check in, problem reports |
 | `migrations/..._security.sql` | Row level security, function permissions, Realtime bed board, room photo bucket |
+| `migrations/20261126..._live_signup.sql` | Stage 1 hardening of the sign up trigger |
 | `migrations/..._cron.sql` | Releases unpaid reservations and sends waiting list notices every 5 minutes |
 | `seed.sql` | Maria (rooms 1 to 19, 48 beds) and Camille (rooms 20 to 42, 39 beds) with 2026/27 prices |
 | `functions/paystack-init` | Starts a Paystack payment. The amount comes from the database, never the browser |
@@ -77,6 +109,11 @@ suite of functional, security and two-session race tests run clean on PostgreSQL
 | Paystack secret key, Microsoft client secret, sync secret | Supabase secrets only |
 
 ## Known limits to decide on
+
+- **Sign in by TAGL ID or student ID** is demo only. Supabase signs in by email. Looking up the email from an ID in the
+  browser would let anyone find a student's email from their ID, so doing it safely needs a small edge function.
+- **Unconfirmed accounts hold their ID.** Someone who signs up with another student's TAGL ID and never confirms blocks
+  that ID. The housing office can delete the unconfirmed user in Authentication, Users. An automatic clean up is a later step.
 
 - **Waiting list fairness.** Everyone waiting for a room type is told at the same time and the first to reserve wins. If the university wants strict queue order, the next step is holding the freed bed for the first person in the queue for a few hours.
 - **Records removed from the admissions sheet** are not deleted here. Withdrawn admissions need a status column in the sheet.

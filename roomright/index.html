@@ -524,6 +524,9 @@ footer .wrap { display: flex; flex-wrap: wrap; gap: 12px 24px; justify-content: 
 .role[aria-selected="true"] .ico { background: var(--red); color: #FFFFFF; }
 .role b { font-weight: 800; font-size: 1.02rem; }
 .role span { font-size: .86rem; color: var(--muted); }
+.modebar { background: #18181B; color: #FFFFFF; font-size: .86rem; padding: 9px 16px; text-align: center; line-height: 1.45; }
+.modebar.warn { background: #B5121B; }
+.modebar a, .modebar button { color: inherit; font: inherit; font-weight: 700; text-decoration: underline; background: none; border: 0; padding: 0; cursor: pointer; }
 .demo-note { background: var(--canvas); border-radius: var(--r-md); padding: 12px 14px; font-size: .86rem; color: var(--muted); margin: 0; }
 .demo-note code { font-family: inherit; font-weight: 800; color: var(--fg); background: var(--card); padding: 2px 7px; border-radius: 6px; box-shadow: inset 0 0 0 1px var(--line); }
 
@@ -860,6 +863,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
 </head>
 <body>
 
+<div class="modebar" id="modebar" role="status" hidden></div>
 <header class="top">
   <div class="wrap">
     <button class="brand" data-go="home" aria-label="RoomRight home">
@@ -1060,8 +1064,8 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
 
 <footer>
   <div class="wrap">
-    <span><b style="color:var(--fg)">RoomRight</b> for Lancaster University Ghana · Demo build. Rooms, beds and prices follow the 2026/27 hostel documents. Residents and bookings are sample data and no real payment is taken. Not an official university service.</span>
-    <span style="display:flex;gap:16px;flex-wrap:wrap"><button class="linkbtn" data-go="policy">Hostel policy</button><button class="linkbtn" id="staff-link" data-go="staff">Staff login</button><button class="linkbtn" data-action="reset">Reset demo data</button></span>
+    <span id="foot-note"><b style="color:var(--fg)">RoomRight</b> for Lancaster University Ghana · Demo build. Rooms, beds and prices follow the 2026/27 hostel documents. Residents and bookings are sample data and no real payment is taken. Not an official university service.</span>
+    <span style="display:flex;gap:16px;flex-wrap:wrap"><button class="linkbtn" data-go="policy">Hostel policy</button><button class="linkbtn" id="staff-link" data-go="staff">Staff login</button><button class="linkbtn" id="reset-link" data-action="reset">Reset demo data</button><a class="linkbtn" id="mode-link" href="?demo=1" hidden>Try the demo</a></span>
   </div>
 </footer>
 
@@ -1074,6 +1078,8 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<!-- Supabase client for live booking. If it fails to load, the site falls back to the demo. -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.119.0/dist/umd/supabase.js" integrity="sha384-uteMfOloLDGt042uDz+xHGF3ym63/WQ6rFq7murQRG8Ih7QrXGEGNtWd8688sb4O" crossorigin="anonymous"></script>
 <script>
 (function () {
   "use strict";
@@ -1083,6 +1089,12 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   var STORE_KEY = "roomright-lug-v4", MEDIA_KEY = "roomright-lug-media-v1";
   var CODES = { maria: "MARIA-2026", camille: "CAMILLE-2026", admin: "ADMIN-2026" };   // demo access codes
   var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+  // Live backend. The publishable key is meant to be public: row level security protects the data.
+  // window.ROOMRIGHT_BACKEND can override this (used by the test harness). Add ?demo=1 to the address for the demo.
+  var BACKEND = window.ROOMRIGHT_BACKEND || { url: "https://ewvvpliiescxoesijyap.supabase.co", key: "sb_publishable_GfoezSarhuYqoanY2-ShZg_U-w8COeS" };
+  // on: true once the live catalogue loaded. beds: bed id -> { taken, g }. rt: Realtime channel status.
+  var LIVE = { on: false, sb: null, beds: {}, rt: "", polls: 0, busy: false, year: "2026/27" };
 
   var TYPES = [
     { id: "t1",  beds: 1, name: "One in a room", short: "1 in a room", price: 30000 },
@@ -1210,12 +1222,14 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     return s;
   }
   function save() {
+    if (LIVE.on) return;   // live data lives in Supabase, never in the demo store
     var o = {}; for (var k in state) if (k !== "session") o[k] = state[k];
     try { localStorage.setItem(STORE_KEY, JSON.stringify(o)); } catch (e) {}
     try { sessionStorage.setItem(STORE_KEY + "-session", JSON.stringify(state.session)); } catch (e) {}
   }
   // Re-read what other tabs have saved, right before anything that takes a bed
   function refresh() {
+    if (LIVE.on) return;
     try { var s = JSON.parse(localStorage.getItem(STORE_KEY) || "null"); if (valid(s)) { s.session = state.session; state = s; index(); } } catch (e) {}
   }
   // Room photos live in their own storage slot so the main data stays small
@@ -1238,6 +1252,13 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   function holding(a) { return a.status === "reserved" || a.status === "paid" || a.status === "in"; }
   function index() {
     OCC = {};
+    if (LIVE.on) {
+      // Live: the public bed board says which beds are held and by which gender. Only our own booking has details.
+      var mine = myApp();
+      for (var k in LIVE.beds) if (LIVE.beds[k].taken && ROOM[+k.split("-")[0]]) OCC[k] = { id: "", name: "", gender: LIVE.beds[k].g, status: "held" };
+      if (mine && holding(mine) && mine.bed) OCC[mine.bed] = mine;
+      return;
+    }
     state.apps.forEach(function (a) {
       if (holding(a) && a.bed) OCC[a.bed] = a;
       if (a.up && a.up.status === "approved" && a.up.bed) OCC[a.up.bed] = a;   // bed held for an approved upgrade
@@ -1397,7 +1418,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     $("f-types").innerHTML = '<button type="button" class="pill" data-ft="" aria-pressed="' + (ui.ft === "") + '">All<span class="num">' + totalFree(g) + '</span></button>' +
       TYPES.map(function (t) { return '<button type="button" class="pill" data-ft="' + t.id + '" aria-pressed="' + (ui.ft === t.id) + '">' + t.short + '<span class="num">' + countFree(t.id, g) + '</span></button>'; }).join("");
     var t = TYPE[ui.ft], n = t ? countFree(t.id, g) : totalFree(g);
-    $("f-price").textContent = t ? money(t.price) : "From " + money(14000);
+    $("f-price").textContent = t ? money(t.price) : "From " + money(Math.min.apply(null, TYPES.map(function (x) { return x.price; })));
     $("f-sub").textContent = (t ? t.name + " · " : "") + "per bed for 9 months, no extra fees";
     $("f-btn").textContent = app && app.status !== "applied" ? "View my application" : n ? "Apply · " + n + (n === 1 ? " bed free" : " beds free") : "Join the waiting list";
 
@@ -1482,6 +1503,12 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   function kindOpt(v, t, sub) { return '<label class="kind"><input type="radio" name="skind" value="' + v + '"' + (ui.skind === v ? " checked" : "") + '><span><b>' + t + '</b><small>' + sub + '</small></span></label>'; }
   function renderSignin() {
     var h, v = ui.verify && state.profiles[ui.verify];
+    if (LIVE.on && ui.verify) {
+      $("signin-panel").innerHTML = '<div><h3 class="panel-title">Confirm your email</h3><p class="panel-sub">We sent a link to <b>' + esc(ui.verify) + '</b>. Open it to activate your account and you are signed in straight away. You cannot use your account until it is confirmed.</p></div>' +
+        '<ul class="ticks"><li>Check your spam or promotions folder if it is not in your inbox.</li><li>The link works on any device. If you open it on another device, come back here and sign in.</li></ul>' +
+        '<div class="r-actions" style="justify-content:space-between"><button class="linkbtn" type="button" data-action="resend">Send the link again</button><button class="linkbtn" type="button" data-action="auth" data-tab="in">Back to sign in</button></div>';
+      return;
+    }
     if (v && !v.verified) {
       var m = state.mail.filter(function (x) { return x.uid === v.uid; })[0];
       h = '<div><h3 class="panel-title">Verify your email</h3><p class="panel-sub">We sent a 6 digit code to <b>' + esc(v.email) + '</b>. Enter it to activate your account. You cannot use your account until it is verified.</p></div>' +
@@ -1492,9 +1519,10 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     }
     var up = (ui.sauth || (Object.keys(state.profiles).length ? "in" : "up")) === "up", ret = ui.skind === "returning";
     h = '<div class="authtabs" role="tablist" aria-label="Student account"><button role="tab" type="button" data-action="auth" data-tab="in" aria-selected="' + !up + '">Sign in</button><button role="tab" type="button" data-action="auth" data-tab="up" aria-selected="' + up + '">Create an account</button></div>';
-    if (!up) h += '<div><h3 class="panel-title">Welcome back</h3><p class="panel-sub">Sign in with your email, your TAGL ID if you are a new student, or your student ID if you are returning.</p></div>' +
+    if (!up) h += '<div><h3 class="panel-title">Welcome back</h3><p class="panel-sub">' + (LIVE.on ? "Sign in with the email and password you used to create your account." : "Sign in with your email, your TAGL ID if you are a new student, or your student ID if you are returning.") + '</p></div>' +
       '<form id="f-student" novalidate style="display:grid;gap:14px">' +
-      field("s-id", "Email, TAGL ID or student ID", "text", "", "TAGL ID for new students, student ID for returning students", 'autocomplete="username" spellcheck="false" placeholder="you@example.com, TAGL2026001 or 20241234"') +
+      (LIVE.on ? field("s-id", "Email", "email", "", "", 'autocomplete="username" spellcheck="false" placeholder="you@example.com"')
+        : field("s-id", "Email, TAGL ID or student ID", "text", "", "TAGL ID for new students, student ID for returning students", 'autocomplete="username" spellcheck="false" placeholder="you@example.com, TAGL2026001 or 20241234"')) +
       field("s-pw", "Password", "password", "", "", 'autocomplete="current-password"') +
       '<button class="btn block" type="submit">Sign in</button>' +
       '<p class="panel-sub" style="margin:0">No account yet? <button class="linkbtn" type="button" data-action="auth" data-tab="up">Create one</button></p></form>';
@@ -1505,21 +1533,21 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
         kindOpt("returning", "I am a returning student", "Use your student ID. You stayed in a hostel last year.") + '</fieldset>' +
       '<div id="su-new" style="display:grid;gap:14px"' + (ret ? " hidden" : "") + '><div class="grid2">' +
         field("su-tagl", "TAGL ID", "text", "", "From your admission letter", 'autocomplete="off" spellcheck="false" placeholder="TAGL2026001"') +
-        selectField("su-adm", "Admission", [["admitted", "Admitted, waiting for my student ID"], ["pending", "Still waiting for my admission decision"]], "admitted", "If you are not admitted, the hostel fee is refunded") + '</div></div>' +
+        (LIVE.on ? "" : selectField("su-adm", "Admission", [["admitted", "Admitted, waiting for my student ID"], ["pending", "Still waiting for my admission decision"]], "admitted", "If you are not admitted, the hostel fee is refunded")) + '</div></div>' +
       '<div id="su-ret" class="grid2"' + (ret ? "" : " hidden") + '>' +
         field("su-sid", "Student ID", "text", "", "8 digits", 'inputmode="numeric" maxlength="8" placeholder="20241234"') +
         selectField("su-stay", "Hostel last year", [["yes", "I stayed in Maria or Camille"], ["no", "I did not stay in a hostel"], ["two", "I have already stayed two years"]], "yes") + '</div>' +
       '<div class="grid2">' + field("su-name", "Full name", "text", "", "As on your admission letter", 'autocomplete="name"') +
         selectField("su-gender", "I am", [["", "Choose"], ["F", "Female"], ["M", "Male"]], "", "Shared rooms are single gender") + '</div>' +
       '<div class="grid2">' + field("su-dob", "Date of birth", "date", "", "You must be 18 or older to apply", 'autocomplete="bday" max="' + new Date().toISOString().slice(0, 10) + '"') +
-        field("su-email", "Email", "email", "", "We send your verification code here", 'autocomplete="email" placeholder="you@example.com"') + '</div>' +
+        field("su-email", "Email", "email", "", LIVE.on ? "We send a link to confirm your account here" : "We send your verification code here", 'autocomplete="email" placeholder="you@example.com"') + '</div>' +
       '<div class="grid2">' + field("su-prog", "Programme of study", "text", "", "As on your admission letter", 'list="prog-list" autocomplete="off"') +
         selectField("su-year", "Current year of study", [["", "Choose"], ["Foundation", "Foundation"], ["Year 1", "Year 1"], ["Year 2", "Year 2"], ["Year 3", "Year 3"], ["Year 4", "Year 4"]], "") + '</div>' +
       '<datalist id="prog-list">' + programmes().map(function (x) { return '<option value="' + esc(x) + '">'; }).join("") + '</datalist>' +
       field("su-phone", "Phone number", "tel", "", "For WhatsApp updates from Hostel Management", 'inputmode="tel" autocomplete="tel" placeholder="024 123 4567"') +
       '<div class="grid2">' + field("su-pw", "Password", "password", "", "At least 6 characters", 'autocomplete="new-password"') +
         field("su-pw2", "Confirm password", "password", "", "", 'autocomplete="new-password"') + '</div>' +
-      '<p class="demo-note">Demo only. Everything you type stays in this browser. Do not use a real password.</p>' +
+      (LIVE.on ? '<p class="demo-note">We check your details against the Admission Department records, then email you a link to confirm your account.</p>' : '<p class="demo-note">Demo only. Everything you type stays in this browser. Do not use a real password.</p>') +
       '<button class="btn block" type="submit">Create account</button></form>';
     $("signin-panel").innerHTML = h;
   }
@@ -1557,6 +1585,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   }
   function signinStudent() {
     var id = $("s-id").value.trim(), pw = $("s-pw").value, p;
+    if (LIVE.on) { liveSignin(id, pw); return; }
     if (!setErr("s-id", id ? "" : "Enter your email, TAGL ID or student ID.")) return;
     if (id.indexOf("@") > -1) {
       p = findProfile(function (x) { return x.email && x.email === id.toLowerCase(); });
@@ -1598,11 +1627,16 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     ok = setErr("su-phone", /^0\d{9}$/.test(phone) ? "" : "Enter a 10 digit number starting with 0.") && ok;
     ok = setErr("su-pw", pw.length >= 6 ? "" : "Use at least 6 characters.") && ok;
     ok = setErr("su-pw2", $("su-pw2").value === pw ? "" : "The passwords do not match.") && ok;
-    var chk = ok ? checkAdmission(idv, name, dob) : null;
+    var chk = ok && !LIVE.on ? checkAdmission(idv, name, dob) : null;   // live: the database checks the records
     if (chk && chk.status === "missing") ok = setErr(idf, "We cannot find this " + (k === "new" ? "TAGL ID" : "student ID") + " in the admission records. Check it, or contact the Admissions office.");
     if (chk && chk.status === "dob") ok = setErr("su-dob", "Your date of birth does not match the admission records for this ID.");
     if (chk && chk.status === "name") ok = setErr("su-name", "Your name does not match the admission records for this ID.");
     if (!ok) { var bad = $("signin-panel").querySelector('[aria-invalid="true"]'); if (bad) bad.focus(); return; }
+    if (LIVE.on) {
+      liveSignup({ kind: k, full_name: name, gender: gender, dob: dob, programme: prog, year_of_study: year, phone: phone, stayed_last_year: k === "returning" ? stay : undefined,
+        tagl_id: k === "new" ? tagl : undefined, student_id: k === "returning" ? sid : undefined }, email, pw, idf);
+      return;
+    }
     var p = { uid: "U" + pad(state.useq++, 4), kind: k, name: name, gender: gender, phone: phone, email: email, sid: k === "returning" ? sid : "", tagl: k === "new" ? tagl : "",
       dob: dob, programme: prog, year: year, admCheck: chk.status,
       adm: k === "new" ? $("su-adm").value : "admitted", elig: k === "new" ? "fresher" : "returning", pw: hash(pw), ts: Date.now(), verified: false };
@@ -1612,6 +1646,12 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   }
   function addSid() {
     var p = me(), sid = $("as-sid").value.trim();
+    if (LIVE.on) {
+      if (!setErr("as-sid", /^\d{8}$/.test(sid) ? "" : "Student ID must be 8 digits.")) return;
+      liveRun("add_student_id", { p_sid: sid }, $("f-addsid")).then(function () { return liveLoadMe(); }).then(function () { commit(); toast("Student ID added."); })
+        .catch(function (e) { if (!setErr("as-sid", e.code ? e.msg : "")) return; toast(e.msg); });
+      return;
+    }
     var used = findProfile(function (x) { return x.sid === sid && x !== p; }) || state.apps.some(function (a) { return a.sid === sid && a.uid !== p.uid; });
     if (!setErr("as-sid", !/^\d{8}$/.test(sid) ? "Student ID must be 8 digits." : used ? "Another account already uses this student ID." : "")) return;
     p.sid = sid; p.adm = "admitted";
@@ -1621,6 +1661,11 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
 
   /* ---------- Staff: sign in, code requests, administrator reset ---------- */
   function renderStaff() {
+    if (LIVE.on) {
+      $("staff-panel").innerHTML = '<div><h3 class="panel-title">Staff pages are moving to the live system</h3><p class="panel-sub">Student sign up, applications and bed reservations are live. The hostel manager and administrator dashboards connect next. Until then you can explore them with sample data in the demo.</p></div>' +
+        '<a class="btn block" href="?demo=1#staff">Open the staff demo</a>';
+      return;
+    }
     document.querySelectorAll(".role").forEach(function (b) { b.setAttribute("aria-selected", String(b.dataset.role === ui.role)); });
     var h, mode = ui.smode, hopts = [["maria", "Maria"], ["camille", "Camille"]];
     if (ui.role !== "admin") {
@@ -1741,9 +1786,13 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     ok = setErr("ap-second-box", first === second ? "Pick a different room type for your second choice." : "") && ok;
     if (!ok) { var bad = $("sheet").querySelector('[aria-invalid="true"]'); if (bad && bad.focus) bad.focus(); return; }
     if (myApp()) { closeSheet(); go("me"); return; }   // one application per student
+    if (LIVE.on) { liveApply(first, second, g, kin); return; }
     var app = { id: appId(state.seq++), uid: p.uid, sid: p.sid || "", tagl: p.tagl || "", dob: p.dob, programme: p.programme, year: p.year, guardian: g, kin: kin, email: p.email || "", adm: p.adm, name: p.name, gender: p.gender, elig: p.elig, first: first, second: second, type: null, bed: null, status: "applied", ts: Date.now(), invoices: [], token: null };
     state.apps.push(app); logEvent("Application " + app.id + " received from " + app.name + ": " + TYPE[first].short + ", then " + TYPE[second].short); commit();
-    var f1 = countFree(first, p.gender), f2 = countFree(second, p.gender), next;
+    appReceived(app);
+  }
+  function appReceived(app) {
+    var first = app.first, second = app.second, f1 = countFree(first, app.gender), f2 = countFree(second, app.gender), next;
     if (f1) next = '<p style="margin:0">Your first choice, <b>' + TYPE[first].name + '</b>, has ' + f1 + ' free ' + (f1 === 1 ? "bed" : "beds") + '. Choose yours now.</p><div class="actions"><button class="btn block" data-action="choose" data-tid="' + first + '">Choose my bed</button></div>';
     else next = '<p style="margin:0">Your first choice, <b>' + TYPE[first].name + '</b>, is fully booked.' + (f2 ? ' Your second choice, <b>' + TYPE[second].name + '</b>, has ' + f2 + ' free.' : ' Your second choice is full too.') + '</p><div class="actions">' +
       (f2 ? '<button class="btn block" data-action="choose" data-tid="' + second + '">Choose a bed in my second choice</button>' : "") +
@@ -1772,6 +1821,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       (countFree(other, g) ? '<button class="linkbtn" data-action="choose" data-tid="' + other + '" style="justify-self:center">See my other choice: ' + TYPE[other].name + '</button>' : "") + '</div></div>', ".bed.sel");
   }
   function reserve() {
+    if (LIVE.on) { liveReserve(); return; }
     refresh();   // pick up beds other people took a moment ago
     var s = ui.sheet, app = byId(s.id);
     if (!app || app.status !== "applied") { closeSheet(); go("me"); return; }
@@ -1782,6 +1832,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   var METHODS = [["mtn", "MTN MoMo", "Approve on your phone", "MTN", "#E0A800"], ["telecel", "Telecel Cash", "Approve on your phone", "T", "#C8102E"], ["at", "AT Money", "Approve on your phone", "AT", "#1F4AA8"], ["card", "Bank card", "Visa or Mastercard", "CARD", "#121214"]];
   var payForm = { method: "mtn", momo: "" };
   function openPay(app, kind) {
+    if (LIVE.on) { liveHeld(app, kind); return; }
     var up = kind === "upgrade", t = TYPE[up ? app.up.to : app.type], amount = up ? t.price - TYPE[app.type].price : t.price, bed = up ? app.up.bed : app.bed, exp = up ? app.up.exp : app.exp;
     ui.sheet = { kind: "pay", id: app.id, pay: kind };
     showSheet(head(up ? "Pay for your upgrade" : "Pay for your bed", app.id + " · " + t.name) + (up ? "" : stepper(3)) +
@@ -1881,7 +1932,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       var f1 = countFree(app.first, g), f2 = countFree(app.second, g);
       if (app.waitlist) {
         var wf = countFree(app.waitlist, g);
-        next = '<h3>' + (wf ? "A bed just opened up" : "You are number " + waitPos(app) + " on the waiting list") + '</h3><p>' + (wf ? TYPE[app.waitlist].name + " has " + wf + " free now. Reserve it before someone else does." : "We will show a bed here as soon as one opens in " + TYPE[app.waitlist].name + ".") + '</p><div class="row">' +
+        next = '<h3>' + (wf ? "A bed just opened up" : LIVE.on ? "You are on the waiting list" : "You are number " + waitPos(app) + " on the waiting list") + '</h3><p>' + (wf ? TYPE[app.waitlist].name + " has " + wf + " free now. Reserve it before someone else does." : "We will show a bed here as soon as one opens in " + TYPE[app.waitlist].name + ".") + '</p><div class="row">' +
           (wf ? '<button class="btn" data-action="choose" data-tid="' + app.waitlist + '">Choose my bed</button>' : "") + (app.waitlist !== app.second && f2 ? '<button class="btn white" data-action="choose" data-tid="' + app.second + '">Take my second choice instead</button>' : "") + '<button class="linkbtn" data-action="unwait">Leave the waiting list</button></div>';
       } else {
         next = '<h3>' + (app.expired ? "Your reservation ran out" : "Next: choose your bed") + '</h3><p>' + (app.expired ? "You did not pay within " + RESERVE_DAYS + " days, so the bed went back on offer. Your application is still open." : "Your application is in. Pick the exact bed you want.") + '</p><div class="row">' +
@@ -1911,7 +1962,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     el.innerHTML = '<div class="page-head"><p class="kicker">My application</p><h2>' + esc(p.name.split(" ")[0]) + ', here is where you are.</h2></div>' +
       '<div class="me-grid"><div class="stack"><div class="panel"><div class="panel-head"><div><div class="code-lbl">Application number</div><div class="appid">' + app.id + '</div></div><span class="st ' + st + '">' + STATUS[st] + '</span></div>' + track +
       (p.adm === "pending" ? '<p class="note" style="margin:0"><span class="issue">Awaiting admission</span><span>If you are not admitted, the hostel fee is refunded, as the university\'s policy allows.</span></p>' : "") +
-      '<dl class="rows"><div><dt>Student</dt><dd>' + esc(p.name) + ' · ' + esc(idText(p)) + '</dd></div><div><dt>Sign in with</dt><dd>' + esc(p.kind === "new" ? p.email : "Student ID " + p.sid) + '</dd></div><div><dt>First choice</dt><dd>' + TYPE[app.first].name + '</dd></div><div><dt>Second choice</dt><dd>' + TYPE[app.second].name + '</dd></div>' + (app.bed ? '<div><dt>Your bed</dt><dd><b>' + bedName(app.bed, true) + '</b></dd></div>' : "") + '</dl></div>' +
+      '<dl class="rows"><div><dt>Student</dt><dd>' + esc(p.name) + ' · ' + esc(idText(p)) + '</dd></div><div><dt>Sign in with</dt><dd>' + esc(LIVE.on || p.kind === "new" ? p.email : "Student ID " + p.sid) + '</dd></div><div><dt>First choice</dt><dd>' + TYPE[app.first].name + '</dd></div><div><dt>Second choice</dt><dd>' + TYPE[app.second].name + '</dd></div>' + (app.bed ? '<div><dt>Your bed</dt><dd><b>' + bedName(app.bed, true) + '</b></dd></div>' : "") + '</dl></div>' +
       '<div class="next">' + next + '</div></div><div class="stack">' + right + '</div></div>';
   }
   function upgradePanel(app) {
@@ -2277,8 +2328,14 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   }
 
   /* ---------- Waitlist notifications ---------- */
-  function myNotes() { var a = myApp(); return a ? state.notes.filter(function (n) { return n.app === a.id; }) : []; }
-  function markNotesRead() { var ch = false; myNotes().forEach(function (n) { if (!n.read) { n.read = true; ch = true; } }); if (ch) { save(); renderNav(); } }
+  function myNotes() { if (LIVE.on) return me() ? state.notes : []; var a = myApp(); return a ? state.notes.filter(function (n) { return n.app === a.id; }) : []; }
+  function markNotesRead() {
+    if (LIVE.on) {
+      if (!myNotes().some(function (n) { return !n.read; })) return;
+      liveRun("mark_notifications_read", {}).then(function () { state.notes.forEach(function (n) { n.read = true; }); renderNav(); }, function () {});
+      return;
+    }
+    var ch = false; myNotes().forEach(function (n) { if (!n.read) { n.read = true; ch = true; } }); if (ch) { save(); renderNav(); } }
   // Runs after every change: a waiting student hears about a free bed once, and again if beds fill up and free up later
   function notifyWaitlist() {
     state.apps.forEach(function (a) {
@@ -2497,7 +2554,8 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     setTimeout(simulate, 40000 + Math.random() * 30000);
   }
   function tick() {
-    if (!paying && checkExpiry()) { commit(); if (ui.sheet && (ui.sheet.kind === "pay")) { closeSheet(); toast("Time ran out. The bed is back on offer."); } }
+    if (LIVE.on) { var la = myApp(); if (la && la.status === "reserved" && la.exp < Date.now() && !LIVE.expiryAsked) { LIVE.expiryAsked = true; setTimeout(function () { LIVE.expiryAsked = false; livePoll(true); }, 6 * 6e4); } }
+    else if (!paying && checkExpiry()) { commit(); if (ui.sheet && (ui.sheet.kind === "pay")) { closeSheet(); toast("Time ran out. The bed is back on offer."); } }
     var now = Date.now(), els = document.querySelectorAll("[data-exp]");
     for (var i = 0; i < els.length; i++) els[i].textContent = hms(+els[i].getAttribute("data-exp") - now);
   }
@@ -2518,9 +2576,253 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     log.insertBefore(li, log.firstChild); while (log.children.length > 4) log.removeChild(log.lastChild);
   }
 
+  /* ---------- Live backend (Supabase) ---------- */
+  // Every write goes through a database function that re-checks the rules (see supabase/migrations).
+  // The browser never decides who gets a bed: it asks, and shows what the database answered.
+  var LIVE_LATER = { "report-new": 1, "report": 1, "up-request": 1, "up-cancel": 1, "up-pay": 1, "invoice": 1, "pdf": 1, "reset": 1, "verify-link": 1 };
+  var NET_MSG = "We could not reach RoomRight. Check your connection and try again.";
+  // Database rules fail with "RR_CODE: message". Turn any error into { code, msg } for the screen.
+  function liveErr(e) {
+    var raw = String((e && (e.message || e.msg || e.error_description)) || ""), m = /(RR_[A-Z_]+):\s*(.*)$/.exec(raw);
+    if (m) return { code: m[1], msg: m[2] };
+    if (!raw || /fetch|network|load failed|timeout/i.test(raw)) return { code: "", msg: NET_MSG };
+    return { code: "", msg: raw, raw: true };
+  }
+  function timeout(p, ms) { return Promise.race([p, new Promise(function (_, no) { setTimeout(function () { no(new Error("timeout")); }, ms); })]); }
+  function q(p) { return timeout(Promise.resolve(p), 15000).then(function (r) { if (r.error) throw r.error; return r.data; }); }
+  function liveCall(fn, args) { return q(LIVE.sb.rpc(fn, args || {})).catch(function (e) { throw liveErr(e); }); }
+  // Runs a database function with the submit button disabled, so a double tap cannot send it twice
+  function liveRun(fn, args, form) {
+    if (LIVE.busy) return new Promise(function () {});   // a second tap while the first is on its way does nothing
+    LIVE.busy = true;
+    var btn = form && (form.tagName === "BUTTON" ? form : form.querySelector('[type="submit"]')), label = btn && btn.textContent;
+    if (btn) { btn.disabled = true; btn.textContent = "Please wait…"; }
+    return liveCall(fn, args).then(function (v) { LIVE.busy = false; if (btn) { btn.disabled = false; btn.textContent = label; } return v; },
+      function (e) { LIVE.busy = false; if (btn) { btn.disabled = false; btn.textContent = label; } throw e; });
+  }
+  function liveState() {
+    return { apps: [], log: [], inv: 1, seq: 1, session: null, profiles: {}, useq: 1, reports: [], rseq: 1, codes: { maria: "", camille: "", admin: "" }, adminEmail: "", codeReqs: [], cseq: 1, mail: [], notes: [],
+      admissions: {}, admImport: null, inventory: defaultInventory(), places: { maria: { lat: "", lng: "", desc: "On the Lancaster University Ghana campus" }, camille: { lat: "", lng: "", desc: "On the Lancaster University Ghana campus" }, buildings: [] } };
+  }
+  // Rooms, prices and what is in each room come from the database, so the housing office can change them without a code release
+  function liveLoadCatalogue(s) {
+    var sb = LIVE.sb;
+    return Promise.all([q(sb.from("room_types").select("id,name,price_ghs,premium,inventory")), q(sb.from("rooms").select("room_no,hostel_id,type_id")),
+      q(sb.from("settings").select("key,value")), q(sb.from("hostels").select("id,description,lat,lng")), q(sb.from("lecture_buildings").select("name,lat,lng"))
+    ]).then(function (r) {
+      r[0].forEach(function (t) { var T = TYPE[t.id]; if (!T) return; T.price = +t.price_ghs; T.name = t.name; T.premium = !!t.premium;
+        if (Array.isArray(t.inventory) && t.inventory.length) s.inventory[t.id] = t.inventory.map(function (x) { return [x.item, +x.qty || 1]; }); });
+      r[1].forEach(function (x) { var R = ROOM[x.room_no], to = TYPE[x.type_id];
+        if (!R || !to) { if (window.console) console.warn("RoomRight: room " + x.room_no + " is in the database but not on the floor plan"); return; }
+        if (R.type !== x.type_id) { TYPE[R.type].total -= R.beds; TYPE[R.type].rooms--; R.type = x.type_id; to.total += R.beds; to.rooms++; } });
+      r[2].forEach(function (x) { if (x.key === "reserve_days" && +x.value > 0) { RESERVE_DAYS = +x.value; RESERVE_HOURS = RESERVE_DAYS * 24; } if (x.key === "academic_year" && x.value) LIVE.year = String(x.value); });
+      r[3].forEach(function (h) { if (s.places[h.id]) s.places[h.id] = { lat: h.lat == null ? "" : h.lat, lng: h.lng == null ? "" : h.lng, desc: h.description || s.places[h.id].desc }; });
+      s.places.buildings = r[4].map(function (b) { return { name: b.name, lat: b.lat, lng: b.lng }; });
+    });
+  }
+  function liveLoadBeds() {
+    return q(LIVE.sb.from("bed_state").select("bed_id,taken,holder_gender")).then(function (rows) {
+      var b = {}; rows.forEach(function (r) { b[r.bed_id] = { taken: !!r.taken, g: r.holder_gender }; }); LIVE.beds = b;
+    });
+  }
+  function liveProfile(r) {
+    return { uid: r.id, role: r.role, kind: r.kind, name: r.full_name, gender: r.gender, phone: r.phone || "", email: r.email || "", sid: r.student_id || "", tagl: r.tagl_id || "",
+      dob: r.dob, programme: r.programme || "", year: r.year_of_study || "", admCheck: r.adm_check, adm: "admitted", elig: r.kind === "new" ? "fresher" : "returning", verified: true };
+  }
+  function liveApp(r, p) {
+    var st = r.status === "checked_in" ? "in" : r.status;
+    return { id: r.id, uid: r.student, sid: p.sid, tagl: p.tagl, name: p.name, gender: p.gender, email: p.email, dob: p.dob, programme: p.programme, year: p.year,
+      first: r.first_choice, second: r.second_choice, type: r.type_id, bed: r.bed_id, status: st, ts: Date.parse(r.created_at),
+      exp: r.reserved_until ? Date.parse(r.reserved_until) : null, waitlist: r.waitlist_type || undefined, expired: st === "applied" && !!r.expired_at,
+      termsAt: r.terms_accepted_at ? Date.parse(r.terms_accepted_at) : null, invoices: [], token: r.token || null };
+  }
+  // Loads the signed-in student's profile, this year's application and notifications. Resolves with the profile, or null.
+  function liveLoadMe() {
+    var sb = LIVE.sb;
+    return q(sb.auth.getSession()).then(function (d) {
+      var u = d && d.session && d.session.user; if (!u) { liveClearMe(); return null; }
+      return Promise.all([q(sb.from("profiles").select("id,role,kind,full_name,gender,email,phone,tagl_id,student_id,dob,programme,year_of_study,adm_check").eq("id", u.id).maybeSingle()),
+        q(sb.from("applications").select("*").eq("student", u.id).eq("academic_year", LIVE.year).neq("status", "cancelled").order("created_at", { ascending: false }).limit(1)),
+        q(sb.from("notifications").select("id,title,body,read_at,created_at").eq("user_id", u.id).order("created_at", { ascending: false }).limit(20))
+      ]).then(function (r) {
+        if (!r[0] || r[0].role !== "student") { liveClearMe(); return r[0] ? liveProfile(r[0]) : null; }
+        var p = liveProfile(r[0]); state.profiles = {}; state.profiles[p.uid] = p; state.session = { role: "student", uid: p.uid };
+        state.apps = r[1].map(function (a) { return liveApp(a, p); });
+        state.notes = r[2].map(function (n) { return { id: n.id, ts: Date.parse(n.created_at), read: !!n.read_at, title: n.title, text: n.body }; });
+        return p;
+      });
+    });
+  }
+  function liveClearMe() { state.session = null; state.profiles = {}; state.apps = []; state.notes = []; }
+  function siteUrl() { return location.origin + location.pathname; }
+
+  // Sign up: the database trigger checks the ID, age and admission records and refuses the account if they fail
+  var SIGNUP_ERR = {
+    RR_SIGNUP_UNDER_AGE: ["su-dob", "You must be 18 or older to apply for hostel accommodation."],
+    RR_SIGNUP_BAD_ID: ["", "Check the ID. A TAGL ID is letters and numbers, a student ID is 8 digits."],
+    RR_SIGNUP_MISMATCH: ["", "These details do not match the admission records. Check your ID, full name and date of birth, or contact the Admissions office."],
+    RR_SIGNUP_TAKEN: ["", "An account already uses this ID. Sign in instead, or contact Hostel Management if it is not yours."],
+    RR_NOT_ELIGIBLE: ["su-stay", "Hostel places are for freshers and students who stayed in a hostel last year. Contact Hostel Management if you have a medical exception or are a hostel representative."],
+    RR_SIGNUP_GENDER: ["su-gender", "Choose female or male."],
+    RR_SIGNUP_NAME: ["su-name", "Enter your full name."]
+  };
+  function liveSignup(meta, email, pw, idf) {
+    if (LIVE.busy) return;
+    var form = $("f-signup"), btn = form && form.querySelector('[type="submit"]');
+    LIVE.busy = true; if (btn) { btn.disabled = true; btn.textContent = "Creating your account…"; }
+    var done = function () { LIVE.busy = false; if (btn) { btn.disabled = false; btn.textContent = "Create account"; } };
+    var data = {}; for (var k in meta) if (meta[k] !== undefined) data[k] = meta[k];
+    timeout(LIVE.sb.auth.signUp({ email: email, password: pw, options: { emailRedirectTo: siteUrl(), data: data } }), 20000).then(function (r) {
+      done();
+      if (r.error) throw r.error;
+      var u = r.data && r.data.user;
+      // With email confirmation on, Supabase answers an already used email with a user that has no identities
+      if (u && Array.isArray(u.identities) && !u.identities.length) { setErr("su-email", "An account already uses this email. Sign in instead."); $("su-email").focus(); return; }
+      if (r.data.session) { liveAfterAuth(true); return; }   // email confirmation is switched off in Supabase
+      ui.verify = email; renderSignin(); window.scrollTo(0, 0); toast("Account created. Check your email for the link.");
+    }).catch(function (e) {
+      done();
+      var x = liveErr(e), m = SIGNUP_ERR[x.code], st = e && e.status, raw = String(e && e.message || "");
+      if (m) { var f = m[0] || idf; setErr(f, m[1]); if ($(f)) $(f).focus(); return; }
+      if (/already registered|already exists/i.test(raw)) { setErr("su-email", "An account already uses this email. Sign in instead."); return; }
+      if (/password/i.test(raw) && st === 422) { setErr("su-pw", raw); return; }
+      if (st === 429 || /rate limit/i.test(raw)) { toast("Too many sign ups right now. Wait a few minutes and try again."); return; }
+      if (/email/i.test(raw) && st >= 400 && st < 500) { setErr("su-email", raw); return; }
+      toast(x.raw ? "We could not create your account. Try again in a moment." : x.msg);
+    });
+  }
+  function liveSignin(email, pw) {
+    if (!setErr("s-id", /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email) ? "" : "Enter the email you signed up with.")) return;
+    if (!setErr("s-pw", pw ? "" : "Enter your password.")) return;
+    if (LIVE.busy) return;
+    var btn = $("f-student").querySelector('[type="submit"]'); LIVE.busy = true; btn.disabled = true; btn.textContent = "Signing in…";
+    var done = function () { LIVE.busy = false; btn.disabled = false; btn.textContent = "Sign in"; };
+    timeout(LIVE.sb.auth.signInWithPassword({ email: email.toLowerCase(), password: pw }), 20000).then(function (r) {
+      if (r.error) throw r.error;
+      return liveAfterAuth(false).then(done);
+    }).catch(function (e) {
+      done();
+      var raw = String(e && e.message || "");
+      if (/not confirmed/i.test(raw)) { ui.verify = email.toLowerCase(); renderSignin(); toast("Confirm your email first. You can send the link again."); return; }
+      if (/invalid login|invalid credentials/i.test(raw)) { setErr("s-pw", "That email and password do not match."); return; }
+      toast(liveErr(e).msg);
+    });
+  }
+  function liveAfterAuth(isNew) {
+    return liveLoadMe().then(function (p) {
+      if (!p) { LIVE.sb.auth.signOut(); toast("This account has no student profile. Contact Hostel Management."); return; }
+      if (p.role !== "student") { LIVE.sb.auth.signOut(); liveClearMe(); go("staff"); toast("Staff accounts use the staff pages."); return; }
+      index(); startStudent(p, isNew);
+    });
+  }
+  function liveResend() {
+    if (!ui.verify) return;
+    timeout(LIVE.sb.auth.resend({ type: "signup", email: ui.verify, options: { emailRedirectTo: siteUrl() } }), 20000).then(function (r) {
+      if (r.error) throw r.error; toast("A new link is on its way to " + ui.verify + ".");
+    }).catch(function (e) { var raw = String(e && e.message || ""); toast(e && e.status === 429 || /rate limit|seconds/i.test(raw) ? "Wait a minute before asking for another link." : liveErr(e).msg); });
+  }
+  function liveSignout() {
+    var done = function () { liveClearMe(); ui.verify = null; if (!$("overlay").hidden) closeSheet(); index(); go("home"); toast("Signed out."); };
+    timeout(LIVE.sb.auth.signOut(), 8000).then(done, done);
+  }
+  // Re-read bookings and the bed board after any change, so the screen shows what the database holds
+  function liveReload() { return Promise.all([liveLoadMe(), liveLoadBeds()]).then(function () { commit(); }); }
+
+  var APPLY_ERR = { RR_GUARDIAN: "ag-name", RR_KIN: "ak-name" };
+  function liveApply(first, second, g, kin) {
+    liveRun("submit_application", { p_first: first, p_second: second, p_guardian: { name: g.name, phone: g.phone, email: g.email }, p_kin: { name: kin.name, phone: kin.phone, relationship: kin.rel } }, $("f-apply"))
+      .then(function () { return liveReload(); })
+      .then(function () { var a = myApp(); if (a) appReceived(a); else { closeSheet(); go("me"); } })
+      .catch(function (e) {
+        if (e.code === "RR_ALREADY_APPLIED") { liveReload().then(function () { closeSheet(); go("me"); toast(e.msg); }); return; }
+        if (APPLY_ERR[e.code]) { setErr(APPLY_ERR[e.code], e.msg); $(APPLY_ERR[e.code]).focus(); return; }
+        if (/^RR_(RECORDS|UNDER_AGE|CLOSED|NOT_STUDENT)$/.test(e.code)) { showSheet(head("Hostel application", "We could not take your application") + '<div class="sheet-body"><div class="result bad"><h3>Application not sent</h3><p>' + esc(e.msg) + '</p></div></div>'); return; }
+        toast(e.msg);
+      });
+  }
+  function liveReserve() {
+    var s = ui.sheet, app = myApp();
+    if (!app || app.status !== "applied") { closeSheet(); go("me"); return; }
+    if (!canTake(s.sel, app.gender, app)) { toast("That bed was just taken. Pick another one."); openChooser(app, s.tid); return; }
+    LIVE.reserving = true;
+    liveRun("reserve_bed", { p_bed: s.sel }, $("sheet").querySelector('[data-action="reserve"]'))
+      .then(function () { return liveReload(); })
+      .then(function () { LIVE.reserving = false; var a = myApp(); flashWindow(s.sel); if (a && a.status === "reserved") openPay(a, "booking"); else { closeSheet(); go("me"); } })
+      .catch(function (e) {
+        liveReload().catch(function () {}).then(function () {
+          LIVE.reserving = false; var a = myApp();
+          if (e.code === "RR_BED_TAKEN" || e.code === "RR_NOT_YOUR_CHOICE" || e.code === "RR_NO_SUCH_BED") { toast(e.msg); openChooser(a, s.tid); return; }
+          if (e.code === "RR_HAS_BED") { closeSheet(); go("me"); toast(e.msg); return; }
+          toast(e.msg);
+        });
+      });
+  }
+  // Payment is the next stage. Until then a reserved bed shows how long it is held, and nothing pretends to take money.
+  function liveHeld(app, kind) {
+    if (kind !== "booking" || !app || app.status !== "reserved") { closeSheet(); go("me"); return; }
+    var t = TYPE[app.type]; ui.sheet = { kind: "held", id: app.id };
+    showSheet(head("Your bed is reserved", app.id + " · " + t.name) + stepper(3) +
+      '<div class="sheet-body"><div class="holdbox"><div><small>Reserved for you</small><div class="bedname">' + bedName(app.bed, true) + '</div></div><div style="text-align:right"><small>Time left to pay</small><div class="timer num" data-exp="' + app.exp + '">' + hms(app.exp - Date.now()) + '</div></div></div>' +
+      '<dl class="rows"><div><dt>Hostel fee, ' + t.name + ', 9 months</dt><dd>' + money(t.price) + '</dd></div><div><dt>Held until</dt><dd>' + dateStr(app.exp) + ', ' + timeStr(app.exp) + '</dd></div></dl>' +
+      '<p class="note"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M12 8v4l3 2"/><circle cx="12" cy="12" r="9"/></svg><span>Online payment with Paystack opens soon. Nobody else can take this bed while it is reserved for you. We will tell you under My application and by email when you can pay.</span></p>' +
+      '<div class="actions"><button class="btn block dark" data-action="close">Go to my application</button></div></div>', ".btn.dark");
+  }
+  // Release, join or leave the waiting list
+  function liveAction(fn, args, okMsg, close) {
+    liveRun(fn, args).then(function () { return liveReload(); }).then(function () { if (close) { closeSheet(); go("me"); } toast(okMsg); })
+      .catch(function (e) { liveReload().then(function () { toast(e.msg); }); });
+  }
+  // Someone booked or freed a bed: update the screen without wiping a form the student is typing in
+  function liveBedsChanged(keys) {
+    var before = totalFree(), mine = myApp();
+    index(); renderNav(); renderHome(); if (ui.view === "me") renderMe();
+    if (LIVE.busy || LIVE.reserving) return;   // our own request is on its way; its answer redraws the sheet
+    (keys || []).forEach(function (k) { if (OCC[k] && !(mine && mine.bed === k)) flashWindow(k); });
+    var sh = ui.sheet;
+    if (sh && sh.kind === "choose") {
+      var a = myApp();
+      if (a && (keys || []).indexOf(sh.sel) > -1 && !canTake(sh.sel, a.gender, a)) { toast("Someone just booked the bed you picked. Choose another one."); openChooser(a, sh.tid, sh.sel); }
+      else if (a) openChooser(a, sh.tid, sh.sel);
+      return;
+    }
+    var after = totalFree(), ownBed = mine && (keys || []).indexOf(mine.bed) > -1;
+    if (after < before && !ownBed && $("overlay").hidden) toast("A bed was just booked. " + after + " beds are free now.");
+  }
+  function liveSubscribe() {
+    LIVE.sb.channel("bed-board").on("postgres_changes", { event: "*", schema: "public", table: "bed_state" }, function (pl) {
+      var r = pl.new; if (!r || !r.bed_id) return;
+      var was = LIVE.beds[r.bed_id]; LIVE.beds[r.bed_id] = { taken: !!r.taken, g: r.holder_gender };
+      if (!was || was.taken !== !!r.taken || was.g !== r.holder_gender) liveBedsChanged([r.bed_id]);
+    }).subscribe(function (st) { LIVE.rt = st; });
+  }
+  // Backup for Realtime: re-read the board every 30 seconds while Realtime is down, every 2 minutes while it is up
+  function livePoll(force) {
+    LIVE.polls++;
+    if (!force && (document.hidden || (LIVE.rt === "SUBSCRIBED" && LIVE.polls % 4))) return;
+    var before = JSON.stringify(LIVE.beds), app0 = JSON.stringify(myApp()), n0 = state.notes.length;
+    Promise.all([liveLoadBeds(), state.session ? liveLoadMe() : null]).then(function () {
+      var changed = []; var now = LIVE.beds, was = JSON.parse(before);
+      for (var k in now) if (!was[k] || was[k].taken !== now[k].taken || was[k].g !== now[k].g) changed.push(k);
+      if (changed.length) liveBedsChanged(changed);
+      else if (JSON.stringify(myApp()) !== app0 || state.notes.length !== n0) { index(); renderNav(); if (ui.view === "me") renderMe(); }
+    }, function () {});
+  }
+  function modeBar(mode) {
+    var bar = $("modebar"), live = mode === "live";
+    $("reset-link").hidden = live; $("mode-link").hidden = !live;
+    if (live) {
+      bar.hidden = true;
+      $("foot-note").innerHTML = '<b style="color:var(--fg)">RoomRight</b> for Lancaster University Ghana · Live booking for the 2026/27 academic year. Rooms, beds and prices come from the hostel records. Not an official university service.';
+      return;
+    }
+    bar.hidden = false; bar.className = "modebar" + (mode === "down" ? " warn" : "");
+    bar.innerHTML = mode === "down" ? "Live booking cannot be reached right now, so this is the <b>demo</b>. Nothing you do here is a real booking. <button type=\"button\" data-action=\"golive\">Try live booking again</button>"
+      : "You are in the <b>demo</b>, with sample students. Nothing you do here is a real booking. <a href=\"" + esc(location.pathname) + "\">Go to live booking</a>";
+  }
+
   /* ---------- Rendering and routing ---------- */
   function renderAll() { renderNav(); renderHome(); if (ui.view === "signin") renderSignin(); if (ui.view === "staff") renderStaff(); renderMe(); renderManager(); renderAdmin(); }
-  function commit() { index(); notifyWaitlist(); save(); renderAll(); }
+  function commit() { index(); if (!LIVE.on) notifyWaitlist(); save(); renderAll(); }
   function go(view) {
     var s = state.session, need = { me: "student", manager: "manager", admin: "admin" }[view];
     if (need && (!s || s.role !== need)) { if (need !== "student") ui.role = need; view = need === "student" ? "signin" : "staff"; }
@@ -2545,9 +2847,12 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     if (d.go) { if (!$("overlay").hidden) closeSheet(); if (d.role) ui.role = d.role; go(d.go); return; }
     if (d.fg !== undefined) { ui.fg = d.fg; renderHome(); return; }
     if (d.ft !== undefined) { ui.ft = d.ft; renderHome(); return; }
+    if (LIVE.on && LIVE_LATER[d.action]) { toast("This is not connected to the live system yet. It comes with online payment."); return; }
     switch (d.action) {
       case "close": closeSheet(); break;
-      case "signout": var wasStaff = state.session && state.session.role !== "student"; state.session = null; if (!$("overlay").hidden) closeSheet(); go(wasStaff ? "staff" : "home"); toast("Signed out."); break;
+      case "golive": location.href = location.pathname; break;
+      case "signout": if (LIVE.on) { liveSignout(); break; }
+        var wasStaff = state.session && state.session.role !== "student"; state.session = null; if (!$("overlay").hidden) closeSheet(); go(wasStaff ? "staff" : "home"); toast("Signed out."); break;
       case "reset": state = freshState(); if (!$("overlay").hidden) closeSheet(); ui.view = "home"; index(); buildModel(); commit(); toast("Demo data reset."); break;
       case "apply": if (!$("overlay").hidden) closeSheet(); apply(d.tid); break;
       case "rooms": openRooms(d.hid, +d.floor || 0); break;
@@ -2555,9 +2860,12 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       case "sel": openChooser(byId(ui.sheet.id), ui.sheet.tid, d.key); break;
       case "reserve": reserve(); break;
       case "pay": openPay(app, "booking"); break;
-      case "release": releaseBed(app, "released by the student"); commit(); toast("Bed released. Your application stays open."); break;
-      case "wait": app.waitlist = d.tid; logEvent(app.id + " joined the waiting list for " + TYPE[d.tid].short, "info"); closeSheet(); go("me"); toast("You are on the waiting list for " + TYPE[d.tid].name + "."); break;
-      case "unwait": delete app.waitlist; commit(); break;
+      case "release": if (LIVE.on) { liveAction("release_my_reservation", {}, "Bed released. Your application stays open."); break; }
+        releaseBed(app, "released by the student"); commit(); toast("Bed released. Your application stays open."); break;
+      case "wait": if (LIVE.on) { liveAction("join_waitlist", { p_type: d.tid }, "You are on the waiting list for " + TYPE[d.tid].name + ". We will tell you here and by email when a bed opens.", true); break; }
+        app.waitlist = d.tid; logEvent(app.id + " joined the waiting list for " + TYPE[d.tid].short, "info"); closeSheet(); go("me"); toast("You are on the waiting list for " + TYPE[d.tid].name + "."); break;
+      case "unwait": if (LIVE.on) { liveAction("leave_waitlist", {}, "You left the waiting list."); break; }
+        delete app.waitlist; commit(); break;
       case "invoice": var inv = app.invoices.filter(function (i) { return i.no === d.inv; })[0]; showSheet(head("Invoice " + inv.no, "Paid " + dateStr(inv.ts)) + '<div class="sheet-body">' + invoiceHTML(app, inv) + '</div>'); break;
       case "copy-inv": var a2 = byId(d.id); copyText(invoiceText(a2, a2.invoices.filter(function (i) { return i.no === d.inv; })[0])); break;
       case "up-request": app.up = { to: d.tid, status: "pending", ts: Date.now() }; logEvent(app.id + " asked to upgrade from " + TYPE[app.type].short + " to " + TYPE[d.tid].short, "info"); commit(); toast("Upgrade request sent to the housing office."); break;
@@ -2582,7 +2890,8 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
       case "recheck": recheckProfiles(); break;
       case "photo-del": (media.photos[d.tid] || []).splice(+d.i, 1); saveMedia(); renderAdmin(); break;
       case "bld-del": state.places.buildings.splice(+d.i, 1); commit(); break;
-      case "resend": var pv = state.profiles[ui.verify]; if (pv) { sendVerify(pv); save(); renderSignin(); toast("New code sent to " + pv.email + "."); } break;
+      case "resend": if (LIVE.on) { liveResend(); break; }
+        var pv = state.profiles[ui.verify]; if (pv) { sendVerify(pv); save(); renderSignin(); toast("New code sent to " + pv.email + "."); } break;
       case "verify-link": verifyAccount(d.uid, d.c); break;
       case "smode": ui.smode = d.m || null; ui.resetSent = null; renderStaff(); break;
       case "reset-link": if (state.resetTok && state.resetTok.tok === d.tok && Date.now() < state.resetTok.exp) { ui.smode = "reset"; renderStaff(); } else toast("That link has expired. Ask for a new one."); break;
@@ -2622,6 +2931,7 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
     else if (id === "f-code") saveCode();
     else if (id === "f-amove") adminMove();
     else if (id === "f-addsid") addSid();
+    else if (LIVE.on && (id === "f-report" || id === "f-reply" || id === "f-pay")) toast("This is not connected to the live system yet.");
     else if (id === "f-report") submitReport();
     else if (id === "f-reply") submitReply();
   });
@@ -2650,14 +2960,45 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   $("overlay").addEventListener("click", function (e) { if (e.target === this && !paying) closeSheet(); });
 
   /* ---------- Boot ---------- */
-  state = load();
-  if (state.session && state.session.role === "student" && !(state.profiles[state.session.uid] && state.profiles[state.session.uid].verified)) state.session = null;
-  index();
-  if (checkExpiry()) index();
-  var s0 = state.session; ui.view = !s0 ? (location.hash === "#staff" ? "staff" : "home") : s0.role === "student" ? "home" : s0.role;
+  // Live booking when Supabase answers. The demo when the address has ?demo=1, or when the live system cannot be reached.
+  var booted = false;
+  function bootDemo(why) {
+    if (booted) return; booted = true;
+    LIVE.on = false;
+    state = load();
+    if (state.session && state.session.role === "student" && !(state.profiles[state.session.uid] && state.profiles[state.session.uid].verified)) state.session = null;
+    index();
+    if (checkExpiry()) index();
+    var s0 = state.session; ui.view = !s0 ? (location.hash === "#staff" ? "staff" : "home") : s0.role === "student" ? "home" : s0.role;
+    modeBar(why); buildModel(); commit();
+    setTimeout(simulate, 30000);
+  }
+  function bootLive() {
+    var hash = location.hash, fromLink = /type=(signup|email)/.test(hash), linkErr = /error_description=([^&]+)/.exec(hash);
+    LIVE.sb = window.supabase.createClient(BACKEND.url, BACKEND.key, { auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true } });
+    var s = liveState(), ctl = window.AbortController ? new AbortController() : null, t = setTimeout(function () { if (ctl) ctl.abort(); }, 5000);
+    // One quick check first: the client library retries failed reads with backoff, which would leave the page blank for several seconds
+    var probe = fetch(BACKEND.url + "/rest/v1/settings?select=key&limit=1", { headers: { apikey: BACKEND.key }, signal: ctl ? ctl.signal : undefined })
+      .then(function (r) { clearTimeout(t); if (!r.ok) throw new Error("Live booking answered HTTP " + r.status); });
+    return timeout(probe, 6000).then(function () { return timeout(Promise.all([liveLoadCatalogue(s), liveLoadBeds()]), 12000); }).then(function () {
+      if (booted) return; booted = true;
+      LIVE.on = true; state = s;
+      return liveLoadMe().catch(function () { return null; }).then(function (p) {
+        if (p && p.role !== "student") { LIVE.sb.auth.signOut(); liveClearMe(); }
+        ui.view = state.session ? (fromLink ? "me" : "home") : location.hash === "#staff" ? "staff" : "home";
+        if (/access_token|error_description/.test(hash) && history.replaceState) history.replaceState(null, "", siteUrl() + location.search);
+        modeBar("live"); index(); buildModel(); commit();
+        liveSubscribe(); setInterval(livePoll, 30000);
+        document.addEventListener("visibilitychange", function () { if (!document.hidden) livePoll(true); });
+        LIVE.sb.auth.onAuthStateChange(function (ev) { if (ev === "SIGNED_OUT" && state.session) { liveClearMe(); index(); go("home"); } });
+        if (fromLink && me()) toast("Email confirmed. Welcome, " + me().name.split(" ")[0] + ".");
+        else if (linkErr) { go("signin"); toast(decodeURIComponent(linkErr[1].replace(/\+/g, " ")) + ". Sign in to get a new link."); }
+      });
+    });
+  }
   // Another tab (another student) booked or freed a bed: update this tab straight away
   window.addEventListener("storage", function (e) {
-    if (e.key !== STORE_KEY || paying) return;
+    if (LIVE.on || e.key !== STORE_KEY || paying) return;
     var before = totalFree(); refresh(); renderAll(); if (ui.view === "home") paintWindows();
     var sh = ui.sheet;
     if (sh && sh.kind === "choose") { var ca = byId(sh.id); if (ca && !canTake(sh.sel, ca.gender, ca)) toast("Someone just booked the bed you picked. Choose another one."); openChooser(ca, sh.tid, sh.sel); }
@@ -2665,9 +3006,11 @@ input[type="file"] { font-size: .88rem; max-width: 100%; }
   });
   $("policy-body").innerHTML = POLICY_HTML;
   window.addEventListener("hashchange", function () { if (location.hash === "#staff" && !state.session) go("staff"); });
-  buildModel(); commit();
+  state = liveState();   // empty until a boot below fills it, so early clicks and timers have something safe to read
   setInterval(tick, 1000);
-  setTimeout(simulate, 30000);
+  if (/[?&]demo=1(&|$)/.test(location.search)) bootDemo("chosen");
+  else if (!BACKEND.url || !window.supabase || !window.supabase.createClient) bootDemo("down");
+  else bootLive().catch(function (e) { if (window.console) console.warn("RoomRight: live booking unavailable, using the demo", e); bootDemo("down"); });
 })();
 </script>
 </body>
