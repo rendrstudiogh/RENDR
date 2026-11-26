@@ -4,6 +4,15 @@ The live site in `roomright/` still runs as a self-contained demo (data stays in
 This folder is the real backend it will be wired to. It is tested: the migrations, seed and a
 suite of functional, security and two-session race tests run clean on PostgreSQL 16.
 
+## Live project
+
+| | |
+| --- | --- |
+| Project URL | `https://ewvvpliiescxoesijyap.supabase.co` |
+| Publishable key (public, goes in the website) | `sb_publishable_GfoezSarhuYqoanY2-ShZg_U-w8COeS` |
+
+`setup.sql` has been run on this project. Secret keys never go in this repository or the website.
+
 ## What is here
 
 | Path | What it does |
